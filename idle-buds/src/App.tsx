@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { BrowserRouter } from 'react-router-dom'
 import './App.css'
 
 import { DrawerLayout } from './components/Layout/Drawer'
@@ -6,16 +6,12 @@ import { Sidebar } from './components/Sidebar'
 import { GameContent } from './components/GameContent'
 
 function App() {
-  const [] = useState(0)
-
   return (
-    <>
-      <DrawerLayout 
-      sideContent={<Sidebar />}
-    >
-      <GameContent />
-    </DrawerLayout>
-    </>
+    <BrowserRouter>
+      <DrawerLayout sideContent={<Sidebar />}>
+        <GameContent />
+      </DrawerLayout>
+    </BrowserRouter>
   )
 }
 
