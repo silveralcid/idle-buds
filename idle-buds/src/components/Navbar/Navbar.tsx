@@ -36,7 +36,7 @@ export const Navbar = ({ drawerTitle, onMenuClick }: NavbarProps) => {
                                 </svg>
                             </label>
                         </div>
-                        <NavbarLocationIndicator pageTitle='Woodcutting' />
+                        <NavbarLocationIndicator />
                     </div>
 
                     {/* Right Column */}

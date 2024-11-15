@@ -1,7 +1,8 @@
+import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { ROUTES, ROUTE_ICONS, ROUTE_TITLES } from '../constants/routeMappings';
 
-// Define themes array
 const THEMES = [
   "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave",
   "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua",
@@ -11,6 +12,31 @@ const THEMES = [
 ] as const;
 
 type Theme = typeof THEMES[number];
+
+interface MenuItemProps {
+  route: string;
+  onClick: () => void;
+}
+
+const MenuItem: FC<MenuItemProps> = ({ route, onClick }) => {
+  const iconPath = ROUTE_ICONS[route];
+  const title = ROUTE_TITLES[route];
+
+  return (
+    <li>
+      <a onClick={onClick} className="flex items-center gap-2">
+        {iconPath && (
+          <img 
+            src={iconPath} 
+            alt={title} 
+            className="w-5 h-5"
+          />
+        )}
+        {title}
+      </a>
+    </li>
+  );
+};
 
 export const Sidebar = () => {
   const navigate = useNavigate();
@@ -37,7 +63,7 @@ export const Sidebar = () => {
       {/* Title and Theme Selector */}
       <div className="sticky top-0 -mt-4 -mr-2 px-4 py-4 bg-base-200 z-20">
         <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-bold cursor-pointer text-center" onClick={() => navigate('/')}>
+          <h1 className="text-2xl font-bold cursor-pointer text-center" onClick={() => navigate(ROUTES.HOME)}>
             Idle Buds
           </h1>
           <select 
@@ -56,50 +82,50 @@ export const Sidebar = () => {
 
       <div>
         <ul className="menu menu-lg bg-base-100 rounded-lg">
-          <li><a onClick={() => navigate('/store')}>Store</a></li>
-          <li><a onClick={() => navigate('/inventory')}>Inventory</a></li>
-          <li><a onClick={() => navigate('/bud-box')}>Bud Box</a></li>            
+          <MenuItem route={ROUTES.STORE} onClick={() => navigate(ROUTES.STORE)} />
+          <MenuItem route={ROUTES.INVENTORY} onClick={() => navigate(ROUTES.INVENTORY)} />
+          <MenuItem route={ROUTES.BUD_BOX} onClick={() => navigate(ROUTES.BUD_BOX)} />
         </ul>
       </div>
 
       <div>
         <h2 className="font-bold text-lg mb-2">Combat</h2>
         <ul className="menu menu-lg bg-base-100 rounded-lg">
-          <li><a onClick={() => navigate('/level')}>Level</a></li>
-          <li><a onClick={() => navigate('/attack')}>Attack</a></li>
-          <li><a onClick={() => navigate('/defense')}>Defense</a></li>
-          <li><a onClick={() => navigate('/health')}>Health</a></li>            
-          <li><a onClick={() => navigate('/efficiency')}>Efficiency</a></li>
+          <MenuItem route={ROUTES.LEVEL} onClick={() => navigate(ROUTES.LEVEL)} />
+          <MenuItem route={ROUTES.ATTACK} onClick={() => navigate(ROUTES.ATTACK)} />
+          <MenuItem route={ROUTES.DEFENSE} onClick={() => navigate(ROUTES.DEFENSE)} />
+          <MenuItem route={ROUTES.HEALTH} onClick={() => navigate(ROUTES.HEALTH)} />
+          <MenuItem route={ROUTES.EFFICIENCY} onClick={() => navigate(ROUTES.EFFICIENCY)} />
         </ul>
       </div>
       
       <div>
         <h2 className="font-bold text-lg mb-2">Passive</h2>
         <ul className="menu menu-lg bg-base-100 rounded-lg">
-          <li><a onClick={() => navigate('/farming')}>Farming</a></li>
+          <MenuItem route={ROUTES.FARMING} onClick={() => navigate(ROUTES.FARMING)} />
         </ul>
       </div>
       
       <div>
         <h2 className="font-bold text-lg mb-2">Non-Combat</h2>
         <ul className="menu menu-lg bg-base-100 rounded-lg">
-          <li><a onClick={() => navigate('/woodcutting')}>Woodcutting</a></li>
-          <li><a onClick={() => navigate('/crafting')}>Crafting</a></li>
-          <li><a onClick={() => navigate('/fishing')}>Fishing</a></li>
-          <li><a onClick={() => navigate('/cooking')}>Cooking</a></li>
-          <li><a onClick={() => navigate('/mining')}>Mining</a></li>
-          <li><a onClick={() => navigate('/smithing')}>Smithing</a></li>
+          <MenuItem route={ROUTES.WOODCUTTING} onClick={() => navigate(ROUTES.WOODCUTTING)} />
+          <MenuItem route={ROUTES.CRAFTING} onClick={() => navigate(ROUTES.CRAFTING)} />
+          <MenuItem route={ROUTES.FISHING} onClick={() => navigate(ROUTES.FISHING)} />
+          <MenuItem route={ROUTES.COOKING} onClick={() => navigate(ROUTES.COOKING)} />
+          <MenuItem route={ROUTES.MINING} onClick={() => navigate(ROUTES.MINING)} />
+          <MenuItem route={ROUTES.SMITHING} onClick={() => navigate(ROUTES.SMITHING)} />
         </ul>
       </div>
       
       <div>
         <h2 className="font-bold text-lg mb-2">Other</h2>
         <ul className="menu menu-lg bg-base-100 rounded-lg">
-          <li><a onClick={() => navigate('/completion-log')}>Achievements</a></li>
-          <li><a onClick={() => navigate('/lore')}>Lore</a></li>
-          <li><a onClick={() => navigate('/statistics')}>Statistics</a></li>
-          <li><a onClick={() => navigate('/settings')}>Settings</a></li>
-          <li><a onClick={() => navigate('/news')}>News & Changelog</a></li>
+          <MenuItem route={ROUTES.COMPLETION_LOG} onClick={() => navigate(ROUTES.COMPLETION_LOG)} />
+          <MenuItem route={ROUTES.LORE} onClick={() => navigate(ROUTES.LORE)} />
+          <MenuItem route={ROUTES.STATISTICS} onClick={() => navigate(ROUTES.STATISTICS)} />
+          <MenuItem route={ROUTES.SETTINGS} onClick={() => navigate(ROUTES.SETTINGS)} />
+          <MenuItem route={ROUTES.NEWS} onClick={() => navigate(ROUTES.NEWS)} />
         </ul>
       </div>
       
@@ -113,14 +139,17 @@ export const Sidebar = () => {
           <li><a href="https://twitter.com/example" target="_blank" rel="noopener noreferrer">Twitter</a></li>
         </ul>
       </div>
+      
       <div>
         <h2 className="font-bold text-lg mb-2">Other</h2>
         <ul className="menu menu-lg bg-base-100 rounded-lg">
-          <li><a onClick={() => navigate('/bug-report')}>Report a Bug</a></li>
-          <li><a onClick={() => navigate('/privacy')}>Privacy Policy</a></li>
+          <MenuItem route={ROUTES.BUG_REPORT} onClick={() => navigate(ROUTES.BUG_REPORT)} />
+          <MenuItem route={ROUTES.PRIVACY} onClick={() => navigate(ROUTES.PRIVACY)} />
         </ul>
       </div>
       <p>Version 0</p>
     </div>
   );
 };
+
+export default Sidebar;

@@ -1,63 +1,24 @@
 import { FC } from 'react';
 import { useLocation } from 'react-router-dom';
-
-// Icon mapping object
-const ROUTE_ICONS: Record<string, JSX.Element> = {
-  '/woodcutting': (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-    </svg>
-  ),
-  '/crafting': (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-    </svg>
-  ),
-  '/fishing': (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-    </svg>
-  ),
-  // Add more icons for other routes as needed
-};
-
-// Title mapping object
-const ROUTE_TITLES: Record<string, string> = {
-  '/': 'Home',
-  '/store': 'Store',
-  '/inventory': 'Inventory',
-  '/bud-box': 'Bud Box',
-  '/level': 'Level',
-  '/attack': 'Attack',
-  '/defense': 'Defense',
-  '/health': 'Health',
-  '/efficiency': 'Efficiency',
-  '/farming': 'Farming',
-  '/woodcutting': 'Woodcutting',
-  '/crafting': 'Crafting',
-  '/fishing': 'Fishing',
-  '/cooking': 'Cooking',
-  '/mining': 'Mining',
-  '/smithing': 'Smithing',
-  '/completion-log': 'Completion Log',
-  '/lore': 'Lore',
-  '/statistics': 'Statistics',
-  '/settings': 'Settings',
-  '/news': 'News & Changelog',
-  '/bug-report': 'Report a Bug',
-  '/privacy': 'Privacy Policy',
-};
+import { ROUTE_ICONS, ROUTE_TITLES } from '../../constants/routeMappings';
 
 export const NavbarLocationIndicator: FC = () => {
     const location = useLocation();
     const currentPath = location.pathname;
     const pageTitle = ROUTE_TITLES[currentPath] || 'Page Not Found';
+    const iconPath = ROUTE_ICONS[currentPath];
 
     return (
         <div className="flex items-center gap-3">
             {/* Column 1: Square Icon */}
             <div className="w-12 h-12 bg-base-300 rounded-lg flex items-center justify-center">
-                {ROUTE_ICONS[currentPath] || (
+                {iconPath ? (
+                    <img 
+                        src={iconPath} 
+                        alt={pageTitle}
+                        className="w-6 h-6 stroke-current"
+                    />
+                ) : (
                     <svg 
                         xmlns="http://www.w3.org/2000/svg" 
                         fill="none" 
