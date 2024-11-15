@@ -2,7 +2,6 @@ export const Sidebar = () => {
     return (
       <div className="flex flex-col gap-6">
         <div>
-          <h2 className="font-bold text-lg mb-2">Actions</h2>
           <ul className="menu menu-lg bg-base-100 rounded-lg">
             <li><a>Shop</a></li>
             <li><a>Bank</a></li>
@@ -39,6 +38,32 @@ export const Sidebar = () => {
             <li><a>Crafting</a></li>
           </ul>
         </div>
+        
+        
+        <div>
+          <h2 className="font-bold text-lg mb-2">Other</h2>
+          <ul className="menu menu-lg bg-base-100 rounded-lg">
+            <li><a>Completion Log</a></li>
+            <li><a>Lore</a></li>
+            <li><a>Statistics</a></li>
+            <li><a>Settings</a></li>
+            <li><a>News & Changelog</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h2 className="font-bold text-lg mb-2">Socials</h2>
+          <ul className="menu menu-lg bg-base-100 rounded-lg">
+            <li><a>Wiki</a></li>
+            <li><a>Patreon</a></li>
+            <li><a>Discord</a></li>
+            <li><a>Reddit</a></li>
+            <li><a>Twitter</a></li>
+          </ul>
+        </div>
       </div>
+      
+
+      
     );
   };
