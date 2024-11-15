@@ -17,7 +17,7 @@ export const DrawerLayout = ({ children, sideContent, drawerTitle }: DrawerProps
         <Navbar drawerTitle={drawerTitle} />
         
         {/* Page Content */}
-        <div className="p-4 mt-20">
+        <div className="mt-6">
           {children}
         </div>
       </div>
