@@ -1,3 +1,5 @@
+import NavbarDropdownOptions from "./NavbarDropdownOptions";
+
 interface NavbarProps {
     drawerTitle?: string;
     onMenuClick?: () => void;
@@ -25,6 +27,7 @@ interface NavbarProps {
   
         {/* Right side */}
         <div className="flex-none">
+          <NavbarDropdownOptions playerName="Silver" />
         </div>
       </div>
     );
