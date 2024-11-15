@@ -9,10 +9,10 @@ interface NavbarProps {
 
 export const Navbar = ({ drawerTitle, onMenuClick }: NavbarProps) => {
     return (
-        <div className="w-screen flex flex-col h-20 fixed top-0 z-50 right-0 left-0">
+        <div className="fixed top-0 left-0 right-0 h-20 z-[51]">
             {/* Top Row */}
             <div className="w-full h-2/3 bg-base-300 shadow-lg">
-                <div className="max-w-screen-2xl mx-auto w-full h-full flex items-center px-4">
+                <div className="h-full flex items-center px-4 lg:pl-64">
                     {/* Left Column */}
                     <div className="flex items-center gap-2">
                         <div className="lg:hidden">
@@ -49,7 +49,7 @@ export const Navbar = ({ drawerTitle, onMenuClick }: NavbarProps) => {
 
             {/* Bottom Row */}
             <div className="w-full h-1/3 bg-base-200 shadow-md">
-                <div className="max-w-screen-2xl mx-auto w-full h-full flex items-center px-4">
+                <div className="h-full flex items-center px-4 lg:pl-64">
                     {/* Left Column */}
                     <div className="flex items-center">
                         {/* Add any left-aligned content here */}
