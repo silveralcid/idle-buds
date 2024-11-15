@@ -14,16 +14,16 @@ const WoodcuttingActivityPage: FC<WoodcuttingActivityPageProps> = () => {
         { amount: 25, item: 'XP', type: 'xp' as const }
     ];
 
-    // Mock data for trees
+    // Mock data for trees with added timeSeconds
     const trees = [
-        { id: 1, name: 'Wonder Tree', levelRequired: 1, xpReward: 10 },
-        { id: 2, name: 'Oak Tree', levelRequired: 5, xpReward: 25 },
-        { id: 3, name: 'Willow Tree', levelRequired: 10, xpReward: 40 },
-        { id: 4, name: 'Maple Tree', levelRequired: 15, xpReward: 60 },
-        { id: 5, name: 'Yew Tree', levelRequired: 20, xpReward: 80 },
-        { id: 6, name: 'Magic Tree', levelRequired: 25, xpReward: 100 },
-        { id: 7, name: 'Elder Tree', levelRequired: 30, xpReward: 120 },
-        { id: 8, name: 'Crystal Tree', levelRequired: 35, xpReward: 150 }
+        { id: 1, name: 'Wonder Tree', levelRequired: 1, xpReward: 10, timeSeconds: 3 },
+        { id: 2, name: 'Oak Tree', levelRequired: 5, xpReward: 25, timeSeconds: 4 },
+        { id: 3, name: 'Willow Tree', levelRequired: 10, xpReward: 40, timeSeconds: 5 },
+        { id: 4, name: 'Maple Tree', levelRequired: 15, xpReward: 60, timeSeconds: 6 },
+        { id: 5, name: 'Yew Tree', levelRequired: 20, xpReward: 80, timeSeconds: 7 },
+        { id: 6, name: 'Magic Tree', levelRequired: 25, xpReward: 100, timeSeconds: 8 },
+        { id: 7, name: 'Elder Tree', levelRequired: 30, xpReward: 120, timeSeconds: 9 },
+        { id: 8, name: 'Crystal Tree', levelRequired: 35, xpReward: 150, timeSeconds: 10 }
     ];
 
     const handleTreeSelect = (treeId: number) => {
@@ -59,6 +59,7 @@ const WoodcuttingActivityPage: FC<WoodcuttingActivityPageProps> = () => {
                             name={tree.name}
                             levelRequired={tree.levelRequired}
                             xpReward={tree.xpReward}
+                            timeSeconds={tree.timeSeconds}
                             isLocked={tree.levelRequired > 1} // Replace 1 with actual player level
                             onClick={() => handleTreeSelect(tree.id)}
                         />
