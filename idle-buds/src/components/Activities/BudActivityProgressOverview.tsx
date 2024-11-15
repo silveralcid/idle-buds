@@ -31,7 +31,7 @@ const BudActivityProgressOverview: FC<BudActivityProgressOverviewProps> = ({
                 <div className="flex flex-col items-center">
                     <div className="text-sm text-base-content/70">Active Bud</div>
                     <div className="text-xl font-bold truncate max-w-[120px]" title={currentEquipment}>
-                        {currentEquipment}
+                        Jo
                     </div>
                 </div>
                 <div className="flex flex-col items-center">
