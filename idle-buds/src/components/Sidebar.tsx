@@ -37,7 +37,7 @@ export const Sidebar = () => {
       {/* Title and Theme Selector */}
       <div className="sticky top-0 -mt-4 -mr-2 px-4 py-4 bg-base-200 z-20">
         <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-bold cursor-pointer" onClick={() => navigate('/')}>
+          <h1 className="text-2xl font-bold cursor-pointer text-center" onClick={() => navigate('/')}>
             Idle Buds
           </h1>
           <select 
