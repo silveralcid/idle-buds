@@ -30,7 +30,7 @@ const TamerCraftingProgressOverview: FC<TamerCraftingProgressOverviewProps> = ({
             <div className="grid grid-cols-2 p-4 gap-4">
                 <div className="flex flex-col items-center justify-center">
                     <div className="text-sm text-base-content/70">Level</div>
-                    <div className="text-xl font-bold">{currentLevel}</div>
+                    <div className="text-xl font-bold">{currentLevel} / 99</div>
                 </div>
                 <div className="flex flex-col items-center justify-center">
                     <div className="text-sm text-base-content/70">XP Progress</div>

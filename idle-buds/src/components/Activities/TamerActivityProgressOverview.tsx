@@ -36,7 +36,7 @@ const TamerActivityProgressOverview: FC<TamerActivityProgressOverviewProps> = ({
                 </div>
                 <div className="flex flex-col items-center">
                     <div className="text-sm text-base-content/70">Level</div>
-                    <div className="text-xl font-bold">{currentLevel}</div>
+                    <div className="text-xl font-bold">{currentLevel} / 99</div>
                 </div>
                 <div className="flex flex-col items-center">
                     <div className="text-sm text-base-content/70">XP Progress</div>
