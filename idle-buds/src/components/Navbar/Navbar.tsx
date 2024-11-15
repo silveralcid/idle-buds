@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import NavbarDropdownOptions from "./NavbarDropdownOptions";
 import NavbarModalInventory from "./NavbarEquipmentInventory";
+import NavbarLocationIndicator from "./NavbarLocationIndicator";
 
 interface NavbarProps {
     drawerTitle?: string;
@@ -19,7 +20,7 @@ export const Navbar = ({ drawerTitle, onMenuClick }: NavbarProps) => {
                 {/* Top Row */}
                 <div className="flex w-full h-2/3 bg-base-300 shadow-lg">
                     {/* Mobile Menu Toggle */}
-                    <div className="flex-none lg:hidden self-center px-2">
+                    <div className="flex-none lg:hidden self-center">
                         <label 
                             htmlFor="main-drawer" 
                             className="btn btn-square btn-ghost" 
@@ -42,8 +43,8 @@ export const Navbar = ({ drawerTitle, onMenuClick }: NavbarProps) => {
                     </div>
                     
                     {/* Left side */}
-                    <div className="flex-1 flex items-center px-4">
-                        <h1 className="text-xl font-bold">{drawerTitle}</h1>
+                    <div className="flex-1 flex items-center">
+                        <NavbarLocationIndicator pageTitle='Woodcutting' />
                     </div>
         
                     {/* Center */}
