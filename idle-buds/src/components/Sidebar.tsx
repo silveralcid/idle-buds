@@ -1,13 +1,57 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+
+// Define themes array
+const THEMES = [
+  "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave",
+  "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua",
+  "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula",
+  "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee",
+  "winter", "dim", "nord", "sunset"
+] as const;
+
+type Theme = typeof THEMES[number];
 
 export const Sidebar = () => {
   const navigate = useNavigate();
+  const [currentTheme, setCurrentTheme] = useState<Theme>(() => {
+    const htmlTheme = document.documentElement.getAttribute('data-theme') as Theme;
+    return htmlTheme || 'fantasy';
+  });
+
+  const handleThemeChange = (theme: Theme) => {
+    setCurrentTheme(theme);
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  };
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as Theme;
+    if (savedTheme) {
+      handleThemeChange(savedTheme);
+    }
+  }, []);
 
   return (
     <div className="flex flex-col gap-6 h-[calc(100vh-5rem)] overflow-y-auto pr-2 [&::-webkit-scrollbar]:hidden hover:[&::-webkit-scrollbar]:block [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300">
-      {/* Title */}
+      {/* Title and Theme Selector */}
       <div className="sticky top-0 -mt-4 -mr-2 px-4 py-4 bg-base-200 z-20">
-        <h1 className="text-2xl font-bold cursor-pointer" onClick={() => navigate('/')}>Idle Buds</h1>
+        <div className="flex flex-col gap-2">
+          <h1 className="text-2xl font-bold cursor-pointer" onClick={() => navigate('/')}>
+            Idle Buds
+          </h1>
+          <select 
+            className="select select-sm select-bordered w-full"
+            value={currentTheme}
+            onChange={(e) => handleThemeChange(e.target.value as Theme)}
+          >
+            {THEMES.map((theme) => (
+              <option key={theme} value={theme}>
+                {theme.charAt(0).toUpperCase() + theme.slice(1)}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div>
@@ -51,7 +95,7 @@ export const Sidebar = () => {
       <div>
         <h2 className="font-bold text-lg mb-2">Other</h2>
         <ul className="menu menu-lg bg-base-100 rounded-lg">
-          <li><a onClick={() => navigate('/completion-log')}>Completion Log</a></li>
+          <li><a onClick={() => navigate('/completion-log')}>Achievements</a></li>
           <li><a onClick={() => navigate('/lore')}>Lore</a></li>
           <li><a onClick={() => navigate('/statistics')}>Statistics</a></li>
           <li><a onClick={() => navigate('/settings')}>Settings</a></li>
