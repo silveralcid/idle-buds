@@ -3,9 +3,9 @@ export const Sidebar = () => {
       <div className="flex flex-col gap-6">
         <div>
           <ul className="menu menu-lg bg-base-100 rounded-lg">
-            <li><a>Shop</a></li>
-            <li><a>Bank</a></li>
-            <li><a>Buds</a></li>            
+            <li><a>Store</a></li>
+            <li><a>Inventory</a></li>
+            <li><a>Bud Box</a></li>            
           </ul>
         </div>
   
