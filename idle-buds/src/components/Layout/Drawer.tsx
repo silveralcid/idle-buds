@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { Navbar } from '../Navbar/Navbar';
 
 interface DrawerProps {
   children: ReactNode;
@@ -13,17 +14,7 @@ export const DrawerLayout = ({ children, sideContent, drawerTitle }: DrawerProps
       
       {/* Main Content */}
       <div className="drawer-content flex flex-col">
-        {/* Navbar */}
-        <div className="w-full navbar bg-base-300">
-          <div className="flex-none lg:hidden">
-            <label htmlFor="main-drawer" className="btn btn-square btn-ghost">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-6 h-6 stroke-current">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-              </svg>
-            </label>
-          </div>
-          <div className="flex-1 px-2 mx-2">{drawerTitle}</div>
-        </div>
+        <Navbar drawerTitle={drawerTitle} />
         
         {/* Page Content */}
         <div className="p-4">

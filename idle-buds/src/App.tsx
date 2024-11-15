@@ -11,7 +11,6 @@ function App() {
   return (
     <>
       <DrawerLayout 
-      drawerTitle="Melvor-like Game"
       sideContent={<Sidebar />}
     >
       <GameContent />
