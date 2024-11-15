@@ -1,13 +1,12 @@
 import { FC } from 'react';
-import ActivityProgressOverview from '../../ActivityProgressOverview';
-import GatheringSessionProgress from '../GatheringSessionProgress';
-import GatheringNodeCard from '../GatheringNodeCard';
+import CraftingProgressOverview from '../CraftingProgressOverview';
+import GatheringNodeCard from '../../Gathering/GatheringNodeCard';
 
-interface WoodcuttingActivityPageProps {
+interface CraftingActivityPageProps {
     // Add props as needed
 }
 
-const WoodcuttingActivityPage: FC<WoodcuttingActivityPageProps> = () => {
+const CraftingActivityPage: FC<CraftingActivityPageProps> = () => {
     // Mock data for gathering session
     const currentRewards = [
         { amount: 5, item: 'Oak Logs', type: 'item' as const },
@@ -34,21 +33,14 @@ const WoodcuttingActivityPage: FC<WoodcuttingActivityPageProps> = () => {
     return (
         <div className="flex flex-col w-full gap-4 p-4">
             {/* Row 1: Activity Progress Overview Section */}
-            <ActivityProgressOverview 
-                activityName="Woodcutting"
+            <CraftingProgressOverview 
+                activityName="Crafting"
                 currentLevel={1}
                 currentXP={0}
                 maxXP={100}
             />
 
-            {/* Row 2: Active Woodcutting Area */}
-            <GatheringSessionProgress 
-                activityName="Woodcutting"
-                targetName="Oak Tree"
-                progress={70}
-                maxProgress={100}
-                rewards={currentRewards}
-            />
+
 
             {/* Row 3: Available Trees Grid */}
             <div className="w-full">
@@ -70,4 +62,4 @@ const WoodcuttingActivityPage: FC<WoodcuttingActivityPageProps> = () => {
     );
 };
 
-export default WoodcuttingActivityPage;
+export default CraftingActivityPage;
