@@ -40,7 +40,7 @@ export const Sidebar = () => {
           <li><a>Fishing</a></li>
           <li><a>Cooking</a></li>
           <li><a>Mining</a></li>
-          <li><a>Smithing</a></li>
+          <li><a>Refining</a></li>
           <li><a>Crafting</a></li>
         </ul>
       </div>
