@@ -16,7 +16,7 @@ export const Navbar = ({ drawerTitle, onMenuClick }: NavbarProps) => {
 
     return (
         <>
-            <div className="w-full flex flex-col h-20 fixed top-0 z-50">
+            <div className="w-full flex flex-col h-20 fixed top-0 z-50 overflow-x-hidden">
                 {/* Top Row */}
                 <div className="flex w-full h-2/3 bg-base-300 shadow-lg">
                     {/* Mobile Menu Toggle */}

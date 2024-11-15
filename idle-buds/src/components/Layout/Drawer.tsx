@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import { Navbar } from '../Navbar/Navbar';
 
 interface DrawerProps {
   children: ReactNode;
@@ -14,7 +13,6 @@ export const DrawerLayout = ({ children, sideContent, drawerTitle }: DrawerProps
       
       {/* Main Content */}
       <div className="drawer-content flex flex-col">
-        <Navbar drawerTitle={drawerTitle} />
         
         {/* Page Content */}
         <div className="p-4">
