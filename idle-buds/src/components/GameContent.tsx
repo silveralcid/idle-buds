@@ -1,53 +1,87 @@
 // src/components/GameContent.tsx
-import { Routes, Route } from 'react-router-dom';
-import WoodcuttingActivityPage from "./Activities/Gathering/Woodcutting/WoodcuttingActivityPage";
-import CraftingActivityPage from "./Activities/Crafting/Crafting/CraftingActivityPage";
+import { useRouterStore } from '../router/RouterStore';
+import WoodcuttingActivityPage from "../pages/WoodcuttingPage";
+import CraftingActivityPage from "../pages/CraftingPage";
 import DummyPage from "./DummyPage";
+import { ROUTES } from '../constants/routeMappings';
 
 export const GameContent = () => {
+  const currentRoute = useRouterStore((state) => state.currentRoute);
+
+  console.log('GameContent rendering, current route:', currentRoute);
+
+  // Route mapping function
+  const getRouteComponent = (path: string) => {
+    switch (path) {
+      // Default route
+      case ROUTES.HOME:
+        return <CraftingActivityPage />;
+
+      // Main sections
+      case ROUTES.STORE:
+        return <DummyPage title="Store" />;
+      case ROUTES.INVENTORY:
+        return <DummyPage title="Inventory" />;
+      case ROUTES.BUD_BOX:
+        return <DummyPage title="Bud Box" />;
+
+      // Combat routes
+      case ROUTES.LEVEL:
+        return <DummyPage title="Level" />;
+      case ROUTES.ATTACK:
+        return <DummyPage title="Attack" />;
+      case ROUTES.DEFENSE:
+        return <DummyPage title="Defense" />;
+      case ROUTES.HEALTH:
+        return <DummyPage title="Health" />;
+      case ROUTES.EFFICIENCY:
+        return <DummyPage title="Efficiency" />;
+
+      // Passive routes
+      case ROUTES.FARMING:
+        return <DummyPage title="Farming" />;
+
+      // Non-Combat routes
+      case ROUTES.WOODCUTTING:
+        return <WoodcuttingActivityPage />;
+      case ROUTES.FISHING:
+        return <DummyPage title="Fishing" />;
+      case ROUTES.COOKING:
+        return <DummyPage title="Cooking" />;
+      case ROUTES.MINING:
+        return <DummyPage title="Mining" />;
+      case ROUTES.SMITHING:
+        return <DummyPage title="Smithing" />;
+      case ROUTES.CRAFTING:
+        return <CraftingActivityPage />;
+
+      // Other routes
+      case ROUTES.COMPLETION_LOG:
+        return <DummyPage title="Completion Log" />;
+      case ROUTES.LORE:
+        return <DummyPage title="Lore" />;
+      case ROUTES.STATISTICS:
+        return <DummyPage title="Statistics" />;
+      case ROUTES.SETTINGS:
+        return <DummyPage title="Settings" />;
+      case ROUTES.NEWS:
+        return <DummyPage title="News & Changelog" />;
+
+      // Support routes
+      case ROUTES.BUG_REPORT:
+        return <DummyPage title="Report a Bug" />;
+      case ROUTES.PRIVACY:
+        return <DummyPage title="Privacy Policy" />;
+
+      // 404 route
+      default:
+        return <DummyPage title="Page Not Found" />;
+    }
+  };
+
   return (
     <div className="pt-12">
-      <Routes>
-        {/* Default route */}
-        <Route path="/" element={<CraftingActivityPage />} />
-        
-        {/* Main sections */}
-        <Route path="/store" element={<DummyPage title="Store" />} />
-        <Route path="/inventory" element={<DummyPage title="Inventory" />} />
-        <Route path="/bud-box" element={<DummyPage title="Bud Box" />} />
-        
-        {/* Combat routes */}
-        <Route path="/level" element={<DummyPage title="Level" />} />
-        <Route path="/attack" element={<DummyPage title="Attack" />} />
-        <Route path="/defense" element={<DummyPage title="Defense" />} />
-        <Route path="/health" element={<DummyPage title="Health" />} />
-        <Route path="/efficiency" element={<DummyPage title="Efficiency" />} />
-
-        {/* Passive routes */}
-        <Route path="/farming" element={<DummyPage title="Farming" />} />
-        
-        {/* Non-Combat routes */}
-        <Route path="/woodcutting" element={<WoodcuttingActivityPage />} />
-        <Route path="/fishing" element={<DummyPage title="Fishing" />} />
-        <Route path="/cooking" element={<DummyPage title="Cooking" />} />
-        <Route path="/mining" element={<DummyPage title="Mining" />} />
-        <Route path="/smithing" element={<DummyPage title="Smithing" />} />
-        <Route path="/crafting" element={<CraftingActivityPage />} />
-
-        {/* Other routes */}
-        <Route path="/completion-log" element={<DummyPage title="Completion Log" />} />
-        <Route path="/lore" element={<DummyPage title="Lore" />} />
-        <Route path="/statistics" element={<DummyPage title="Statistics" />} />
-        <Route path="/settings" element={<DummyPage title="Settings" />} />
-        <Route path="/news" element={<DummyPage title="News & Changelog" />} />
-
-        {/* Support routes */}
-        <Route path="/bug-report" element={<DummyPage title="Report a Bug" />} />
-        <Route path="/privacy" element={<DummyPage title="Privacy Policy" />} />
-        
-        {/* 404 route */}
-        <Route path="*" element={<DummyPage title="Page Not Found" />} />
-      </Routes>
+      {getRouteComponent(currentRoute)}
     </div>
   );
 };

@@ -1,13 +1,13 @@
 import { FC } from 'react';
-import ActivityProgressOverview from '../../ActivityProgressOverview';
-import GatheringSessionProgress from '../GatheringSessionProgress';
-import GatheringNodeCard from '../GatheringNodeCard';
+import ActivityProgressOverview from '../components/Activities/ActivityProgressOverview';
+import GatheringSessionProgress from '../components/Activities/Gathering/GatheringSessionProgress';
+import GatheringNodeCard from '../components/Activities/Gathering/GatheringNodeCard';
 
-interface WoodcuttingActivityPageProps {
+interface WoodcuttingPageProps {
     // Add props as needed
 }
 
-const WoodcuttingActivityPage: FC<WoodcuttingActivityPageProps> = () => {
+const WoodcuttingPage: FC<WoodcuttingPageProps> = () => {
     // Mock data for gathering session
     const currentRewards = [
         { amount: 5, item: 'Oak Logs', type: 'item' as const },
@@ -70,4 +70,4 @@ const WoodcuttingActivityPage: FC<WoodcuttingActivityPageProps> = () => {
     );
 };
 
-export default WoodcuttingActivityPage;
+export default WoodcuttingPage;

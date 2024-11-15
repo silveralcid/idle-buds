@@ -1,13 +1,20 @@
 import { ReactNode } from 'react';
 import { Navbar } from '../Navbar/Navbar';
+import { useRouterStore } from '../../router/RouterStore';
+import { ROUTE_TITLES } from '../../constants/routeMappings';
 
 interface DrawerProps {
   children: ReactNode;
   sideContent: ReactNode;
-  drawerTitle?: string;
 }
 
-export const DrawerLayout = ({ children, sideContent, drawerTitle }: DrawerProps) => {
+export const DrawerLayout = ({ children, sideContent }: DrawerProps) => {
+  const currentRoute = useRouterStore((state) => state.currentRoute);
+  const drawerTitle = ROUTE_TITLES[currentRoute];
+
+  console.log('DrawerLayout rendering, current route:', currentRoute);
+  console.log('Drawer title:', drawerTitle);
+
   return (
     <div className="drawer lg:drawer-open">
       <input id="main-drawer" type="checkbox" className="drawer-toggle" />

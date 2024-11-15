@@ -1,17 +1,28 @@
-import { BrowserRouter } from 'react-router-dom'
-import './App.css'
-
 import { DrawerLayout } from './components/Layout/Drawer'
+import { Router } from './router/Router'
+import { routes } from './routes'
 import { Sidebar } from './components/Sidebar'
+import { useRouterStore } from './router/RouterStore'
+import { useEffect } from 'react'
+import type { Theme } from './router/RouterStore' 
 import { GameContent } from './components/GameContent'
 
 function App() {
+  const setTheme = useRouterStore((state) => state.setTheme)
+  
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme')
+    if (savedTheme) {
+      setTheme(savedTheme as Theme)
+    }
+  }, [setTheme])  // Add setTheme to dependency array
+
   return (
-    <BrowserRouter>
-      <DrawerLayout sideContent={<Sidebar />}>
-        <GameContent />
-      </DrawerLayout>
-    </BrowserRouter>
+    <DrawerLayout sideContent={<Sidebar />}>
+      <Router routes={routes} />
+      <Sidebar />
+      <GameContent />
+    </DrawerLayout>
   )
 }
 

@@ -1,7 +1,6 @@
-import { FC } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { ROUTES, ROUTE_ICONS, ROUTE_TITLES } from '../constants/routeMappings';
+import { FC } from 'react'
+import { ROUTES, ROUTE_ICONS, ROUTE_TITLES } from '../constants/routeMappings'
+import { useRouterStore } from '../router/RouterStore'
 
 const THEMES = [
   "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave",
@@ -9,18 +8,18 @@ const THEMES = [
   "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula",
   "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee",
   "winter", "dim", "nord", "sunset"
-] as const;
+] as const
 
-type Theme = typeof THEMES[number];
+type Theme = typeof THEMES[number]
 
 interface MenuItemProps {
-  route: string;
-  onClick: () => void;
+  route: string
+  onClick: () => void
 }
 
 const MenuItem: FC<MenuItemProps> = ({ route, onClick }) => {
-  const iconPath = ROUTE_ICONS[route];
-  const title = ROUTE_TITLES[route];
+  const iconPath = ROUTE_ICONS[route]
+  const title = ROUTE_TITLES[route]
 
   return (
     <li>
@@ -35,41 +34,29 @@ const MenuItem: FC<MenuItemProps> = ({ route, onClick }) => {
         {title}
       </a>
     </li>
-  );
-};
+  )
+}
 
 export const Sidebar = () => {
-  const navigate = useNavigate();
-  const [currentTheme, setCurrentTheme] = useState<Theme>(() => {
-    const htmlTheme = document.documentElement.getAttribute('data-theme') as Theme;
-    return htmlTheme || 'fantasy';
-  });
-
-  const handleThemeChange = (theme: Theme) => {
-    setCurrentTheme(theme);
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-  };
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme;
-    if (savedTheme) {
-      handleThemeChange(savedTheme);
-    }
-  }, []);
+  const navigate = useRouterStore((state) => state.navigate)
+  const currentTheme = useRouterStore((state) => state.currentTheme)
+  const setTheme = useRouterStore((state) => state.setTheme)
 
   return (
     <div className="flex flex-col gap-6 h-[calc(100vh-5rem)] overflow-y-auto pr-2 [&::-webkit-scrollbar]:hidden hover:[&::-webkit-scrollbar]:block [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-base-300">
       {/* Title and Theme Selector */}
       <div className="sticky top-0 -mt-4 -mr-2 px-4 py-4 bg-base-200 z-20">
         <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-bold cursor-pointer text-center" onClick={() => navigate(ROUTES.HOME)}>
+          <h1 
+            className="text-2xl font-bold cursor-pointer text-center" 
+            onClick={() => navigate(ROUTES.HOME)}
+          >
             Idle Buds
           </h1>
           <select 
             className="select select-sm select-bordered w-full"
             value={currentTheme}
-            onChange={(e) => handleThemeChange(e.target.value as Theme)}
+            onChange={(e) => setTheme(e.target.value as Theme)}
           >
             {THEMES.map((theme) => (
               <option key={theme} value={theme}>
@@ -98,7 +85,7 @@ export const Sidebar = () => {
           <MenuItem route={ROUTES.EFFICIENCY} onClick={() => navigate(ROUTES.EFFICIENCY)} />
         </ul>
       </div>
-      
+
       <div>
         <h2 className="font-bold text-lg mb-2">Passive</h2>
         <ul className="menu menu-lg bg-base-100 rounded-lg">

@@ -1,10 +1,9 @@
 import { FC } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useRouterStore } from '../../router/RouterStore';
 import { ROUTE_ICONS, ROUTE_TITLES } from '../../constants/routeMappings';
 
 export const NavbarLocationIndicator: FC = () => {
-    const location = useLocation();
-    const currentPath = location.pathname;
+    const currentPath = useRouterStore((state) => state.currentRoute);
     const pageTitle = ROUTE_TITLES[currentPath] || 'Page Not Found';
     const iconPath = ROUTE_ICONS[currentPath];
 
