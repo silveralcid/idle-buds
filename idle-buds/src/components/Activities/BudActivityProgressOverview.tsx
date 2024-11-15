@@ -41,9 +41,6 @@ const BudActivityProgressOverview: FC<BudActivityProgressOverviewProps> = ({
                 <div className="flex flex-col items-center">
                     <div className="text-sm text-base-content/70">XP Progress</div>
                     <div className="text-xl font-bold">
-                        {((currentXP / maxXP) * 100).toFixed(1)}%
-                    </div>
-                    <div className="text-xs text-base-content/50">
                         {currentXP.toLocaleString()} / {maxXP.toLocaleString()}
                     </div>
                 </div>
