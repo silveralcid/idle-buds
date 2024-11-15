@@ -61,6 +61,14 @@ export const Sidebar = () => {
             <li><a>Twitter</a></li>
           </ul>
         </div>
+        <div>
+          <h2 className="font-bold text-lg mb-2">Other</h2>
+          <ul className="menu menu-lg bg-base-100 rounded-lg">
+            <li><a>Report a Bug</a></li>
+            <li><a>Privacy Policy</a></li>
+          </ul>
+        </div>
+        <p>Version 0</p>
       </div>
       
 
