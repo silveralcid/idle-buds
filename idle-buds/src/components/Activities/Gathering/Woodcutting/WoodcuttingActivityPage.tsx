@@ -1,14 +1,20 @@
 import { FC } from 'react';
 import ActivityProgressOverview from '../../ActivityProgressOverview';
-
+import GatheringSessionProgress from '../GatheringSessionProgress';
 interface WoodcuttingActivityPageProps {
     // Add props as needed
 }
 
 const WoodcuttingActivityPage: FC<WoodcuttingActivityPageProps> = () => {
+    // Mock data for gathering session
+    const currentRewards = [
+        { amount: 5, item: 'Oak Logs', type: 'item' as const },
+        { amount: 25, item: 'XP', type: 'xp' as const }
+    ];
+
     return (
         <div className="flex flex-col w-full gap-4 p-4">
-            {/* Row 1: Activity Progress overview Section */}
+            {/* Row 1: Activity Progress Overview Section */}
             <ActivityProgressOverview 
                 activityName="Woodcutting"
                 currentLevel={1}
@@ -17,31 +23,13 @@ const WoodcuttingActivityPage: FC<WoodcuttingActivityPageProps> = () => {
             />
 
             {/* Row 2: Active Woodcutting Area */}
-            <div className="w-full bg-base-200 rounded-lg p-4 shadow-lg">
-                <h2 className="text-xl font-bold mb-4">Current Activity</h2>
-                <div className="flex flex-col md:flex-row gap-4">
-                    {/* Active Tree Info */}
-                    <div className="flex-1 bg-base-300 rounded-lg p-4">
-                        <h3 className="text-lg font-semibold">Oak Tree</h3>
-                        <div className="progress-bar mt-2">
-                            <progress 
-                                className="progress progress-primary w-full" 
-                                value="70" 
-                                max="100"
-                            ></progress>
-                        </div>
-                    </div>
-                    
-                    {/* Current Rewards */}
-                    <div className="flex-1 bg-base-300 rounded-lg p-4">
-                        <h3 className="text-lg font-semibold">Rewards</h3>
-                        <div className="flex gap-2 mt-2">
-                            <div className="badge badge-primary">+5 Oak Logs</div>
-                            <div className="badge badge-secondary">+25 XP</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <GatheringSessionProgress 
+                activityName="Woodcutting"
+                targetName="Oak Tree"
+                progress={70}
+                maxProgress={100}
+                rewards={currentRewards}
+            />
 
             {/* Row 3: Available Trees Grid */}
             <div className="w-full">
