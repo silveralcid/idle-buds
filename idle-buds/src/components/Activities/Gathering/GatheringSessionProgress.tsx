@@ -26,12 +26,6 @@ const GatheringSessionProgress: FC<GatheringSessionProgressProps> = ({
             
             {/* Active Gathering Info Row */}
             <div className="w-full bg-base-300 rounded-lg p-4 mb-4">
-                <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-lg font-semibold">{targetName}</h3>
-                    <span className="text-sm text-base-content/70">
-                        {progress}/{maxProgress}
-                    </span>
-                </div>
                 <div className="progress-bar">
                     <progress 
                         className="progress progress-primary w-full" 
@@ -42,9 +36,8 @@ const GatheringSessionProgress: FC<GatheringSessionProgressProps> = ({
             </div>
             
             {/* Drops Row */}
-            <div className="w-full bg-base-300 rounded-lg p-4">
-                <h3 className="text-lg font-semibold mb-2">Drops</h3>
-                <div className="flex flex-wrap gap-2">
+            <div className="w-full">
+                <div className="flex flex-wrap gap-2 justify-center">
                     {rewards.map((reward, index) => (
                         <div 
                             key={index} 
