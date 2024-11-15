@@ -1,4 +1,6 @@
 import { FC } from 'react';
+import TamerActivityProgressOverview from './TamerActivityProgressOverview';
+import BudActivityProgressOverview from './BudActivityProgressOverview';
 
 interface ActivityProgressOverviewProps {
     activityName: string;
@@ -13,21 +15,27 @@ const ActivityProgressOverview: FC<ActivityProgressOverviewProps> = ({
     currentXP,
     maxXP
 }) => {
+    // Woodcutting example data
+    const mainHandEquipment = "Bronze Axe";
+    const offHandEquipment = "Empty";
+
     return (
-        <div className="w-full bg-base-200 rounded-lg p-4 shadow-lg">
-            <h2 className="text-xl font-bold">{activityName} Status</h2>
-            <div className="stats shadow mt-4">
-                <div className="stat">
-                    <div className="stat-title">Current Level</div>
-                    <div className="stat-value">{currentLevel}</div>
-                </div>
-                <div className="stat">
-                    <div className="stat-title">XP</div>
-                    <div className="stat-value">
-                        {currentXP.toLocaleString()} / {maxXP.toLocaleString()}
-                    </div>
-                </div>
-            </div>
+        <div className="flex flex-col md:flex-row gap-4 w-full p-4">
+            <TamerActivityProgressOverview
+                activityName={`${activityName} - Main Hand`}
+                currentLevel={12}
+                currentXP={12}
+                maxXP={maxXP}
+                currentEquipment={mainHandEquipment}
+            />
+
+            <BudActivityProgressOverview
+                activityName={`${activityName} - Off Hand`}
+                currentLevel={4}
+                currentXP={74}
+                maxXP={maxXP}
+                currentEquipment={offHandEquipment}
+            />
         </div>
     );
 };
