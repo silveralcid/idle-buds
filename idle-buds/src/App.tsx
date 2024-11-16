@@ -20,8 +20,6 @@ function App() {
   return (
     <DrawerLayout sideContent={<Sidebar />}>
       <Router routes={routes} />
-      <Sidebar />
-      <GameContent />
     </DrawerLayout>
   )
 }
