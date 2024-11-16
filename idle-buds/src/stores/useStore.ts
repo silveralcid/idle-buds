@@ -17,7 +17,10 @@ interface Inventory {
 interface GameState {
   level: number;
   experience: number;
-  woodcutting: WoodcuttingSkill;
+  woodcutting: WoodcuttingSkill & {
+    baseXpRate: number;
+    baseResourceRate: number;
+  };
   inventory: Inventory;
   currentActivity: Activity;
   
@@ -47,9 +50,13 @@ const initialState = {
     level: 1,
     experience: 0,
     isChopping: false,
-    progress: 0
+    progress: 0,
+    baseXpRate: 1,
+    baseResourceRate: 1
   },
-  inventory: {},
+  inventory: {
+    wood: 0
+  },
   currentActivity: 'woodcutting' as Activity
 };
 
@@ -150,7 +157,9 @@ export const useGameStore = create<GameState>((set, get) => ({
         level: state.woodcutting.level,
         experience: state.woodcutting.experience,
         isChopping: false,
-        progress: 0
+        progress: 0,
+        baseXpRate: state.woodcutting.baseXpRate,
+        baseResourceRate: state.woodcutting.baseResourceRate
       },
       inventory: state.inventory,
       currentActivity: state.currentActivity
