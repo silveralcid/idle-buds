@@ -32,7 +32,7 @@ const WoodcuttingPage: FC<WoodcuttingPageProps> = () => {
     };
 
     return (
-        <div className="flex flex-col w-full gap-4 p-4">
+        <div className="flex flex-col w-full gap-4 p-4 pt-16">
             {/* Row 1: Activity Progress Overview Section */}
             <ActivityProgressOverview 
                 activityName="Woodcutting"
