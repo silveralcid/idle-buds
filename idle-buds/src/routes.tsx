@@ -11,6 +11,10 @@ export interface RouteConfig {
 
 export const routes: RouteConfig[] = [
   {
+    path: '/',
+    component: <WoodcuttingPage />
+  },
+  {
     path: ROUTES.WOODCUTTING,
     component: <WoodcuttingPage />
   },

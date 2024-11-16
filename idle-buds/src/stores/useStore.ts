@@ -69,6 +69,12 @@ interface GameState {
   // Utility functions
   getRequiredXPForLevel: (level: number) => number;
   canChopTree: (tree: Tree) => boolean;
+
+  // Add navigation state
+  currentActivity: 'woodcutting' | 'mining' | 'fishing' | null;
+  
+  // Add navigation action
+  setCurrentActivity: (activity: 'woodcutting' | 'mining' | 'fishing' | null) => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -163,5 +169,10 @@ export const useGameStore = create<GameState>((set, get) => ({
   canChopTree: (tree) => {
     const state = get();
     return state.woodcutting.level >= tree.requiredLevel;
-  }
+  },
+  
+  // Set woodcutting as default activity
+  currentActivity: 'woodcutting',
+  
+  setCurrentActivity: (activity) => set({ currentActivity: activity }),
 }));
