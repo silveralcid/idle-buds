@@ -4,6 +4,7 @@ import type { Tree } from '../types/resources';
 import type { WoodcuttingSkill } from '../types/skills';
 import type { Activity } from '../types/activities';
 import { TREES } from '../data/trees';
+import { saveGame, loadGame, clearSave } from '../utils/saveGame';
 
 // Constants
 export const MAX_LEVEL = 99;
@@ -29,24 +30,31 @@ interface GameState {
   addResource: (resourceName: string, amount: number) => void;
   setCurrentActivity: (activity: Activity) => void;
   
+  // Save/Load actions
+  saveGame: () => void;
+  loadGame: () => void;
+  resetGame: () => void;
+  
   // Utility
   getRequiredXPForLevel: (level: number) => number;
   canChopTree: (tree: Tree) => boolean;
 }
 
-export const useGameStore = create<GameState>((set, get) => ({
+const initialState = {
   level: 1,
   experience: 0,
-  
   woodcutting: {
     level: 1,
     experience: 0,
     isChopping: false,
     progress: 0
   },
-  
   inventory: {},
-  currentActivity: 'woodcutting',
+  currentActivity: 'woodcutting' as Activity
+};
+
+export const useGameStore = create<GameState>((set, get) => ({
+  ...initialState,
 
   addExperience: (amount) => set((state) => {
     if (state.level >= MAX_LEVEL) return state;
@@ -131,4 +139,34 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
   
   setCurrentActivity: (activity) => set({ currentActivity: activity }),
+
+  // Save/Load functionality
+  saveGame: () => {
+    const state = get();
+    const saveData = {
+      level: state.level,
+      experience: state.experience,
+      woodcutting: {
+        level: state.woodcutting.level,
+        experience: state.woodcutting.experience,
+        isChopping: false,
+        progress: 0
+      },
+      inventory: state.inventory,
+      currentActivity: state.currentActivity
+    };
+    saveGame(saveData);
+  },
+
+  loadGame: () => {
+    const saveData = loadGame();
+    if (saveData) {
+      set({ ...initialState, ...saveData });
+    }
+  },
+
+  resetGame: () => {
+    set(initialState);
+    clearSave();
+  }
 }));
