@@ -20,7 +20,7 @@ export interface BudStats {
     defense: number;
     health: number;
     speed: number;
-    specialAttack: number;
+    specialAttack: number; // ?
   }
   
   // Breeding-related attributes
@@ -38,14 +38,14 @@ export interface BudStats {
     id: string;
     name: string;
     species: string;
-    rarity: 'common' | 'uncommon' | 'rare' | 'legendary' | 'mythical';
+    sex: 'male' | 'female' | 'parthenogen';
     level: number;
     experience: number;
     
     // Core Stats
     stats: BudStats;
     combatStats: BudCombatStats;
-    
+        
     // Abilities and Skills
     abilities: string[];
     passiveEffects: string[];
