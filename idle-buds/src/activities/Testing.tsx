@@ -1,11 +1,106 @@
-// src/activities/Testing.tsx
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useGameStore } from '../stores/useStore';
 import { TREES } from '../data/trees';
 
+// Memoized components to prevent unnecessary re-renders
+const NumberInput = React.memo<{
+  label: string;
+  value: number;
+  onChange: (value: string) => void;
+}>(({ label, value, onChange }) => (
+  <div className="form-control w-full">
+    <div className="flex items-center gap-2">
+      <label className="label-text flex-1">{label}</label>
+      <input
+        type="number"
+        className="input input-bordered input-sm w-32"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </div>
+  </div>
+));
+
+const SkillCard = React.memo<{
+  title: string;
+  fields: { label: string; value: number; path: string[] }[];
+  onNumberChange: (path: string[], value: string) => void;
+}>(({ title, fields, onNumberChange }) => (
+  <div className="card bg-base-200 shadow-xl">
+    <div className="card-body p-4">
+      <h3 className="card-title text-lg mb-2">{title}</h3>
+      <div className="space-y-2">
+        {fields.map((field) => (
+          <NumberInput
+            key={field.label}
+            label={field.label}
+            value={field.value}
+            onChange={(value) => onNumberChange(field.path, value)}
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+));
+
+const InventoryManager = React.memo<{
+  inventory: Record<string, number>;
+  onAddItem: (name: string, amount: number) => void;
+  onUpdateItem: (name: string, amount: string) => void;
+  onRemoveItem: (name: string) => void;
+}>(({ inventory, onAddItem, onUpdateItem, onRemoveItem }) => (
+  <div className="card bg-base-200 shadow-xl">
+    <div className="card-body p-4">
+      <h3 className="card-title text-lg mb-2">Inventory</h3>
+      
+      <div className="flex gap-2 mb-4">
+        <select 
+          className="select select-bordered select-sm flex-1"
+          onChange={(e) => onAddItem(e.target.value, 1)}
+        >
+          <option value="">Add item...</option>
+          {TREES.map(tree => (
+            <option key={tree.id} value={tree.resourceName}>
+              {tree.resourceName}
+            </option>
+          ))}
+        </select>
+        <button 
+          className="btn btn-primary btn-sm"
+          onClick={() => onAddItem('normal_logs', 10)}
+        >
+          +10 Logs
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+        {Object.entries(inventory).map(([item, amount]) => (
+          <div key={item} className="flex items-center gap-2">
+            <span className="label-text flex-1 truncate">{item}</span>
+            <input
+              type="number"
+              className="input input-bordered input-sm w-24"
+              value={amount}
+              onChange={(e) => onUpdateItem(item, e.target.value)}
+            />
+            <button 
+              className="btn btn-error btn-square btn-sm"
+              onClick={() => onRemoveItem(item)}
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+));
+
 export const Testing: React.FC = () => {
   const gameState = useGameStore();
-  const [localState, setLocalState] = useState({
+  
+  // Use useMemo to derive initial state
+  const initialState = useMemo(() => ({
     level: gameState.level,
     experience: gameState.experience,
     woodcutting: {
@@ -13,16 +108,16 @@ export const Testing: React.FC = () => {
       experience: gameState.woodcutting.experience,
     },
     inventory: { ...gameState.inventory }
-  });
+  }), [gameState]);
 
-  // Handle number input changes
-  const handleNumberChange = (
+  const [localState, setLocalState] = useState(initialState);
+
+  // Memoize handlers to prevent unnecessary re-renders
+  const handleNumberChange = useCallback((
     path: string[], 
-    value: string, 
-    setter: (value: number) => void
+    value: string
   ) => {
     const numValue = parseInt(value) || 0;
-    setter(numValue);
     
     // Update local state
     setLocalState(prev => {
@@ -34,11 +129,10 @@ export const Testing: React.FC = () => {
       current[path[path.length - 1]] = numValue;
       return newState;
     });
-  };
+  }, []);
 
-  // Apply changes to game state
-  const applyChanges = () => {
-    // Update experience and levels
+  // Memoize action handlers
+  const applyChanges = useCallback(() => {
     useGameStore.setState({
       level: localState.level,
       experience: localState.experience,
@@ -49,23 +143,13 @@ export const Testing: React.FC = () => {
       },
       inventory: localState.inventory
     });
-  };
+  }, [localState, gameState]);
 
-  // Reset to current game state
-  const resetChanges = () => {
-    setLocalState({
-      level: gameState.level,
-      experience: gameState.experience,
-      woodcutting: {
-        level: gameState.woodcutting.level,
-        experience: gameState.woodcutting.experience,
-      },
-      inventory: { ...gameState.inventory }
-    });
-  };
+  const resetChanges = useCallback(() => {
+    setLocalState(initialState);
+  }, [initialState]);
 
-  // Add item to inventory
-  const addInventoryItem = (resourceName: string, amount: number) => {
+  const addInventoryItem = useCallback((resourceName: string, amount: number) => {
     setLocalState(prev => ({
       ...prev,
       inventory: {
@@ -73,158 +157,50 @@ export const Testing: React.FC = () => {
         [resourceName]: (prev.inventory[resourceName] || 0) + amount
       }
     }));
-  };
+  }, []);
 
   return (
-    <div className="p-4 space-y-6 pt-16">
-      {/* General Stats */}
-      <div className="card bg-base-200 shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title">General Stats</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Level</span>
-              </label>
-              <input
-                type="number"
-                className="input input-bordered"
-                value={localState.level}
-                onChange={(e) => handleNumberChange(['level'], e.target.value, 
-                  (value) => setLocalState(prev => ({ ...prev, level: value }))
-                )}
-              />
-            </div>
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Experience</span>
-              </label>
-              <input
-                type="number"
-                className="input input-bordered"
-                value={localState.experience}
-                onChange={(e) => handleNumberChange(['experience'], e.target.value,
-                  (value) => setLocalState(prev => ({ ...prev, experience: value }))
-                )}
-              />
-            </div>
-          </div>
-        </div>
+    <div className="p-4 space-y-4 pt-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <SkillCard
+          title="General Stats"
+          fields={[
+            { label: 'Level', value: localState.level, path: ['level'] },
+            { label: 'Experience', value: localState.experience, path: ['experience'] }
+          ]}
+          onNumberChange={handleNumberChange}
+        />
+
+        <SkillCard
+          title="Woodcutting"
+          fields={[
+            { label: 'Level', value: localState.woodcutting.level, path: ['woodcutting', 'level'] },
+            { label: 'Experience', value: localState.woodcutting.experience, path: ['woodcutting', 'experience'] }
+          ]}
+          onNumberChange={handleNumberChange}
+        />
       </div>
 
-      {/* Woodcutting Stats */}
-      <div className="card bg-base-200 shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title">Woodcutting</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Level</span>
-              </label>
-              <input
-                type="number"
-                className="input input-bordered"
-                value={localState.woodcutting.level}
-                onChange={(e) => handleNumberChange(['woodcutting', 'level'], e.target.value,
-                  (value) => setLocalState(prev => ({
-                    ...prev,
-                    woodcutting: { ...prev.woodcutting, level: value }
-                  }))
-                )}
-              />
-            </div>
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Experience</span>
-              </label>
-              <input
-                type="number"
-                className="input input-bordered"
-                value={localState.woodcutting.experience}
-                onChange={(e) => handleNumberChange(['woodcutting', 'experience'], e.target.value,
-                  (value) => setLocalState(prev => ({
-                    ...prev,
-                    woodcutting: { ...prev.woodcutting, experience: value }
-                  }))
-                )}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <InventoryManager
+        inventory={localState.inventory}
+        onAddItem={addInventoryItem}
+        onUpdateItem={(item, value) => handleNumberChange(['inventory', item], value)}
+        onRemoveItem={(item) => setLocalState(prev => {
+          const newInventory = { ...prev.inventory };
+          delete newInventory[item];
+          return { ...prev, inventory: newInventory };
+        })}
+      />
 
-      {/* Inventory Management */}
-      <div className="card bg-base-200 shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title">Inventory</h2>
-          
-          {/* Add items section */}
-          <div className="flex gap-4 mb-4">
-            <select 
-              className="select select-bordered flex-1"
-              onChange={(e) => addInventoryItem(e.target.value, 1)}
-            >
-              <option value="">Select resource to add...</option>
-              {TREES.map(tree => (
-                <option key={tree.id} value={tree.resourceName}>
-                  {tree.resourceName}
-                </option>
-              ))}
-            </select>
-            <button 
-              className="btn btn-primary"
-              onClick={() => addInventoryItem('normal_logs', 10)}
-            >
-              Add 10 Normal Logs
-            </button>
-          </div>
-
-          {/* Current inventory */}
-          <div className="grid grid-cols-2 gap-4">
-            {Object.entries(localState.inventory).map(([item, amount]) => (
-              <div key={item} className="form-control">
-                <label className="label">
-                  <span className="label-text">{item}</span>
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    className="input input-bordered flex-1"
-                    value={amount}
-                    onChange={(e) => handleNumberChange(['inventory', item], e.target.value,
-                      (value) => setLocalState(prev => ({
-                        ...prev,
-                        inventory: { ...prev.inventory, [item]: value }
-                      }))
-                    )}
-                  />
-                  <button 
-                    className="btn btn-error btn-square"
-                    onClick={() => setLocalState(prev => {
-                      const newInventory = { ...prev.inventory };
-                      delete newInventory[item];
-                      return { ...prev, inventory: newInventory };
-                    })}
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex gap-4 justify-end">
+      <div className="flex gap-2 justify-end">
         <button 
-          className="btn btn-error"
+          className="btn btn-error btn-sm"
           onClick={resetChanges}
         >
           Reset Changes
         </button>
         <button 
-          className="btn btn-primary"
+          className="btn btn-primary btn-sm"
           onClick={applyChanges}
         >
           Apply Changes
