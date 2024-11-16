@@ -21,13 +21,8 @@ const ActivityProgressOverview: FC<ActivityProgressOverviewProps> = ({
 
     return (
         <div className="flex flex-col md:flex-row gap-4 w-full p-4">
-            <TamerActivityProgressOverview
-                activityName={`${activityName} - Main Hand`}
-                currentLevel={12}
-                currentXP={12}
-                maxXP={maxXP}
-                currentEquipment={mainHandEquipment}
-            />
+            <TamerActivityProgressOverview activityName="Woodcutting" />
+
 
             <BudActivityProgressOverview
                 activityName={`${activityName} - Off Hand`}

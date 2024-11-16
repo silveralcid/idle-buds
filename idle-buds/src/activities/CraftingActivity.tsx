@@ -2,11 +2,11 @@ import { FC } from 'react';
 import CraftingProgressOverview from '../components/Activities/Crafting/CraftingProgressOverview';
 import CraftingWorkbenchSelection from '../components/Activities/Crafting/Crafting/CraftingWorkbenchSelection';
 
-interface CraftingPageProps {
+interface CraftingActivityProps {
     // Add props as needed
 }
 
-const CraftingPage: FC<CraftingPageProps> = () => {
+const CraftingActivity: FC<CraftingActivityProps> = () => {
 
 
     return (
@@ -31,4 +31,4 @@ const CraftingPage: FC<CraftingPageProps> = () => {
     );
 };
 
-export default CraftingPage;
+export default CraftingActivity;

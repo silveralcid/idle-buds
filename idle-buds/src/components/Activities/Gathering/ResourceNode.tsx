@@ -1,21 +1,22 @@
 import { FC } from 'react';
 
-interface GatheringNodeCardProps {
+interface ResourceNodeProps {
     name: string;
     levelRequired: number;
     xpReward: number;
     timeSeconds: number;
-    iconUrl?: string;
-    isLocked?: boolean;
-    onClick?: () => void;
+    isLocked: boolean;
+    isActive?: boolean;
+    onClick: () => void;
 }
 
-const GatheringNodeCard: FC<GatheringNodeCardProps> = ({
+const ResourceNode: FC<ResourceNodeProps> = ({
     name,
     levelRequired,
     xpReward,
     timeSeconds,
     iconUrl,
+    isActive,
     isLocked = false,
     onClick
 }) => {
@@ -24,6 +25,7 @@ const GatheringNodeCard: FC<GatheringNodeCardProps> = ({
             className={`
                 card bg-base-200 shadow-lg hover:shadow-xl transition-shadow cursor-pointer
                 ${isLocked ? 'opacity-75' : ''}
+                ${isActive ? 'border-green-100 bg-green-100' : 'border-gray-200'}
             `}
             onClick={!isLocked ? onClick : undefined}
         >
@@ -82,4 +84,4 @@ const GatheringNodeCard: FC<GatheringNodeCardProps> = ({
     );
 };
 
-export default GatheringNodeCard;
+export default ResourceNode;

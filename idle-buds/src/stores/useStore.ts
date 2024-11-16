@@ -1,4 +1,6 @@
+
 import { create } from 'zustand'
+
 
 // Define types for trees
 interface Tree {
@@ -20,14 +22,7 @@ export const TREES: Tree[] = [
     timeToChop: 3000,
     resourceName: 'normal_logs'
   },
-  {
-    id: 'oak_tree',
-    name: 'Oak Tree',
-    requiredLevel: 5,
-    xpPerCut: 37.5,
-    timeToChop: 4000,
-    resourceName: 'oak_logs'
-  },
+
   // Add more trees as needed
 ];
 

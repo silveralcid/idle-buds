@@ -1,7 +1,7 @@
 // src/components/GameContent.tsx
 import { useRouterStore } from '../router/RouterStore';
-import WoodcuttingActivityPage from "../pages/WoodcuttingPage";
-import CraftingActivityPage from "../pages/CraftingPage";
+import WoodcuttingActivityPage from "../activities/WoodcuttingActivity";
+import CraftingActivityPage from "../activities/CraftingActivity";
 import DummyPage from "./DummyPage";
 import { ROUTES } from '../constants/routeMappings';
 

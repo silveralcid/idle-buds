@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
 import { ROUTES } from './constants/routeMappings';
 
-import WoodcuttingPage from './pages/WoodcuttingPage';
-import CraftingPage from './pages/CraftingPage';
+import WoodcuttingPage from './activities/WoodcuttingActivity';
+import CraftingPage from './activities/CraftingActivity';
 
 export interface RouteConfig {
   path: string

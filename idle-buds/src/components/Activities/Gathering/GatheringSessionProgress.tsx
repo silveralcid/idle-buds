@@ -1,5 +1,8 @@
 import { FC } from 'react';
-
+import {
+    useGameStore
+    
+ } from '../../../stores/useStore';
 interface GatheringReward {
     amount: number;
     item: string;
@@ -12,7 +15,7 @@ interface GatheringSessionProgressProps {
     progress: number;
     maxProgress: number;
     rewards: GatheringReward[];
-    timeSeconds?: number; // Added timeSeconds prop
+    timeSeconds?: number;
 }
 
 const GatheringSessionProgress: FC<GatheringSessionProgressProps> = ({
@@ -21,17 +24,36 @@ const GatheringSessionProgress: FC<GatheringSessionProgressProps> = ({
     progress,
     maxProgress,
     rewards,
-    timeSeconds = 0
 }) => {
+    const { woodcutting } = useGameStore();
+
+    // Only render if there's an active woodcutting session
+    if (!woodcutting.isChopping || !woodcutting.currentTree) {
+        return null;
+    }
+
+    // Calculate time in seconds from milliseconds
+    const timeSeconds = Math.round(woodcutting.currentTree.timeToChop / 1000);
+
+    // Calculate progress percentage
+    const progressPercentage = (woodcutting.progress / woodcutting.currentTree.timeToChop) * 100;
+
     return (
         <div className="w-full bg-base-200 rounded-lg p-4 shadow-lg">
+            {/* Activity Header */}
+            <div className="flex justify-between items-center mb-2">
+                <h3 className="text-lg font-semibold">
+                    {activityName}: {woodcutting.currentTree.name}
+                </h3>
+            </div>
+
             {/* Active Gathering Info Row */}
             <div className="w-full bg-base-300 rounded-lg p-4 mb-4">
                 <div className="progress-bar">
                     <progress 
                         className="progress progress-primary w-full" 
-                        value={progress} 
-                        max={maxProgress}
+                        value={woodcutting.progress} 
+                        max={woodcutting.currentTree.timeToChop}
                     ></progress>
                 </div>
             </div>
@@ -39,23 +61,18 @@ const GatheringSessionProgress: FC<GatheringSessionProgressProps> = ({
             {/* Rewards and Time Row */}
             <div className="w-full">
                 <div className="flex flex-wrap gap-2 justify-center items-center">
+                    {/* Resource Badge */}
+                    <div className="badge badge-primary">
+                        +1 {woodcutting.currentTree.resourceName}
+                    </div>
 
-                    {/* Reward Badges */}
-                    {rewards.map((reward, index) => (
-                        <div 
-                            key={index} 
-                            className={`badge ${
-                                reward.type === 'item' 
-                                    ? 'badge-primary' 
-                                    : 'badge-secondary'
-                            }`}
-                        >
-                            +{reward.amount} {reward.item}
-                        </div>
-                    ))}
+                    {/* XP Badge */}
+                    <div className="badge badge-secondary">
+                        +{woodcutting.currentTree.xpPerCut} XP
+                    </div>
 
-                                        {/* Time Badge */}
-                                        <div className="badge badge-primary">
+                    {/* Time Badge */}
+                    <div className="badge badge-primary">
                         <svg 
                             xmlns="http://www.w3.org/2000/svg" 
                             className="h-3 w-3 mr-1" 
