@@ -72,6 +72,7 @@ export const Sidebar = () => {
           <MenuItem route={ROUTES.STORE} onClick={() => navigate(ROUTES.STORE)} />
           <MenuItem route={ROUTES.INVENTORY} onClick={() => navigate(ROUTES.INVENTORY)} />
           <MenuItem route={ROUTES.BUD_BOX} onClick={() => navigate(ROUTES.BUD_BOX)} />
+          <MenuItem route={ROUTES.TESTING} onClick={() => navigate(ROUTES.TESTING)} />
         </ul>
       </div>
 

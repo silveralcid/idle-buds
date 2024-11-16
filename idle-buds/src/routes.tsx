@@ -3,6 +3,7 @@ import { ROUTES } from './constants/routeMappings';
 
 import WoodcuttingPage from './activities/WoodcuttingActivity';
 import CraftingPage from './activities/CraftingActivity';
+import { Testing } from './activities/Testing';
 
 export interface RouteConfig {
   path: string
@@ -12,7 +13,7 @@ export interface RouteConfig {
 export const routes: RouteConfig[] = [
   {
     path: '/',
-    component: <WoodcuttingPage />
+    component: <Testing />
   },
   {
     path: ROUTES.WOODCUTTING,
@@ -21,5 +22,9 @@ export const routes: RouteConfig[] = [
   {
     path: ROUTES.CRAFTING,
     component: <CraftingPage />
+  },
+  {
+    path: ROUTES.TESTING,
+    component: <Testing />
   }
 ]

@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import { useRouterStore } from './RouterStore'
+import DummyPage from '../components/DummyPage'
 
 interface RouteConfig {
   path: string
@@ -16,7 +17,7 @@ export const Router = ({ routes }: RouterProps) => {
   const currentComponent = routes.find(route => route.path === currentPath)?.component
 
   if (!currentComponent) {
-    return <div>Page not found</div>
+    return <DummyPage title="404" />
   }
 
   return <>{currentComponent}</>
