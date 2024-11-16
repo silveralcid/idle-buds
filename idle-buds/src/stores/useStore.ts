@@ -1,79 +1,40 @@
+// src/stores/useStore.ts
+import { create } from 'zustand';
+import type { Tree } from '../types/resources';
+import type { WoodcuttingSkill } from '../types/skills';
+import type { Activity } from '../types/activities';
+import { TREES } from '../data/trees';
 
-import { create } from 'zustand'
+// Constants
+export const MAX_LEVEL = 99;
 
-
-// Define types for trees
-interface Tree {
-  id: string;
-  name: string;
-  requiredLevel: number;
-  xpPerCut: number;
-  timeToChop: number; // in milliseconds
-  resourceName: string;
-}
-
-// Define available trees
-export const TREES: Tree[] = [
-  {
-    id: 'normal_tree',
-    name: 'Normal Tree',
-    requiredLevel: 1,
-    xpPerCut: 25,
-    timeToChop: 3000,
-    resourceName: 'normal_logs'
-  },
-
-  // Add more trees as needed
-];
-
-interface WoodcuttingSkill {
-  level: number;
-  experience: number;
-  isChopping: boolean;
-  currentTree?: Tree;
-  progress: number;
-}
-
+// Types
 interface Inventory {
   [key: string]: number;
 }
 
 interface GameState {
-  // General state
   level: number;
   experience: number;
-  
-  // Woodcutting skill
   woodcutting: WoodcuttingSkill;
-  
-  // Inventory
   inventory: Inventory;
-
-  // General actions
-  addExperience: (amount: number) => void;
+  currentActivity: Activity;
   
-  // Woodcutting actions
+  // Actions
+  addExperience: (amount: number) => void;
   addWoodcuttingExperience: (amount: number) => void;
   startChopping: (treeId: string) => void;
   stopChopping: () => void;
   updateChoppingProgress: (progress: number) => void;
-  
-  // Inventory actions
   addResource: (resourceName: string, amount: number) => void;
+  setCurrentActivity: (activity: Activity) => void;
   
-  // Utility functions
+  // Utility
   getRequiredXPForLevel: (level: number) => number;
   canChopTree: (tree: Tree) => boolean;
-
-  // Add navigation state
-  currentActivity: 'woodcutting' | 'mining' | 'fishing' | null;
-  
-  // Add navigation action
-  setCurrentActivity: (activity: 'woodcutting' | 'mining' | 'fishing' | null) => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
-  // Initial state
   level: 1,
   experience: 0,
   
@@ -85,28 +46,31 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
   
   inventory: {},
+  currentActivity: 'woodcutting',
 
-  // General actions
   addExperience: (amount) => set((state) => {
+    if (state.level >= MAX_LEVEL) return state;
+    
     const newExperience = state.experience + amount;
     let newLevel = state.level;
     
-    while (newExperience >= get().getRequiredXPForLevel(newLevel)) {
+    while (newExperience >= get().getRequiredXPForLevel(newLevel) && newLevel < MAX_LEVEL) {
       newLevel++;
     }
     
     return { 
       experience: newExperience,
-      level: newLevel
+      level: Math.min(newLevel, MAX_LEVEL)
     };
   }),
 
-  // Woodcutting actions
   addWoodcuttingExperience: (amount) => set((state) => {
+    if (state.woodcutting.level >= MAX_LEVEL) return state;
+
     const newExperience = state.woodcutting.experience + amount;
     let newLevel = state.woodcutting.level;
     
-    while (newExperience >= get().getRequiredXPForLevel(newLevel)) {
+    while (newExperience >= get().getRequiredXPForLevel(newLevel) && newLevel < MAX_LEVEL) {
       newLevel++;
     }
     
@@ -114,7 +78,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       woodcutting: {
         ...state.woodcutting,
         experience: newExperience,
-        level: newLevel
+        level: Math.min(newLevel, MAX_LEVEL)
       }
     };
   }),
@@ -156,8 +120,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
   })),
 
-  // Utility functions
   getRequiredXPForLevel: (level) => {
+    if (level > MAX_LEVEL) return Infinity;
     return Math.floor(100 * Math.pow(1.5, level - 1));
   },
 
@@ -165,9 +129,6 @@ export const useGameStore = create<GameState>((set, get) => ({
     const state = get();
     return state.woodcutting.level >= tree.requiredLevel;
   },
-  
-  // Set woodcutting as default activity
-  currentActivity: 'woodcutting',
   
   setCurrentActivity: (activity) => set({ currentActivity: activity }),
 }));

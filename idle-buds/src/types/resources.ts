@@ -6,3 +6,4 @@ export interface Tree {
     timeToChop: number; // in milliseconds
     resourceName: string;
   }
+  

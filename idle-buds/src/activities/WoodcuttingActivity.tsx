@@ -2,7 +2,8 @@ import { FC } from 'react';
 import ActivityProgressOverview from '../components/Activities/ActivityProgressOverview';
 import GatheringSessionProgress from '../components/Activities/Gathering/GatheringSessionProgress';
 import GatheringNodeCard from '../components/Activities/Gathering/ResourceNode';
-import { useGameStore, TREES } from '../stores/useStore';
+import { useGameStore } from '../stores/useStore';
+import { TREES } from '../data/trees';
 import { useWoodcuttingLoop } from '../hooks/useWoodcuttingLoop';
 
 interface WoodcuttingActivityProps {
