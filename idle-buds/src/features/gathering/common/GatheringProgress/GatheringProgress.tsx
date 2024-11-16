@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import TamerActivityProgressOverview from './TamerActivityProgressOverview';
-import BudActivityProgressOverview from './BudActivityProgressOverview';
+import TamerActivityProgressOverview from './TamerGatheringProgress';
+import BudActivityProgressOverview from './ActiveBudGatheringProgress';
 
 interface ActivityProgressOverviewProps {
     activityName: string;

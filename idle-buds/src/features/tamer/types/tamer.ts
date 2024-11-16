@@ -3,7 +3,7 @@ import type {
     BudTeam, 
     BreedingFacility, 
     BudCollection 
-  } from './bud';
+  } from '../../buds/types/bud';
   
 // Combat-specific stats for the Tamer
 export interface TamerCombatStats {

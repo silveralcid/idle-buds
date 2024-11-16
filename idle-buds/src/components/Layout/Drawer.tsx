@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
-import { Navbar } from '../Navbar/Navbar';
+import { Navbar } from './Navbar/Navbar';
 import { useRouterStore } from '../../router/RouterStore';
-import { ROUTE_TITLES } from '../../constants/routeMappings';
+import { ROUTE_TITLES } from '../../data/constants/routeMappings';
 
 interface DrawerProps {
   children: ReactNode;

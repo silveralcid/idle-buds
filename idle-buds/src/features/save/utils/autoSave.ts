@@ -1,5 +1,5 @@
 // src/utils/autoSave.ts
-import { useGameStore } from '../stores/useStore';
+import { useGameStore } from '../../../stores/useStore';
 
 const AUTO_SAVE_INTERVAL = 60000; // 1 minute
 

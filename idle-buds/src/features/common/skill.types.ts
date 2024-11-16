@@ -1,4 +1,4 @@
-import { Tree } from './resources';
+import { Tree } from './resource.types';
 
 export interface WoodcuttingSkill {
   level: number;

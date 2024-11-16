@@ -1,4 +1,4 @@
-import { useGameStore } from '../stores/useStore';
+import { useGameStore } from '../../../stores/useStore';
 
 const LAST_ACTIVE_KEY = 'idle_buds_last_active';
 

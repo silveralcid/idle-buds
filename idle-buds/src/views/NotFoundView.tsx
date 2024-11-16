@@ -1,10 +1,10 @@
-// src/pages/DummyPage.tsx
+// src/pages/NotFound.tsx
 // This is a reusable template for dummy pages
-interface DummyPageProps {
+interface NotFoundProps {
     title: string;
   }
   
-  export const DummyPage: React.FC<DummyPageProps> = ({ title }) => {
+  export const NotFound: React.FC<NotFoundProps> = ({ title }) => {
     return (
       <div className="p-4">
         <div className="bg-base-200 rounded-lg p-6">
@@ -14,4 +14,4 @@ interface DummyPageProps {
     );
 };
   
-export default DummyPage;
+export default NotFound;

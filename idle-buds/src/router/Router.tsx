@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { useRouterStore } from './RouterStore'
-import DummyPage from '../components/DummyPage'
+import DummyPage from '../views/NotFoundView'
 
 interface RouteConfig {
   path: string

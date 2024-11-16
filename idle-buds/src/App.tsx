@@ -1,4 +1,4 @@
-import { DrawerLayout } from './components/Layout/Drawer'
+import { DrawerLayout } from './components/layout/Drawer'
 import { Router } from './router/Router'
 import { routes } from './routes'
 import { Sidebar } from './components/Sidebar'
@@ -6,9 +6,9 @@ import { useRouterStore } from './router/RouterStore'
 import { useGameStore } from './stores/useStore'
 import { useEffect, useState } from 'react'
 import type { Theme } from './router/RouterStore' 
-import { initializeAutoSave } from './utils/autoSave'
-import { updateLastActiveTime, calculateOfflineProgress, applyOfflineProgress } from './utils/offlineProgress'
-import { OfflineProgressModal } from './components/OfflineProgressModal'
+import { initializeAutoSave } from './features/save/utils/autoSave'
+import { updateLastActiveTime, calculateOfflineProgress, applyOfflineProgress } from './features/offline/utils/offlineProgress'
+import { OfflineProgressModal } from './features/offline/hooks/OfflineProgressModal'
 
 function App() {
   const setTheme = useRouterStore((state) => state.setTheme)

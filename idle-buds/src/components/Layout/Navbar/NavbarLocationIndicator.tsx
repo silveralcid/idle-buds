@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import { useRouterStore } from '../../router/RouterStore';
-import { ROUTE_ICONS, ROUTE_TITLES } from '../../constants/routeMappings';
+import { useRouterStore } from '../../../router/RouterStore';
+import { ROUTE_ICONS, ROUTE_TITLES } from '../../../data/constants/routeMappings';
 
 export const NavbarLocationIndicator: FC = () => {
     const currentPath = useRouterStore((state) => state.currentRoute);

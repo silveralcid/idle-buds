@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGameStore } from '../../stores/useStore';
+import { useGameStore } from '../../../stores/useStore';
 
 interface NavbarDropdownOptionsProps {
   playerName: string;

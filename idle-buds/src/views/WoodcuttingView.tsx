@@ -1,7 +1,7 @@
 import { FC } from 'react';
-import ActivityProgressOverview from '../components/Activities/ActivityProgressOverview';
-import GatheringSessionProgress from '../components/Activities/Gathering/GatheringSessionProgress';
-import GatheringNodeCard from '../components/Activities/Gathering/ResourceNode';
+import ActivityProgressOverview from '../components/common/GatheringProgress/GatheringProgress';
+import GatheringSessionProgress from '../components/common/ActiveGatheringInfo/ActiveGatheringInfo';
+import GatheringNodeCard from '../features/gathering/common/ResourceNode/ResourceNode';
 import { useGameStore } from '../stores/useStore';
 import { TREES } from '../data/trees';
 import { useWoodcuttingLoop } from '../hooks/useWoodcuttingLoop';

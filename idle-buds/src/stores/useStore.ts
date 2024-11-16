@@ -1,8 +1,8 @@
 // src/stores/useStore.ts
 import { create } from 'zustand';
-import type { Tree } from '../types/resources';
-import type { WoodcuttingSkill } from '../types/skills';
-import type { Activity } from '../types/activities';
+import type { Tree } from '../features/common/resource.types';
+import type { WoodcuttingSkill } from '../features/common/skill.types';
+import type { Activity } from '../features/common/activity.types';
 import { TREES } from '../data/trees';
 import { saveGame, loadGame, clearSave } from '../utils/saveGame';
 

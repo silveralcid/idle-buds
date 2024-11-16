@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import CraftingProgressOverview from '../components/Activities/Crafting/CraftingProgressOverview';
-import CraftingWorkbenchSelection from '../components/Activities/Crafting/Crafting/CraftingWorkbenchSelection';
+import CraftingProgressOverview from '../features/crafting/common/CraftingProgress/CraftingProgressOverview';
+import CraftingWorkbenchSelection from '../features/base/common/Workbench/CraftingWorkbenchSelection';
 
 interface CraftingActivityProps {
     // Add props as needed
