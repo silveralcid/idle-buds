@@ -151,3 +151,4 @@ export const useBankStore = create<BankStore>((set, get) => ({
       item.name.toLowerCase().includes(query.toLowerCase())
     )
 }));
+

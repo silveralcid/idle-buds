@@ -17,6 +17,8 @@ export const useResourceGathering = () => {
     useEffect(() => {
         console.log('Resource gathering effect triggered');
         console.log('Current activity:', currentActivity);
+        console.log('Nodes:', nodes);
+
         // First check if nodeId exists
         if (!currentActivity?.isActive || !currentActivity.nodeId) {
             console.log('No active gathering or no nodeId');
@@ -25,7 +27,23 @@ export const useResourceGathering = () => {
           
         
         const nodeId = currentActivity.nodeId; // This ensures nodeId is defined
-        const node = nodes[nodeId];
+
+          // Map nodeId to the correct key in the nodes object
+        let nodeKey;
+        switch (nodeId) {
+            case "basic-tree-1":
+                nodeKey = "TIER_1_WOOD";
+                break;
+            case "dense-tree-2":
+                nodeKey = "TIER_2_WOOD";
+                break;
+            // Add more cases for other nodeIds
+            default:
+                console.log("Unknown nodeId:", nodeId);
+                return;
+        }
+
+        const node = nodes[nodeKey];
 
         console.log('Node found:', node);
 
