@@ -1,6 +1,6 @@
 import React from 'react';
 
-const LumberingView = () => {
+const MiningView = () => {
   return (
     <div className="h-full flex flex-col gap-4">
       {/* Activity Header */}
@@ -90,4 +90,4 @@ const LumberingView = () => {
   );
 };
 
-export default LumberingView;
+export default MiningView;
