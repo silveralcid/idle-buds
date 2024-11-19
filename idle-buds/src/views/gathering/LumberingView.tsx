@@ -1,6 +1,36 @@
 import React from 'react';
 
+import { useResourceStore } from '../../stores/resource.store';
+import { useHunterStore } from '../../stores/hunter.store';
+import { ResourceType } from '../../enums/resource.enums';
+import { ActivityType } from '../../enums/activity.enums';
+import { TreeNode } from '../../types/tree.types';
+
 const LumberingView = () => {
+  const nodes = useResourceStore(state => state.nodes);
+  const updateNode = useResourceStore(state => state.updateNode);
+  const hunterLevel = useHunterStore(state => 
+    state.activityLevels.lumbering.level
+  );
+  const currentActivity = useHunterStore(state => state.currentActivity);
+  const setCurrentActivity = useHunterStore(state => state.setCurrentActivity);
+
+  const handleStartGathering = (nodeId: string) => {
+    setCurrentActivity({
+      type: ActivityType.lumbering,
+      startTime: Date.now(),
+      lastTickProcessed: Date.now(),
+      lastActiveTime: Date.now(),
+      isActive: true,
+      nodeId
+    });
+  };
+
+  const calculateResourcesPerHour = (resourcesPerTick: number) => {
+    return Math.floor(resourcesPerTick * 20 * 60 * 60);
+  };
+
+
   return (
     <div className="h-full flex flex-col gap-4">
       {/* Activity Header */}
@@ -13,59 +43,57 @@ const LumberingView = () => {
       </div>
 
       {/* Resource Nodes */}
-      <div className="grid grid-cols-2 gap-4">
-        {/* Tier 1 Wood Node */}
-        <div className="card bg-base-200 shadow-lg">
-          <div className="card-body">
-            <h3 className="card-title">Tier 1 Wood</h3>
-            <div className="space-y-2">
-              <progress 
-                className="progress progress-primary w-full" 
-                value={40} 
-                max={100}
-              />
-              <div className="flex justify-between text-sm">
-                <span>Resources/hr: 20</span>
-                <span>Level Required: 1</span>
-              </div>
-              <div className="card-actions justify-end">
-                <button className="btn btn-primary btn-sm">
-                  Start Gathering
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Tier 2 Wood Node - Locked */}
-        <div className="card bg-base-200 shadow-lg opacity-50">
-          <div className="card-body">
-            <h3 className="card-title">
-              Tier 2 Wood
-              <div className="badge badge-secondary">Locked</div>
-            </h3>
-            <div className="space-y-2">
-              <progress 
-                className="progress progress-secondary w-full" 
-                value={0} 
-                max={100}
-              />
-              <div className="flex justify-between text-sm">
-                <span>Resources/hr: 40</span>
-                <span>Level Required: 15</span>
-              </div>
-              <div className="card-actions justify-end">
-                <button className="btn btn-secondary btn-sm" disabled>
-                  Unlock at Level 15
-                </button>
+      <div className="grid grid-cols-2 gap-4 flex-grow overflow-auto">
+        {Object.values(nodes).map((node) => {
+          const isLocked = hunterLevel < node.requirements.activityLevel;
+          const isActive = currentActivity?.nodeId === node.id;
+          const treeNode = node as TreeNode;
+          return (
+            <div 
+              key={node.id} 
+              className={`card bg-base-200 shadow-lg ${isLocked ? 'opacity-50' : ''}`}
+            >
+              <div className="card-body">
+                <h3 className="card-title flex justify-between">
+                  {node.region}
+                  {isLocked && (
+                    <div className="badge badge-secondary">Locked</div>
+                  )}
+                </h3>
+                <div className="space-y-2">
+                  <progress 
+                    className="progress progress-primary w-full" 
+                    value={treeNode.treeHealth.current} 
+                    max={treeNode.treeHealth.max}
+                  />
+                  <div className="flex justify-between text-sm">
+                    <span>Resources/hr: {calculateResourcesPerHour(node.resourcesPerTick)}</span>
+                    <span>Level Required: {node.requirements.activityLevel}</span>
+                  </div>
+                  <div className="card-actions justify-end">
+                    {isLocked ? (
+                      <button className="btn btn-secondary btn-sm" disabled>
+                        Unlock at Level {node.requirements.activityLevel}
+                      </button>
+                    ) : (
+                      <button 
+                        className={`btn ${isActive ? 'btn-error' : 'btn-primary'} btn-sm`}
+                        onClick={() => handleStartGathering(node.id)}
+                        disabled={currentActivity && !isActive}
+                      >
+                        {isActive ? 'Stop Gathering' : 'Start Gathering'}
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          );
+        })}
       </div>
 
       {/* Active Gatherers */}
-      <div className="card bg-base-200 shadow-lg mt-auto">
+      <div className="card bg-base-200 shadow-lg">
         <div className="card-body">
           <h3 className="card-title">Active Gatherers</h3>
           <div className="divide-y divide-base-300">
