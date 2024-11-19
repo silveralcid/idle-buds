@@ -25,8 +25,6 @@ export enum ToolType {
   AXE = 'AXE',
   PICKAXE = 'PICKAXE',
   FISHING_ROD = 'FISHING_ROD',
-  WATERING_CAN = 'WATERING_CAN',
-  SMITHING_HAMMER = 'SMITHING_HAMMER'
 }
 
 export enum MaterialType {
@@ -39,7 +37,6 @@ export enum MaterialType {
 export enum ConsumableType {
   FOOD = 'FOOD',
   POTION = 'POTION',
-  BAIT = 'BAIT'
 }
 
 export enum EquipmentQuality {
