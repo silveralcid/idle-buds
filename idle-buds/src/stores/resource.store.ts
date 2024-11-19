@@ -13,13 +13,15 @@ interface ResourceState {
 export const useResourceStore = create<ResourceState>((set) => ({
   nodes: treesData,
   inventory: {},
-  updateNode: (nodeId, updates) => 
+  updateNode: (nodeId, updates) => {
+    console.log('Updating node:', nodeId, updates);
     set((state) => ({
       nodes: {
         ...state.nodes,
         [nodeId]: { ...state.nodes[nodeId], ...updates }
       }
-    })),
+    }));
+  },
   addResource: (resourceId, amount) =>
     set((state) => ({
       inventory: {
