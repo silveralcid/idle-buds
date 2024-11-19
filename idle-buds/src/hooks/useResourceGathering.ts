@@ -27,23 +27,8 @@ export const useResourceGathering = () => {
           
         
         const nodeId = currentActivity.nodeId; // This ensures nodeId is defined
-
-          // Map nodeId to the correct key in the nodes object
-        let nodeKey;
-        switch (nodeId) {
-            case "basic-tree-1":
-                nodeKey = "TIER_1_WOOD";
-                break;
-            case "dense-tree-2":
-                nodeKey = "TIER_2_WOOD";
-                break;
-            // Add more cases for other nodeIds
-            default:
-                console.log("Unknown nodeId:", nodeId);
-                return;
-    }
             
-        const node = nodes[nodeKey];
+        const node = nodes[nodeId];
 
         console.log('Node found:', node);
 
