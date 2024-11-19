@@ -41,8 +41,8 @@ export const useResourceGathering = () => {
             default:
                 console.log("Unknown nodeId:", nodeId);
                 return;
-        }
-
+    }
+            
         const node = nodes[nodeKey];
 
         console.log('Node found:', node);

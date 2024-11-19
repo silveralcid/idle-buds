@@ -5,6 +5,7 @@ import { ItemType } from '../enums/item.enums';
 import { useBankStore } from '../stores/bank.store';
 import { TreeNode } from '../types/tree.types';
 import { useResourceStore } from '../stores/resource.store';
+import { useMemo } from 'react';
 
 const HunterInfo = () => {
   const { stats, activityLevels, currentActivity } = useHunterStore();
@@ -14,8 +15,12 @@ const HunterInfo = () => {
 
   // Get only resource items from bank
   const resources = getItemsByType(ItemType.RESOURCE);
-  const currentNode = currentActivity?.nodeId ? nodes[currentActivity.nodeId] as TreeNode : null;
-
+  const currentNode = useMemo(() => {
+    if (currentActivity?.nodeId) {
+      return nodes[currentActivity.nodeId] as TreeNode;
+    }
+    return null;
+  }, [currentActivity, nodes]);  
 
   return (
     <div className="space-y-4">

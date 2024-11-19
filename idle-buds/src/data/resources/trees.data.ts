@@ -3,8 +3,8 @@ import { ResourceType, WoodType } from '../../enums/resource.enums';
 import { ProgressionTier } from '../../enums/game.enums';
 import { TreeNode } from '../../types/tree.types';
 
-export const treesData: Record<WoodType, TreeNode> = {
-  [WoodType.TIER_1_WOOD]: {
+export const treesData: Record<string, TreeNode> = {
+  'basic-tree-1': {
     id: 'basic-tree-1',
     resourceType: ResourceType.LOGS,
     woodType: WoodType.TIER_1_WOOD,
@@ -29,7 +29,7 @@ export const treesData: Record<WoodType, TreeNode> = {
       buds: {}
     }
   },
-  [WoodType.TIER_2_WOOD]: {
+  'dense-tree-2': {
     id: 'dense-tree-2',
     resourceType: ResourceType.LOGS,
     woodType: WoodType.TIER_2_WOOD,
@@ -54,7 +54,7 @@ export const treesData: Record<WoodType, TreeNode> = {
       buds: {}
     }
   },
-  [WoodType.TIER_3_WOOD]: {
+  'mystic-tree-3': {
     id: 'mystic-tree-3',
     resourceType: ResourceType.LOGS,
     woodType: WoodType.TIER_3_WOOD,
@@ -79,7 +79,7 @@ export const treesData: Record<WoodType, TreeNode> = {
       buds: {}
     }
   },
-  [WoodType.TIER_4_WOOD]: {
+  'ancient-tree-4': {
     id: 'ancient-tree-4',
     resourceType: ResourceType.LOGS,
     woodType: WoodType.TIER_4_WOOD,
@@ -104,7 +104,7 @@ export const treesData: Record<WoodType, TreeNode> = {
       buds: {}
     }
   },
-  [WoodType.TIER_5_WOOD]: {
+  'shadow-tree-5': {
     id: 'shadow-tree-5',
     resourceType: ResourceType.LOGS,
     woodType: WoodType.TIER_5_WOOD,
@@ -129,7 +129,7 @@ export const treesData: Record<WoodType, TreeNode> = {
       buds: {}
     }
   },
-  [WoodType.TIER_6_WOOD]: {
+  'crystal-tree-6': {
     id: 'crystal-tree-6',
     resourceType: ResourceType.LOGS,
     woodType: WoodType.TIER_6_WOOD,
@@ -154,7 +154,7 @@ export const treesData: Record<WoodType, TreeNode> = {
       buds: {}
     }
   },
-  [WoodType.TIER_7_WOOD]: {
+  'dragon-tree-7': {
     id: 'dragon-tree-7',
     resourceType: ResourceType.LOGS,
     woodType: WoodType.TIER_7_WOOD,
@@ -179,7 +179,7 @@ export const treesData: Record<WoodType, TreeNode> = {
       buds: {}
     }
   },
-  [WoodType.TIER_8_WOOD]: {
+  'celestial-tree-8': {
     id: 'celestial-tree-8',
     resourceType: ResourceType.LOGS,
     woodType: WoodType.TIER_8_WOOD,
