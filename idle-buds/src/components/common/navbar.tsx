@@ -10,6 +10,7 @@ const Navbar = () => {
             </svg>
           </label>
           <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+            <li><a>Testing</a></li>
             <li><a>Lumbering</a></li>
           </ul>
         </div>

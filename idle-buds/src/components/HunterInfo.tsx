@@ -1,9 +1,15 @@
 import React from 'react';
 import { useHunterStore } from '../stores/hunter.store';
 import { ActivityType } from '../enums/activity.enums';
+import { ItemType } from '../enums/item.enums';
+import { useBankStore } from '../stores/bank.store';
 
 const HunterInfo = () => {
   const { stats, activityLevels, currentActivity } = useHunterStore();
+  const { items, getItemsByType } = useBankStore();
+
+  // Get only resource items from bank
+  const resources = getItemsByType(ItemType.RESOURCE);
 
   return (
     <div className="space-y-4">
@@ -20,12 +26,30 @@ const HunterInfo = () => {
         </div>
       </div>
 
+      {/* Resources Section */}
+      {resources.length > 0 && (
+        <div>
+          <h3 className="font-bold text-lg mb-2">Resources</h3>
+          <div className="space-y-1">
+            {resources.map((resource) => (
+              <div 
+                key={resource.id} 
+                className="flex justify-between items-center text-sm bg-base-200 p-2 rounded-lg"
+              >
+                <span className="capitalize">{resource.name}</span>
+                <span>{resource.quantity}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Current Activity */}
       {currentActivity && (
         <div>
           <h3 className="font-bold text-lg mb-2">Current Activity</h3>
           <div className="bg-base-200 p-2 rounded-lg">
-            <div>{currentActivity.type}</div>
+            <div className="capitalize">{currentActivity.type}</div>
             <div className="text-sm opacity-70">
               Active: {currentActivity.isActive ? 'Yes' : 'No'}
             </div>
