@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useGameStore } from '../stores/useStore';
-import { TREES } from '../data/trees';
-
+import { Trees } from '../data/resources/trees';
 // Memoized components to prevent unnecessary re-renders
 const NumberInput = React.memo<{
   label: string;
@@ -59,7 +58,7 @@ const InventoryManager = React.memo<{
           onChange={(e) => onAddItem(e.target.value, 1)}
         >
           <option value="">Add item...</option>
-          {TREES.map(tree => (
+          {Trees.map(tree => (
             <option key={tree.id} value={tree.resourceName}>
               {tree.resourceName}
             </option>

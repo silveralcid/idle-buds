@@ -1,7 +1,7 @@
 import { DrawerLayout } from './components/layout/Drawer'
+import { Sidebar } from './components/layout/Sidebar'
 import { Router } from './router/Router'
 import { routes } from './routes'
-import { Sidebar } from './components/Sidebar'
 import { useRouterStore } from './router/RouterStore'
 import { useGameStore } from './stores/useStore'
 import { useEffect, useState } from 'react'

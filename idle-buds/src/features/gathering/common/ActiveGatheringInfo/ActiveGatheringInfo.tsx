@@ -2,7 +2,7 @@ import { FC } from 'react';
 import {
     useGameStore
     
- } from '../../../stores/useStore';
+ } from '../../../../stores/useStore';
 interface GatheringReward {
     amount: number;
     item: string;

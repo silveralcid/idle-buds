@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import CraftingProgressOverview from '../features/crafting/common/CraftingProgress/CraftingProgressOverview';
+import TamerCraftingProgressOverview from '../features/crafting/common/CraftingProgress/TamerCraftingProgress';
 import CraftingWorkbenchSelection from '../features/base/common/Workbench/CraftingWorkbenchSelection';
 
 interface CraftingActivityProps {
@@ -12,7 +12,7 @@ const CraftingActivity: FC<CraftingActivityProps> = () => {
     return (
         <div className="flex flex-col w-full gap-4 p-4 pt-16">
             {/* Row 1: Activity Progress Overview Section */}
-            <CraftingProgressOverview
+            <TamerCraftingProgressOverview
                 activityName="Crafting"
                 currentLevel={1}
                 currentXP={0}

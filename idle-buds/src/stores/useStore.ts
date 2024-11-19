@@ -3,8 +3,8 @@ import { create } from 'zustand';
 import type { Tree } from '../features/common/resource.types';
 import type { WoodcuttingSkill } from '../features/common/skill.types';
 import type { Activity } from '../features/common/activity.types';
-import { TREES } from '../data/trees';
-import { saveGame, loadGame, clearSave } from '../utils/saveGame';
+import { Trees } from '../data/resources/trees';
+import { saveGame, loadGame, clearSave } from '../features/save/utils/saveGame'
 
 // Constants
 export const MAX_LEVEL = 99;
@@ -14,7 +14,7 @@ interface Inventory {
   [key: string]: number;
 }
 
-interface GameState {
+export interface GameState {
   level: number;
   experience: number;
   woodcutting: WoodcuttingSkill & {
@@ -99,7 +99,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   }),
 
   startChopping: (treeId) => set((state) => {
-    const tree = TREES.find(t => t.id === treeId);
+    const tree = Trees.find(t => t.id === treeId);
     if (!tree || !get().canChopTree(tree)) return state;
 
     return {

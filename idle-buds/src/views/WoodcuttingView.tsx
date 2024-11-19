@@ -1,10 +1,10 @@
 import { FC } from 'react';
-import ActivityProgressOverview from '../components/common/GatheringProgress/GatheringProgress';
-import GatheringSessionProgress from '../components/common/ActiveGatheringInfo/ActiveGatheringInfo';
+import GatheringSessionProgress from '../features/gathering/common/ActiveGatheringInfo/ActiveGatheringInfo';
+import TamerActivityProgressOverview from '../features/gathering/common/GatheringProgress/TamerGatheringProgress';
 import GatheringNodeCard from '../features/gathering/common/ResourceNode/ResourceNode';
 import { useGameStore } from '../stores/useStore';
-import { TREES } from '../data/trees';
-import { useWoodcuttingLoop } from '../hooks/useWoodcuttingLoop';
+import { Trees } from '../data/resources/trees';
+import { useWoodcuttingLoop } from '../features/gathering/Woodcutting/hooks/useWoodcuttingLoop';
 
 interface WoodcuttingActivityProps {
     // Add props as needed
@@ -38,7 +38,7 @@ const WoodcuttingActivity: FC<WoodcuttingActivityProps> = () => {
     ] : [];
 
     const handleTreeSelect = (treeId: string) => {
-        const tree = TREES.find(t => t.id === treeId);
+        const tree = Trees.find(t => t.id === treeId);
         if (!tree) return;
 
         if (woodcutting.currentTree?.id === treeId) {
@@ -51,7 +51,7 @@ const WoodcuttingActivity: FC<WoodcuttingActivityProps> = () => {
     return (
         <div className="flex flex-col w-full gap-4 p-4 pt-16">
             {/* Row 1: Activity Progress Overview Section */}
-            <ActivityProgressOverview 
+            <TamerActivityProgressOverview
                 activityName="Woodcutting"
                 currentLevel={woodcutting.level}
                 currentXP={woodcutting.experience}
@@ -72,7 +72,7 @@ const WoodcuttingActivity: FC<WoodcuttingActivityProps> = () => {
             {/* Row 3: Available Trees Grid */}
             <div className="w-full">
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {TREES.map((tree) => (
+                    {Trees.map((tree) => (
                         <GatheringNodeCard
                             key={tree.id}
                             name={tree.name}

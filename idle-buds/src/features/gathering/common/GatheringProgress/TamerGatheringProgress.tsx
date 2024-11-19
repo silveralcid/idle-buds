@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { useGameStore } from '../../../stores/useStore';
+import { useGameStore } from '../../../../stores/useStore';
 
 interface TamerActivityProgressOverviewProps {
     activityName: string;

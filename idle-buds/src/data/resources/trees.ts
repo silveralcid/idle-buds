@@ -1,6 +1,6 @@
-import { Tree } from '../types/resources';
+import { Tree } from "../../features/common/resource.types";
 
-export const TREES: Tree[] = [
+export const Trees: Tree[] = [
   {
     id: 'normal_tree',
     name: 'Normal Tree',

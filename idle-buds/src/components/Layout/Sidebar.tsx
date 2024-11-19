@@ -1,6 +1,6 @@
 import { FC } from 'react'
-import { ROUTES, ROUTE_ICONS, ROUTE_TITLES } from '../constants/routeMappings'
-import { useRouterStore } from '../router/RouterStore'
+import { ROUTES, ROUTE_ICONS, ROUTE_TITLES } from '../../data/constants/routeMappings'
+import { useRouterStore } from '../../router/RouterStore'
 
 const THEMES = [
   "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave",

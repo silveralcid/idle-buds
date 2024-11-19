@@ -1,6 +1,6 @@
 // hooks/useWoodcuttingLoop.ts
 import { useEffect } from 'react';
-import { useGameStore } from '../stores/useStore';
+import { useGameStore } from '../../../../stores/useStore';
 
 export const useWoodcuttingLoop = () => {
   const { 

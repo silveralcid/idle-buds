@@ -1,5 +1,5 @@
 // src/utils/saveGame.ts
-import type { GameState } from '../stores/useStore';
+import { GameState } from '../../../stores/useStore'
 
 const SAVE_KEY = 'idle_buds_save';
 const SAVE_VERSION = '1.0.0';
