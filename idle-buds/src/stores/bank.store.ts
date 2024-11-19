@@ -43,7 +43,7 @@ interface BankedEquipment extends BankItem {
 }
 
 // Resources
-interface BankedResource extends BankItem {
+export interface BankedResource extends BankItem {
   itemType: ItemType.RESOURCE;
   resourceType: ResourceType;
 }
