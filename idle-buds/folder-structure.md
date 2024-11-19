@@ -67,3 +67,15 @@ src/
 │ └── index.tsx
 ├── App.tsx
 └── main.tsx
+
+
+src/
+├── types/
+│   ├── base.types.ts
+│   ├── bud.types.ts
+│   ├── battle.types.ts
+│   └── item.types.ts
+├── enums/
+│   ├── game.enums.ts
+│   ├── bud.enums.ts
+│   └── item.enums.ts
