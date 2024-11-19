@@ -1,39 +1,44 @@
 import React from 'react';
-
 import { useResourceStore } from '../../stores/resource.store';
 import { useHunterStore } from '../../stores/hunter.store';
 import { ResourceType } from '../../enums/resource.enums';
 import { ActivityType } from '../../enums/activity.enums';
 import { TreeNode } from '../../types/tree.types';
+import { useResourceGathering } from '../../hooks/useResourceGathering';
 
 const LumberingView = () => {
+  // Store hooks
   const nodes = useResourceStore(state => state.nodes);
-  const updateNode = useResourceStore(state => state.updateNode);
   const hunterLevel = useHunterStore(state => 
     state.activityLevels.lumbering.level
   );
   const currentActivity = useHunterStore(state => state.currentActivity);
   const setCurrentActivity = useHunterStore(state => state.setCurrentActivity);
 
-  const handleStartGathering = (nodeId: string) => {
-    setCurrentActivity({
-      type: ActivityType.lumbering,
-      startTime: Date.now(),
-      lastTickProcessed: Date.now(),
-      lastActiveTime: Date.now(),
-      isActive: true,
-      nodeId
-    });
-  };
+  // Resource gathering hook
+  useResourceGathering();
 
-  const handleStopGathering = () => {
-    setCurrentActivity(undefined);
+  // Handlers
+  const handleGatheringToggle = (nodeId: string) => {
+    if (currentActivity?.nodeId === nodeId) {
+      // Stop gathering
+      setCurrentActivity(undefined);
+    } else {
+      // Start gathering
+      setCurrentActivity({
+        type: ActivityType.lumbering,
+        startTime: Date.now(),
+        lastTickProcessed: Date.now(),
+        lastActiveTime: Date.now(),
+        isActive: true,
+        nodeId
+      });
+    }
   };
 
   const calculateResourcesPerHour = (resourcesPerTick: number) => {
     return Math.floor(resourcesPerTick * 20 * 60 * 60);
   };
-
 
   return (
     <div className="h-full flex flex-col gap-4">
@@ -41,9 +46,11 @@ const LumberingView = () => {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Lumbering</h2>
-          <p className="text-sm opacity-70">Level: 1 | XP: 0/100</p>
+          <p className="text-sm opacity-70">Level: {hunterLevel} | XP: 0/100</p>
         </div>
-        <div className="badge badge-primary">Active</div>
+        {currentActivity?.type === ActivityType.lumbering && (
+          <div className="badge badge-primary">Active</div>
+        )}
       </div>
 
       {/* Resource Nodes */}
@@ -52,6 +59,7 @@ const LumberingView = () => {
           const isLocked = hunterLevel < node.requirements.activityLevel;
           const isActive = currentActivity?.nodeId === node.id;
           const treeNode = node as TreeNode;
+
           return (
             <div 
               key={node.id} 
@@ -81,11 +89,11 @@ const LumberingView = () => {
                       </button>
                     ) : (
                       <button 
-                      className={`btn ${isActive ? 'btn-error' : 'btn-primary'} btn-sm`}
-                      onClick={() => isActive ? handleStopGathering() : handleStartGathering(node.id)}
-                      disabled={currentActivity && !isActive}
-                    >
-                      {isActive ? 'Stop Gathering' : 'Start Gathering'}
+                        className={`btn ${isActive ? 'btn-error' : 'btn-primary'} btn-sm`}
+                        onClick={() => handleGatheringToggle(node.id)}
+                        disabled={currentActivity && !isActive}
+                      >
+                        {isActive ? 'Stop Gathering' : 'Start Gathering'}
                       </button>
                     )}
                   </div>

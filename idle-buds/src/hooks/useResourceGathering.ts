@@ -21,6 +21,8 @@ export const useResourceGathering = () => {
     const nodeId = currentActivity.nodeId; // This ensures nodeId is defined
     const node = nodes[nodeId];
     if (!node) return;
+    
+    console.log('Starting gathering for node:', nodeId);
   
     const gatheringInterval = setInterval(() => {
       const node = nodes[nodeId]; // Use the defined nodeId here
@@ -36,10 +38,14 @@ export const useResourceGathering = () => {
         quantity: resourcesGained,
         tier: node.tier
       } as BankedResource);
+        
+      console.log('Resources deposited:', resourcesGained);
   
     }, 50);
   
-    return () => clearInterval(gatheringInterval);
-  }, [currentActivity, nodes, addResource]);
-  
-};
+    return () => {
+        console.log('Stopping gathering'); // Debug log
+        clearInterval(gatheringInterval);
+      };
+    }, [currentActivity, nodes, addResource]);
+  };
