@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 import type { Theme } from './router/RouterStore' 
 import { initializeAutoSave } from './features/save/utils/autoSave'
 import { updateLastActiveTime, calculateOfflineProgress, applyOfflineProgress } from './features/offline/utils/offlineProgress'
-import { OfflineProgressModal } from './features/offline/hooks/OfflineProgressModal'
+import { OfflineProgressModal } from './features/offline/OfflineProgressModal'
 
 function App() {
   const setTheme = useRouterStore((state) => state.setTheme)

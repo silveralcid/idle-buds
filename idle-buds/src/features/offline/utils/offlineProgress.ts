@@ -1,35 +1,45 @@
 import { useGameStore } from '../../../stores/useStore';
+import type { Activity } from '../../../features/common/activity.types';
 
 const LAST_ACTIVE_KEY = 'idle_buds_last_active';
+const LAST_ACTIVITY_KEY = 'idle_buds_last_activity';
 
 export const updateLastActiveTime = () => {
   localStorage.setItem(LAST_ACTIVE_KEY, Date.now().toString());
+  // Save current activity
+  const currentActivity = useGameStore.getState().currentActivity;
+  localStorage.setItem(LAST_ACTIVITY_KEY, currentActivity);
 };
 
-interface WoodcuttingProgress {
+interface ResourceProgress {
+  [resourceName: string]: number;
+}
+
+interface ActivityProgress {
   experience: number;
-  resources: {
-    wood: number;
-  };
+  resources: ResourceProgress;
 }
 
 interface OfflineProgress {
-  woodcutting: WoodcuttingProgress;
-  // Add other activities here
+  [key: string]: ActivityProgress;
 }
 
 interface GameState {
+  currentActivity: Activity;
   woodcutting: {
     baseXpRate: number;
     baseResourceRate: number;
     level: number;
+    resourceName: string;
   };
-  // Add other state properties
+  // Add other activities here as needed
 }
 
 export const calculateOfflineProgress = () => {
   const lastActiveStr = localStorage.getItem(LAST_ACTIVE_KEY);
-  if (!lastActiveStr) return;
+  const lastActivity = localStorage.getItem(LAST_ACTIVITY_KEY) as Activity;
+  
+  if (!lastActiveStr || !lastActivity) return;
 
   const lastActive = parseInt(lastActiveStr);
   const currentTime = Date.now();
@@ -40,18 +50,27 @@ export const calculateOfflineProgress = () => {
   const gameState = useGameStore.getState() as GameState;
   const offlineMinutes = Math.floor(timeDiff / (1000 * 60));
 
-  // Calculate offline progress for each activity
-  const offlineProgress = {
-    woodcutting: {
-      experience: calculateWoodcuttingExp(gameState, offlineMinutes),
-      resources: calculateWoodcuttingResources(gameState, offlineMinutes)
-    },
+  // Initialize empty progress object
+  const progress: OfflineProgress = {};
+
+  // Calculate progress based on last active activity
+  switch (lastActivity) {
+    case 'woodcutting':
+      progress.woodcutting = {
+        experience: calculateWoodcuttingExp(gameState, offlineMinutes),
+        resources: calculateWoodcuttingResources(gameState, offlineMinutes)
+      };
+      break;
     // Add other activities here
-  };
+    default:
+      console.log('Unknown activity:', lastActivity);
+      return;
+  }
 
   return {
     offlineTime: timeDiff,
-    progress: offlineProgress
+    progress,
+    lastActivity
   };
 };
 
@@ -67,30 +86,40 @@ function calculateWoodcuttingResources(gameState: GameState, minutes: number) {
   const baseRate = gameState.woodcutting.baseResourceRate || 1;
   const level = gameState.woodcutting.level || 1;
   const multiplier = 1 + (level * 0.05); // 5% boost per level
+  const resourceName = gameState.woodcutting.resourceName || 'logs';
 
   return {
-    wood: Math.floor(baseRate * minutes * multiplier)
+    [resourceName]: Math.floor(baseRate * minutes * multiplier)
   };
 }
 
-export const applyOfflineProgress = (progress: { progress: OfflineProgress }) => {
+export const applyOfflineProgress = (progress: { 
+  progress: OfflineProgress,
+  lastActivity: Activity 
+}) => {
   const store = useGameStore.getState();
   
-  // Update woodcutting
-  if (progress.progress.woodcutting) {
-    store.addWoodcuttingExperience(progress.progress.woodcutting.experience);
-    store.addResource('wood', progress.progress.woodcutting.resources.wood);
+  switch (progress.lastActivity) {
+    case 'woodcutting':
+      if (progress.progress.woodcutting) {
+        store.addWoodcuttingExperience(progress.progress.woodcutting.experience);
+        
+        Object.entries(progress.progress.woodcutting.resources).forEach(([resourceName, amount]) => {
+          store.addResource(resourceName, amount);
+        });
+      }
+      break;
+    // Add other activities here
   }
-  
-  // Add other activity updates here
 };
 
-// Usage example:
 export const handleOfflineProgress = () => {
   const progress = calculateOfflineProgress();
   if (progress) {
-    applyOfflineProgress(progress);
-    // Optionally show a modal with the progress
-    return progress; // Return progress for UI display
+    applyOfflineProgress({
+      progress: progress.progress,
+      lastActivity: progress.lastActivity
+    });
+    return progress;
   }
 };
