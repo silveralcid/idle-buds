@@ -52,7 +52,7 @@ export enum ResourceType {
   }
   
   export enum GatheringType {
-    WOODCUTTING = 'WOODCUTTING',
+    LUMBERING = 'LUMBERING',
     MINING = 'MINING',
     FISHING = 'FISHING',
     PLANTING = 'PLANTING'
