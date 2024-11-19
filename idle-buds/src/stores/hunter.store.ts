@@ -20,7 +20,6 @@ interface HunterStore {
 export const useHunterStore = create<HunterStore>((set) => ({
   activityLevels: {
     lumbering: { level: 1, currentXp: 0, requiredXp: 100 },
-
     mining: { level: 1, currentXp: 0, requiredXp: 100 },
     fishing: { level: 1, currentXp: 0, requiredXp: 100 },
     combat: { level: 1, currentXp: 0, requiredXp: 100 },

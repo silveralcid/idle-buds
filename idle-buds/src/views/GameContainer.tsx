@@ -1,4 +1,5 @@
 import React from 'react';
+import HunterInfo from '../components/HunterInfo';
 
 interface GameContainerProps {
   children: React.ReactNode;
@@ -14,7 +15,7 @@ const GameContainer = ({ children }: GameContainerProps) => {
                 <div className="card bg-base-100 shadow-xl h-full">
                   <div className="card-body">
                     <h2 className="card-title">Hunter Info</h2>
-                    {/* Hunter stats & resources */}
+                    <HunterInfo />
                   </div>
                 </div>
               </div>
