@@ -3,10 +3,14 @@ import { useHunterStore } from '../stores/hunter.store';
 import { ActivityType } from '../enums/activity.enums';
 import { ItemType } from '../enums/item.enums';
 import { useBankStore } from '../stores/bank.store';
+import { TreeNode } from '../types/tree.types';
+import { useResourceStore } from '../stores/resource.store';
 
 const HunterInfo = () => {
   const { stats, activityLevels, currentActivity } = useHunterStore();
-  const { items, getItemsByType } = useBankStore();
+  const bankItems = useBankStore(state => state.items);
+  const getItemsByType = useBankStore(state => state.getItemsByType);
+  const nodes = useResourceStore(state => state.nodes); // Add this line
 
   // Get only resource items from bank
   const resources = getItemsByType(ItemType.RESOURCE);
@@ -27,22 +31,25 @@ const HunterInfo = () => {
       </div>
 
       {/* Resources Section */}
-      {resources.length > 0 && (
-        <div>
-          <h3 className="font-bold text-lg mb-2">Resources</h3>
-          <div className="space-y-1">
-            {resources.map((resource) => (
-              <div 
-                key={resource.id} 
-                className="flex justify-between items-center text-sm bg-base-200 p-2 rounded-lg"
-              >
-                <span className="capitalize">{resource.name}</span>
-                <span>{resource.quantity}</span>
+      <div>
+        <h3 className="font-bold text-lg mb-2">Resources</h3>
+        <div className="space-y-1">
+          {resources.map((resource) => (
+            <div 
+              key={resource.id} 
+              className="flex justify-between items-center text-sm bg-base-200 p-2 rounded-lg"
+            >
+              <span className="capitalize">{resource.name}</span>
+              <div className="flex items-center gap-2">
+                <span>{Math.floor(resource.quantity)}</span>
+                {currentActivity?.isActive && (
+                  <span className="loading loading-spinner loading-xs text-primary"/>
+                )}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
-      )}
+      </div>
 
       {/* Current Activity */}
       {currentActivity && (
@@ -53,6 +60,11 @@ const HunterInfo = () => {
             <div className="text-sm opacity-70">
               Active: {currentActivity.isActive ? 'Yes' : 'No'}
             </div>
+            {currentActivity.isActive && (
+              <div className="text-sm mt-1">
+                Resources/tick: {(nodes[currentActivity.nodeId!] as TreeNode).resourcesPerTick}
+              </div>
+            )}
           </div>
         </div>
       )}

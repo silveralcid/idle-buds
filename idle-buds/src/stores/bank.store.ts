@@ -93,11 +93,7 @@ export const useBankStore = create<BankStore>((set, get) => ({
       let additionalWhole = 0;
 
       // If accumulated fractions exceed 1, add to whole number
-      if (newFraction >= 1) {
-        additionalWhole = Math.floor(newFraction);
-      }
-
-      return {
+      const newState = {
         items: {
           ...state.items,
           [item.id]: {
@@ -110,6 +106,9 @@ export const useBankStore = create<BankStore>((set, get) => ({
           [item.id]: newFraction % 1
         }
       };
+
+      console.log('Bank updated:', newState); // Debug log
+      return newState;
     }),
 
   withdrawItem: (itemId, amount) => {
