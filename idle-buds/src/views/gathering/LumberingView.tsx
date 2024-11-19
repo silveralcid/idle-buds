@@ -20,11 +20,14 @@ const LumberingView = () => {
 
   // Handlers
   const handleGatheringToggle = (nodeId: string) => {
+    console.log('Gathering toggled for node:', nodeId);
     if (currentActivity?.nodeId === nodeId) {
+      console.log('Stopping gathering');
       // Stop gathering
       setCurrentActivity(undefined);
     } else {
       // Start gathering
+      console.log('Starting gathering');
       setCurrentActivity({
         type: ActivityType.lumbering,
         startTime: Date.now(),

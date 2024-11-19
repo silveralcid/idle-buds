@@ -14,6 +14,8 @@ const HunterInfo = () => {
 
   // Get only resource items from bank
   const resources = getItemsByType(ItemType.RESOURCE);
+  const currentNode = currentActivity?.nodeId ? nodes[currentActivity.nodeId] as TreeNode : null;
+
 
   return (
     <div className="space-y-4">
@@ -60,9 +62,9 @@ const HunterInfo = () => {
             <div className="text-sm opacity-70">
               Active: {currentActivity.isActive ? 'Yes' : 'No'}
             </div>
-            {currentActivity.isActive && (
+            {currentActivity.isActive && currentNode && (
               <div className="text-sm mt-1">
-                Resources/tick: {(nodes[currentActivity.nodeId!] as TreeNode).resourcesPerTick}
+                Resources/tick: {currentNode.resourcesPerTick}
               </div>
             )}
           </div>
