@@ -1,26 +1,43 @@
+// src/components/game/HunterInfo.tsx
 import React from 'react';
 import { useHunterStore } from '../stores/hunter.store';
 import { ActivityType } from '../enums/activity.enums';
 import { ItemType } from '../enums/item.enums';
+import { ResourceType, WoodType } from '../enums/resource.enums';
 import { useBankStore } from '../stores/bank.store';
 import { TreeNode } from '../types/tree.types';
 import { useResourceStore } from '../stores/resource.store';
 import { useMemo } from 'react';
+import { BankedResource } from '../stores/bank.store';
+import { getResourceTypeFromData } from '../utils/resourceUtils';
 
 const HunterInfo = () => {
   const { stats, activityLevels, currentActivity } = useHunterStore();
   const bankItems = useBankStore(state => state.items);
   const getItemsByType = useBankStore(state => state.getItemsByType);
-  const nodes = useResourceStore(state => state.nodes); // Add this line
+  const nodes = useResourceStore(state => state.nodes);
 
   // Get only resource items from bank
-  const resources = getItemsByType(ItemType.RESOURCE);
+  const resources = Object.values(bankItems).filter(
+    item => item.itemType === ItemType.RESOURCE
+  );
+
   const currentNode = useMemo(() => {
     if (currentActivity?.nodeId) {
-      return nodes[currentActivity.nodeId] as TreeNode;
+      const currentTreeNode = getResourceTypeFromData(currentActivity.nodeId, ResourceType.LOGS);
+      return currentTreeNode as TreeNode;
     }
     return null;
-  }, [currentActivity, nodes]);  
+  }, [currentActivity, nodes]);
+
+  // Format wood type for display
+  const formatWoodType = (woodType: WoodType) => {
+    return woodType.split('_')
+      .slice(1, -1)
+      .join(' ')
+      .toLowerCase()
+      .replace(/\b\w/g, c => c.toUpperCase());
+  };
 
   return (
     <div className="space-y-4">
@@ -41,20 +58,31 @@ const HunterInfo = () => {
       <div>
         <h3 className="font-bold text-lg mb-2">Resources</h3>
         <div className="space-y-1">
-          {resources.map((resource) => (
-            <div 
-              key={resource.id} 
-              className="flex justify-between items-center text-sm bg-base-200 p-2 rounded-lg"
-            >
-              <span className="capitalize">{resource.name}</span>
-              <div className="flex items-center gap-2">
-                <span>{Math.floor(resource.quantity)}</span>
-                {currentActivity?.isActive && (
-                  <span className="loading loading-spinner loading-xs text-primary"/>
-                )}
+          {resources.map((resource) => {
+            const isCurrentResource = currentActivity?.isActive && 
+              currentNode?.id === resource.id;
+
+            return (
+              <div 
+                key={resource.id} 
+                className={`flex justify-between items-center text-sm bg-base-200 p-2 rounded-lg
+                  ${isCurrentResource ? 'border border-primary' : ''}`}
+              >
+                <span className="capitalize">
+                {(resource as BankedResource).resourceType === ResourceType.LOGS && 
+                  (resource as BankedResource).woodType ? 
+                    formatWoodType((resource as BankedResource).woodType as WoodType) : 
+                    'No wood type'}
+                </span>
+                <div className="flex items-center gap-2">
+                  <span>{Math.floor(resource.quantity)}</span>
+                  {isCurrentResource && (
+                    <span className="loading loading-spinner loading-xs text-primary"/>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

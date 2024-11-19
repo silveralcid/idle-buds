@@ -1,4 +1,5 @@
 // src/stores/bank.store.ts
+import React, { ReactNode } from 'react';
 import { create } from 'zustand';
 import { 
   ItemType, 
@@ -10,7 +11,7 @@ import {
   EquipmentQuality,
   EquipmentSlot 
 } from '../enums/item.enums';
-import { ResourceType } from '../enums/resource.enums';
+import { ResourceType, WoodType} from '../enums/resource.enums';
 import { ProgressionTier } from '../enums/game.enums';
 
 // Base Bank Item
@@ -46,6 +47,7 @@ interface BankedEquipment extends BankItem {
 export interface BankedResource extends BankItem {
   itemType: ItemType.RESOURCE;
   resourceType: ResourceType;
+  woodType?: WoodType;
 }
 
 // Materials
