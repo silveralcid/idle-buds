@@ -87,6 +87,7 @@ export const useBankStore = create<BankStore>((set, get) => ({
 
   depositItem: (item) => 
     set((state) => {
+      console.log('Depositing item:', item); 
       const currentFraction = state._accumulatedFractions[item.id] || 0;
       const newFraction = currentFraction + (item.quantity % 1);
       const wholeNumber = Math.floor(item.quantity);
