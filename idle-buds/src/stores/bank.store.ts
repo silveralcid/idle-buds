@@ -67,6 +67,7 @@ interface BankedConsumable extends BankItem {
 
 interface BankStore {
   items: Record<string, BankItem>;
+  _accumulatedFractions: Record<string, number>;  // Track fractional resources
   
   // Bank methods
   depositItem: (item: BankItem) => void;
@@ -82,17 +83,34 @@ interface BankStore {
 
 export const useBankStore = create<BankStore>((set, get) => ({
   items: {},
+  _accumulatedFractions: {},
 
   depositItem: (item) => 
-    set((state) => ({
-      items: {
-        ...state.items,
-        [item.id]: {
-          ...item,
-          quantity: (state.items[item.id]?.quantity || 0) + item.quantity
-        }
+    set((state) => {
+      const currentFraction = state._accumulatedFractions[item.id] || 0;
+      const newFraction = currentFraction + (item.quantity % 1);
+      const wholeNumber = Math.floor(item.quantity);
+      let additionalWhole = 0;
+
+      // If accumulated fractions exceed 1, add to whole number
+      if (newFraction >= 1) {
+        additionalWhole = Math.floor(newFraction);
       }
-    })),
+
+      return {
+        items: {
+          ...state.items,
+          [item.id]: {
+            ...item,
+            quantity: (state.items[item.id]?.quantity || 0) + wholeNumber + additionalWhole
+          }
+        },
+        _accumulatedFractions: {
+          ...state._accumulatedFractions,
+          [item.id]: newFraction % 1
+        }
+      };
+    }),
 
   withdrawItem: (itemId, amount) => {
     const state = get();
@@ -112,11 +130,15 @@ export const useBankStore = create<BankStore>((set, get) => ({
     return true;
   },
 
-  getItemQuantity: (itemId) => 
-    get().items[itemId]?.quantity || 0,
+  getItemQuantity: (itemId) => {
+    const state = get();
+    const wholeNumber = state.items[itemId]?.quantity || 0;
+    const fraction = state._accumulatedFractions[itemId] || 0;
+    return wholeNumber + fraction;
+  },
 
   hasItem: (itemId, amount) => 
-    (get().items[itemId]?.quantity || 0) >= amount,
+    get().getItemQuantity(itemId) >= amount,
 
   getTotalItems: () => 
     Object.values(get().items).reduce((total, item) => total + item.quantity, 0),
