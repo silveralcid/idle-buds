@@ -3,23 +3,30 @@ import { EquipmentType } from "../enums/item.enums";
 import { ProgressionTier } from "../enums/game.enums";
 import { LevelInfo , BaseStats} from "./base.types";
 
-export interface Hunter {
+  export interface Hunter {
     id: string;
     name: string;
-    stats: BaseStats & { attributePoints: number };
+    stats: HunterStats;
     equipment: HunterEquipment;
     activityLevels: ActivityLevels;
-    currentActivity?: {
-      type: ActivityType;
-      startTime: number;
-      lastActiveTime: number;
-      isActive: boolean;
-      nodeId?: string;     // For gathering activities
-      workbenchId?: string; // For crafting activities
-    };
+    currentActivity?: CurrentActivity;
     unlockedContent: UnlockedContent;
-  }
+}
   
+export interface CurrentActivity {
+    type: ActivityType;
+    startTime: number;
+    lastActiveTime: number;    // Changed to lastTickProcessed
+    lastTickProcessed: number; // Added this field
+    isActive: boolean;
+    nodeId?: string;
+    workbenchId?: string;
+  }
+
+export interface HunterStats extends BaseStats {
+    attributePoints: number;
+}
+
   export interface ActivityLevels {
     combat: LevelInfo;
     watering: LevelInfo;
@@ -28,7 +35,8 @@ export interface Hunter {
     smithing: LevelInfo;
     smelting: LevelInfo;
     cooking: LevelInfo;
-    lumbering: LevelInfo;
+    lumbering: LevelInfo;   
+    crafting: LevelInfo
     mining: LevelInfo;
     hatching: LevelInfo;
     offering: LevelInfo;

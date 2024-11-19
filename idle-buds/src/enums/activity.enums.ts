@@ -1,15 +1,15 @@
 export enum ActivityType {
-    WATERING = 'WATERING',
-    PLANTING = 'PLANTING',
-    FISHING = 'FISHING',
-    SMITHING = 'SMITHING',
-    SMELTING = 'SMELTING',
-    COOKING = 'COOKING',
-    LUMBERING = 'LUMBERING',
-    MINING = 'MINING',
-    COMBAT = 'COMBAT',
-    HATCHING = 'HATCHING',
-    OFFERING = 'OFFERING'
+  watering = 'watering',
+  planting = 'planting',
+  fishing = 'fishing',
+  smithing = 'smithing',
+  smelting = 'smelting',
+  cooking = 'cooking',
+  lumbering = 'lumbering',
+  mining = 'mining',
+  combat = 'combat',
+  hatching = 'hatching',
+  offering = 'offering'
 }
 
 export enum TaskStatus {
