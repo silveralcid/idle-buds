@@ -26,6 +26,10 @@ const LumberingView = () => {
     });
   };
 
+  const handleStopGathering = () => {
+    setCurrentActivity(undefined);
+  };
+
   const calculateResourcesPerHour = (resourcesPerTick: number) => {
     return Math.floor(resourcesPerTick * 20 * 60 * 60);
   };
@@ -77,11 +81,11 @@ const LumberingView = () => {
                       </button>
                     ) : (
                       <button 
-                        className={`btn ${isActive ? 'btn-error' : 'btn-primary'} btn-sm`}
-                        onClick={() => handleStartGathering(node.id)}
-                        disabled={currentActivity && !isActive}
-                      >
-                        {isActive ? 'Stop Gathering' : 'Start Gathering'}
+                      className={`btn ${isActive ? 'btn-error' : 'btn-primary'} btn-sm`}
+                      onClick={() => isActive ? handleStopGathering() : handleStartGathering(node.id)}
+                      disabled={currentActivity && !isActive}
+                    >
+                      {isActive ? 'Stop Gathering' : 'Start Gathering'}
                       </button>
                     )}
                   </div>
@@ -90,29 +94,6 @@ const LumberingView = () => {
             </div>
           );
         })}
-      </div>
-
-      {/* Active Gatherers */}
-      <div className="card bg-base-200 shadow-lg">
-        <div className="card-body">
-          <h3 className="card-title">Active Gatherers</h3>
-          <div className="divide-y divide-base-300">
-            <div className="py-2 flex justify-between items-center">
-              <div>
-                <p className="font-semibold">Hunter</p>
-                <p className="text-sm opacity-70">Gathering Tier 1 Wood</p>
-              </div>
-              <button className="btn btn-error btn-sm">Stop</button>
-            </div>
-            <div className="py-2 flex justify-between items-center">
-              <div>
-                <p className="font-semibold">Forest Bud</p>
-                <p className="text-sm opacity-70">Gathering Tier 1 Wood</p>
-              </div>
-              <button className="btn btn-error btn-sm">Stop</button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
