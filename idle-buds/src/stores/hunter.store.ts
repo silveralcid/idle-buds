@@ -1,53 +1,80 @@
 import { create } from 'zustand';
-import { ActivityLevels, HunterStats, CurrentActivity } from '../types/hunter.types';
-import { ActivityType } from '../enums/activity.enums';
-import { calculateNewLevel } from '../utils/level.utils';
+import { Skill } from '../types/skill.types';
 
-interface HunterStore {
-  activityLevels: ActivityLevels;
-  stats: HunterStats;
-  currentActivity?: {
-    type: ActivityType;
-    startTime: number;
-    lastTickProcessed: number;
-    isActive: boolean;
-    nodeId?: string;
-  };
-  setCurrentActivity: (activity: CurrentActivity | undefined) => void;
-  updateActivityLevel: (type: ActivityType, xp: number) => void;
+interface HunterState {
+  skills: Record<string, Skill>;
+  increaseSkillExperience: (skillId: string, amount: number) => void;
+  setSkillLevel: (skillId: string, level: number) => void;
+  setSkillExperience: (skillId: string, experience: number) => void;
+  refreshSkills: () => void;
 }
 
-export const useHunterStore = create<HunterStore>((set) => ({
-  activityLevels: {
-    lumbering: { level: 15, currentXp: 0, requiredXp: 100 },
-    mining: { level: 1, currentXp: 0, requiredXp: 100 },
-    fishing: { level: 1, currentXp: 0, requiredXp: 100 },
-    combat: { level: 1, currentXp: 0, requiredXp: 100 },
-    planting: { level: 1, currentXp: 0, requiredXp: 100 },
-    watering: { level: 1, currentXp: 0, requiredXp: 100 },
-    smithing: { level: 1, currentXp: 0, requiredXp: 100 },
-    smelting: { level: 1, currentXp: 0, requiredXp: 100 },
-    cooking: { level: 1, currentXp: 0, requiredXp: 100 },
-    hatching: { level: 1, currentXp: 0, requiredXp: 100 },
-    offering: { level: 1, currentXp: 0, requiredXp: 100 },
-    crafting: { level: 1, currentXp: 0, requiredXp: 100 }
-    // ... other activities
+const initialSkills: Record<string, Skill> = {
+  lumbering: {
+    id: 'lumbering',
+    name: 'Lumbering',
+    level: 1,
+    experience: 0,
+    experienceToNextLevel: 100,
   },
-  stats: {
-    health: 10,
-    wisdom: 10,
-    attack: 10,
-    defense: 10,
-    dexterity: 10,
-    attributePoints: 0
+  mining: {
+    id: 'mining',
+    name: 'Mining',
+    level: 1,
+    experience: 0,
+    experienceToNextLevel: 100,
   },
-  currentActivity: undefined,
-  setCurrentActivity: (activity) => set({ currentActivity: activity }),
-  updateActivityLevel: (type, xp) => 
-    set((state) => ({
-      activityLevels: {
-        ...state.activityLevels,
-        [type]: calculateNewLevel(state.activityLevels[type], xp)
-      }
-    }))
+};
+
+export const useHunterStore = create<HunterState>((set) => ({
+  skills: { ...initialSkills },
+  increaseSkillExperience: (skillId, amount) => set((state) => {
+    const skill = state.skills[skillId];
+    if (!skill) return state;
+
+    const newExperience = skill.experience + amount;
+    if (newExperience >= skill.experienceToNextLevel) {
+      return {
+        skills: {
+          ...state.skills,
+          [skillId]: {
+            ...skill,
+            experience: newExperience - skill.experienceToNextLevel,
+            level: skill.level + 1,
+            experienceToNextLevel: skill.experienceToNextLevel * 1.1, // Example scaling
+          },
+        },
+      };
+    }
+    return {
+      skills: {
+        ...state.skills,
+        [skillId]: {
+          ...skill,
+          experience: newExperience,
+        },
+      },
+    };
+  }),
+  setSkillLevel: (skillId, level) => set((state) => ({
+    skills: {
+      ...state.skills,
+      [skillId]: {
+        ...state.skills[skillId],
+        level,
+      },
+    },
+  })),
+  setSkillExperience: (skillId, experience) => set((state) => ({
+    skills: {
+      ...state.skills,
+      [skillId]: {
+        ...state.skills[skillId],
+        experience,
+      },
+    },
+  })),
+  refreshSkills: () => set(() => ({
+    skills: { ...initialSkills },
+  })),
 }));

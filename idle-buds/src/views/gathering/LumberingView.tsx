@@ -1,47 +1,44 @@
 import React from 'react';
+import ResourceCard from '../../components/game/ResourceCard';
+import { woodResources } from '../../data/resources/wood.data';
+import { useGameStore } from '../../stores/game.store';
+import { useHunterStore } from '../../stores/hunter.store';
+import { useGameLoop } from '../../hooks/useGameLoop'; // Import the hook
 
 const LumberingView = () => {
+  useGameLoop(); // Call the hook to start the game loop
+
+  const startGathering = useGameStore((state) => state.startGathering);
+  const lumberingSkill = useHunterStore((state) => state.skills.lumbering);
+
+  const handleActivate = (resourceId: string) => {
+    const currentActivity = useGameStore.getState().currentActivity;
+    if (currentActivity !== resourceId) {
+      console.log(`Activating gathering for resource: ${resourceId}`);
+      startGathering(resourceId);
+    }
+  };
+
   return (
     <div className="h-full flex flex-col gap-4">
-      {/* Activity Header */}
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Lumbering</h2>
-          <p className="text-sm opacity-70">Level: -- | XP: --/--</p>
+          <p className="text-sm opacity-70">
+            Level: {lumberingSkill.level} | XP: {lumberingSkill.experience}/{lumberingSkill.experienceToNextLevel}
+          </p>
         </div>
         <div className="badge badge-primary">Active</div>
       </div>
 
-      {/* Resource Nodes */}
       <div className="grid grid-cols-2 gap-4 flex-grow overflow-auto">
-        {[1, 2, 3, 4].map((_, index) => (
-          <div 
-            key={index} 
-            className="card bg-base-200 shadow-lg opacity-50"
-          >
-            <div className="card-body">
-              <h3 className="card-title flex justify-between">
-                Region Name
-                <div className="badge badge-secondary">Locked</div>
-              </h3>
-              <div className="space-y-2">
-                <progress 
-                  className="progress progress-primary w-full" 
-                  value={50} 
-                  max={100}
-                />
-                <div className="flex justify-between text-sm">
-                  <span>Resources/hr: --</span>
-                  <span>Level Required: --</span>
-                </div>
-                <div className="card-actions justify-end">
-                  <button className="btn btn-secondary btn-sm" disabled>
-                    Unlock at Level --
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+        {woodResources.map((resource) => (
+          <ResourceCard
+            key={resource.id}
+            resource={resource}
+            onActivate={handleActivate}
+            skillId="lumbering"
+          />
         ))}
       </div>
     </div>

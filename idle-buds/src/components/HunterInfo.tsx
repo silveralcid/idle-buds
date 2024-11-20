@@ -1,8 +1,21 @@
 import React from 'react';
+import { useHunterStore } from '../stores/hunter.store';
+import { useGameStore } from '../stores/game.store';
+import { useBankStore } from '../stores/bank.store';
 
 const HunterInfo = () => {
+  const skills = useHunterStore((state) => state.skills);
+  const currentActivity = useGameStore((state) => state.currentActivity);
+  const resources = useBankStore((state) => state.resources);
   return (
     <div className="space-y-4">
+      {/* Current Activity */}
+      <div>
+        <h3 className="font-bold text-lg mb-2">Current Activity</h3>
+        <div className="bg-base-200 p-2 rounded-lg">
+          <div className="capitalize">Activity ID: {currentActivity || 'None'}</div>
+        </div>
+      </div>
       {/* Stats Section */}
       <div>
         <h3 className="font-bold text-lg mb-2">Stats</h3>
@@ -16,49 +29,38 @@ const HunterInfo = () => {
         </div>
       </div>
 
-      {/* Resources Section */}
+      {/* Bank Section */}
       <div>
-        <h3 className="font-bold text-lg mb-2">Resources</h3>
+        <h3 className="font-bold text-lg mb-2">Bank</h3>
         <div className="space-y-1">
-          <div className="flex justify-between items-center text-sm bg-base-200 p-2 rounded-lg">
-            <span className="capitalize">Resource Name</span>
-            <div className="flex items-center gap-2">
-              <span>100</span>
-              <span className="loading loading-spinner loading-xs text-primary"/>
+          {Object.entries(resources).map(([resourceName, amount]) => (
+            <div key={resourceName} className="flex justify-between items-center text-sm bg-base-200 p-2 rounded-lg">
+              <span className="capitalize">{resourceName}</span>
+              <span>{amount}</span>
             </div>
-          </div>
+          ))}
         </div>
       </div>
 
-      {/* Current Activity */}
-      <div>
-        <h3 className="font-bold text-lg mb-2">Current Activity</h3>
-        <div className="bg-base-200 p-2 rounded-lg">
-          <div className="capitalize">Activity Type</div>
-          <div className="text-sm opacity-70">
-            Active: Yes
-          </div>
-          <div className="text-sm mt-1">
-            Resources/tick: 5
-          </div>
-        </div>
-      </div>
 
-      {/* Activity Levels */}
+
+      {/* Skills Section */}
       <div>
         <h3 className="font-bold text-lg mb-2">Skills</h3>
         <div className="space-y-2">
-          <div className="text-sm">
-            <div className="flex justify-between items-center">
-              <span className="capitalize">Skill Name</span>
-              <span>Lvl 10</span>
+          {Object.entries(skills).map(([skillId, skill]) => (
+            <div key={skillId} className="text-sm">
+              <div className="flex justify-between items-center">
+                <span className="capitalize">{skill.name}</span>
+                <span>Lvl {skill.level}</span>
+              </div>
+              <progress
+                className="progress progress-primary w-full h-1.5"
+                value={skill.experience}
+                max={skill.experienceToNextLevel}
+              />
             </div>
-            <progress 
-              className="progress progress-primary w-full h-1.5" 
-              value={50} 
-              max={100}
-            />
-          </div>
+          ))}
         </div>
       </div>
     </div>
