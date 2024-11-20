@@ -1,17 +1,21 @@
 import React from 'react';
 import { useHunterStore } from '../stores/hunter.store';
-import { useGameStore } from '../stores/game.store';
+import { useBankStore } from '../stores/bank.store'; // Import the bank store
 import { createBudInstance } from '../factories/budFactory';
 import { budSpecies } from '../data/buds/budSpecies.data';
 
 const TestingView = () => {
   const { skills, setSkillLevel, setSkillExperience, addBudToParty, party } = useHunterStore();
-  const { resources, startGathering, stopGathering } = useGameStore();
+  const { resources, addResource } = useBankStore(); // Access resources and addResource function
 
   const addRandomBudToParty = () => {
     const randomSpecies = budSpecies[Math.floor(Math.random() * budSpecies.length)];
-    const newBud = createBudInstance(randomSpecies); // Removed the id parameter
+    const newBud = createBudInstance(randomSpecies);
     addBudToParty(newBud);
+  };
+
+  const addFlatResource = (resourceName: string, amount: number) => {
+    addResource(resourceName, amount);
   };
 
   return (
@@ -40,7 +44,7 @@ const TestingView = () => {
         ))}
       </div>
 
-      {/* Resource Testing Section */}
+      {/* Resource Section */}
       <div>
         <h2 className="text-xl font-semibold">Resources</h2>
         {Object.entries(resources).map(([resourceName, amount]) => (
@@ -49,7 +53,7 @@ const TestingView = () => {
             <input
               type="number"
               value={amount}
-              onChange={(e) => console.log(`Set ${resourceName} to ${e.target.value}`)}
+              onChange={(e) => addFlatResource(resourceName, parseInt(e.target.value))}
               className="w-16 p-1 border rounded"
             />
           </div>
@@ -59,14 +63,40 @@ const TestingView = () => {
       {/* Bud Party Section */}
       <div>
         <h2 className="text-xl font-semibold">Bud Party</h2>
-        {party.map((bud) => (
-          <div key={bud.id} className="border p-2 rounded space-y-2">
-            <div>ID: {bud.id}</div>
-            <div>Name: {bud.name}</div>
-            <div>Level: {bud.level}</div>
-            {/* Add more Bud properties as needed */}
-          </div>
-        ))}
+        <table className="min-w-full bg-white">
+          <thead>
+            <tr>
+              <th className="py-2">ID</th>
+              <th className="py-2">Name</th>
+              <th className="py-2">Level</th>
+              <th className="py-2">Experience</th>
+              <th className="py-2">Gender</th>
+              <th className="py-2">Species ID</th>
+              <th className="py-2">Description</th>
+              <th className="py-2">Sprite</th>
+              <th className="py-2">Allowed Tasks</th>
+              <th className="py-2">Primary Affinity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {party.map((bud) => (
+              <tr key={bud.id} className="text-center">
+                <td className="border px-4 py-2">{bud.id}</td>
+                <td className="border px-4 py-2">{bud.name}</td>
+                <td className="border px-4 py-2">{bud.level}</td>
+                <td className="border px-4 py-2">{bud.experience}</td>
+                <td className="border px-4 py-2">{bud.gender}</td>
+                <td className="border px-4 py-2">{bud.speciesId}</td>
+                <td className="border px-4 py-2">{bud.description}</td>
+                <td className="border px-4 py-2">
+                  <img src={bud.spriteRef} alt={bud.name} className="w-8 h-8 mx-auto" />
+                </td>
+                <td className="border px-4 py-2">{bud.allowedTasks.join(', ')}</td>
+                <td className="border px-4 py-2">{bud.primaryAffinity}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* Action Buttons */}
