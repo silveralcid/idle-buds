@@ -1,4 +1,8 @@
+import { useViewStore } from '../../stores/view.store';
+
 const Navbar = () => {
+  const setView = useViewStore((state) => state.setView);
+
   return (
     <div className="navbar bg-base-100 shadow-lg">
       {/* Left side */}
@@ -10,8 +14,8 @@ const Navbar = () => {
             </svg>
           </label>
           <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-            <li><a>Testing</a></li>
-            <li><a>Lumbering</a></li>
+            <li><a onClick={() => setView('TestingView')}>Testing</a></li>
+            <li><a onClick={() => setView('LumberingView')}>Lumbering</a></li>
           </ul>
         </div>
       </div>
@@ -20,8 +24,6 @@ const Navbar = () => {
       <div className="navbar-center">
         <a className="btn btn-ghost normal-case text-xl">Idle Buds</a>
       </div>
-
-    
     </div>
   );
 };
