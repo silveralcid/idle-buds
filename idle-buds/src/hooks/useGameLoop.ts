@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useGameStore } from '../stores/game.store';
-import { GameConfig } from '../constants/game-config';
+import { GameConfig } from '../constants/gameConfig';
 
 export const useGameLoop = () => {
   const updateResources = useGameStore((state) => state.updateResources);

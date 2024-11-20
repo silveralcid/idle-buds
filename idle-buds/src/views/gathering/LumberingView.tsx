@@ -28,7 +28,6 @@ const LumberingView = () => {
             Level: {lumberingSkill.level} | XP: {lumberingSkill.experience}/{lumberingSkill.experienceToNextLevel}
           </p>
         </div>
-        <div className="badge badge-primary">Active</div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 flex-grow overflow-auto">

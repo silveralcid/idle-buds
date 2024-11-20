@@ -5,7 +5,7 @@ export const budSpecies: budBase[] = [
     speciesId: '001',
     name: 'Woodland Bud',
     description: 'A Bud that thrives in forested areas, adept at lumbering.',
-    spriteRef: './assets/sprites/buds/slice-2.png',
+    spriteRef: '/assets/sprites/buds/slice-2.png',
     allowedTasks: ['lumbering', 'mining'],
     primaryAffinity: 'grass',
     // Uncomment and fill in if needed

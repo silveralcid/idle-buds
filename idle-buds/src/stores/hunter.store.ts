@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { GameConfig } from '../constants/gameConfig';
 import { Skill } from '../types/skill.types';
 import { budInstance } from '../types/budInstance.types';
 
@@ -32,12 +33,17 @@ const initialSkills: Record<string, Skill> = {
 
 export const useHunterStore = create<HunterState>((set) => ({
     party: [],
-    addBudToParty: (bud) => set((state) => ({
-        party: [...state.party, bud],
-    })),
+    addBudToParty: (bud) => set((state) => {
+      if (state.party.length < GameConfig.partyCapacity) {
+        return { party: [...state.party, bud] };
+      }
+      console.warn('Party is full. Cannot add more Buds.');
+      return state;
+    }),
     removeBudFromParty: (budId) => set((state) => ({
-        party: state.party.filter((bud) => bud.id !== budId),
+      party: state.party.filter((bud) => bud.id !== budId),
     })),
+    
   skills: { ...initialSkills },
   increaseSkillExperience: (skillId, amount) => set((state) => {
     const skill = state.skills[skillId];
