@@ -5,12 +5,12 @@ import { createBudInstance } from '../factories/budFactory';
 import { budSpecies } from '../data/buds/budSpecies.data';
 
 const TestingView = () => {
-  const { skills, setSkillLevel, setSkillExperience, addBudToParty } = useHunterStore();
+  const { skills, setSkillLevel, setSkillExperience, addBudToParty, party } = useHunterStore();
   const { resources, startGathering, stopGathering } = useGameStore();
 
   const addRandomBudToParty = () => {
     const randomSpecies = budSpecies[Math.floor(Math.random() * budSpecies.length)];
-    const newBud = createBudInstance(randomSpecies, `bud-${Date.now()}`);
+    const newBud = createBudInstance(randomSpecies); // Removed the id parameter
     addBudToParty(newBud);
   };
 
@@ -52,6 +52,19 @@ const TestingView = () => {
               onChange={(e) => console.log(`Set ${resourceName} to ${e.target.value}`)}
               className="w-16 p-1 border rounded"
             />
+          </div>
+        ))}
+      </div>
+
+      {/* Bud Party Section */}
+      <div>
+        <h2 className="text-xl font-semibold">Bud Party</h2>
+        {party.map((bud) => (
+          <div key={bud.id} className="border p-2 rounded space-y-2">
+            <div>ID: {bud.id}</div>
+            <div>Name: {bud.name}</div>
+            <div>Level: {bud.level}</div>
+            {/* Add more Bud properties as needed */}
           </div>
         ))}
       </div>
