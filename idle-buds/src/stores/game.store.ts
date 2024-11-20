@@ -6,6 +6,7 @@ import { defaultSkillMapping } from "../data/defaultSkillMapping";
 
 interface GameState {
   resources: Record<string, number>;
+  fractionalResources: Record<string, number>; // Add fractional resources
   isGathering: boolean;
   currentActivity: string | null; // Track the current activity
   startGathering: (activityId: string) => void;
@@ -15,6 +16,7 @@ interface GameState {
 
 export const useGameStore = create<GameState>((set) => ({
   resources: {},
+  fractionalResources: {}, // Initialize fractional resources
   isGathering: false,
   currentActivity: null,
   startGathering: (activityId) => set((state) => {
@@ -28,17 +30,30 @@ export const useGameStore = create<GameState>((set) => ({
     if (!state.isGathering || !state.currentActivity) return state;
     const resource = allResources.find(r => r.id === state.currentActivity);
     if (!resource) return state;
-  
+
+    // Calculate gather amount and XP gain
     const gatherAmount = resource.gatherRate * deltaTime;
     const xpGain = resource.experienceGain * deltaTime;
     const skillId = defaultSkillMapping[resource.type];
-  
-    useBankStore.getState().addResource(resource.id, gatherAmount);
-    useHunterStore.getState().increaseSkillExperience(skillId, xpGain);
-  
-    console.log(`Gathered ${gatherAmount} of ${resource.name}`);
-    console.log(`Gained ${xpGain} XP in ${skillId}`);
-    return state;
-  }),
 
+    // Accumulate fractional resources
+    const currentFraction = state.fractionalResources[resource.id] || 0;
+    const totalAmount = currentFraction + gatherAmount;
+
+    // Calculate whole and fractional parts
+    const wholeAmount = Math.floor(totalAmount);
+    const newFraction = totalAmount - wholeAmount;
+
+    // Update resources and fractional parts
+    useBankStore.getState().addResource(resource.id, wholeAmount);
+    useHunterStore.getState().increaseSkillExperience(skillId, xpGain);
+
+    return {
+      ...state,
+      fractionalResources: {
+        ...state.fractionalResources,
+        [resource.id]: newFraction,
+      },
+    };
+  }),
 }));
