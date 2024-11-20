@@ -7,15 +7,19 @@ const HunterInfo = () => {
   const skills = useHunterStore((state) => state.skills);
   const currentActivity = useGameStore((state) => state.currentActivity);
   const resources = useBankStore((state) => state.resources);
+  const party = useHunterStore((state) => state.party);
+
   return (
     <div className="space-y-4">
       {/* Current Activity */}
       <div>
         <h3 className="font-bold text-lg mb-2">Current Activity</h3>
         <div className="bg-base-200 p-2 rounded-lg">
-          <div className="capitalize">Activity ID: {currentActivity || 'None'}</div>
+          <div className="capitalize">Hunter Activity: {currentActivity || 'None'}</div>
+          <div className="capitalize">Bud Activity: Placeholder for Bud Activity</div>
         </div>
       </div>
+
       {/* Stats Section */}
       <div>
         <h3 className="font-bold text-lg mb-2">Stats</h3>
@@ -42,8 +46,6 @@ const HunterInfo = () => {
         </div>
       </div>
 
-
-
       {/* Skills Section */}
       <div>
         <h3 className="font-bold text-lg mb-2">Skills</h3>
@@ -59,6 +61,19 @@ const HunterInfo = () => {
                 value={skill.experience}
                 max={skill.experienceToNextLevel}
               />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bud Party Section */}
+      <div>
+        <h3 className="font-bold text-lg mb-2">Bud Party</h3>
+        <div className="flex space-x-4">
+          {party.map((bud) => (
+            <div key={bud.id} className="text-center">
+              <img src={bud.spriteRef} alt={bud.name} className="w-16 h-16" />
+              <div className="capitalize">{bud.name}</div>
             </div>
           ))}
         </div>
