@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { Skill } from '../types/skill.types';
+import { budInstance } from '../types/budInstance.types';
 
 interface HunterState {
   skills: Record<string, Skill>;
@@ -7,6 +8,9 @@ interface HunterState {
   setSkillLevel: (skillId: string, level: number) => void;
   setSkillExperience: (skillId: string, experience: number) => void;
   refreshSkills: () => void;
+  party: budInstance[];
+  addBudToParty: (bud: budInstance) => void;
+  removeBudFromParty: (budId: string) => void;
 }
 
 const initialSkills: Record<string, Skill> = {
@@ -27,6 +31,13 @@ const initialSkills: Record<string, Skill> = {
 };
 
 export const useHunterStore = create<HunterState>((set) => ({
+    party: [],
+    addBudToParty: (bud) => set((state) => ({
+        party: [...state.party, bud],
+    })),
+    removeBudFromParty: (budId) => set((state) => ({
+        party: state.party.filter((bud) => bud.id !== budId),
+    })),
   skills: { ...initialSkills },
   increaseSkillExperience: (skillId, amount) => set((state) => {
     const skill = state.skills[skillId];

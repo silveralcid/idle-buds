@@ -1,10 +1,18 @@
 import React from 'react';
 import { useHunterStore } from '../stores/hunter.store';
 import { useGameStore } from '../stores/game.store';
+import { createBudInstance } from '../factories/budFactory';
+import { budSpecies } from '../data/buds/budSpecies.data';
 
 const TestingView = () => {
-  const { skills, setSkillLevel, setSkillExperience } = useHunterStore();
+  const { skills, setSkillLevel, setSkillExperience, addBudToParty } = useHunterStore();
   const { resources, startGathering, stopGathering } = useGameStore();
+
+  const addRandomBudToParty = () => {
+    const randomSpecies = budSpecies[Math.floor(Math.random() * budSpecies.length)];
+    const newBud = createBudInstance(randomSpecies, `bud-${Date.now()}`);
+    addBudToParty(newBud);
+  };
 
   return (
     <div className="p-4 space-y-4">
@@ -50,11 +58,8 @@ const TestingView = () => {
 
       {/* Action Buttons */}
       <div className="space-x-2">
-        <button onClick={() => startGathering('lumbering')} className="p-2 bg-blue-500 text-white rounded">
-          Start Lumbering
-        </button>
-        <button onClick={stopGathering} className="p-2 bg-red-500 text-white rounded">
-          Stop Gathering
+        <button onClick={addRandomBudToParty} className="p-2 bg-green-500 text-white rounded">
+          Add Random Bud to Party
         </button>
       </div>
     </div>
