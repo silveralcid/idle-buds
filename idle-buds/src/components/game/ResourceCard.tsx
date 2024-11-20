@@ -35,6 +35,9 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skill
 
   const handleAssignBud = (budId: string) => {
     if (budId) {
+      if (currentActivity === resource.id) {
+        useGameStore.getState().stopGathering();
+      }
       moveBudToResource(budId, resource.id);
     }
   };
