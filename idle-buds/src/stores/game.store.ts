@@ -3,6 +3,7 @@ import { allResources } from "../data/allResources.data";
 import { useBankStore } from "./bank.store";
 import { useHunterStore } from "./hunter.store";
 import { defaultSkillMapping } from "../data/defaultSkillMapping";
+import { useResourceAssignmentStore } from "./resourceAssignment.store";
 
 interface GameState {
   resources: Record<string, number>;
@@ -33,50 +34,68 @@ export const useGameStore = create<GameState>((set) => ({
     const resource = allResources.find(r => r.id === state.currentActivity);
     if (!resource) return state;
   
-    // Calculate gather amount and XP gain
+    const { assignments } = useResourceAssignmentStore.getState();
+    const assignedBud = assignments[state.currentActivity];
+  
     const gatherAmount = resource.gatherRate * deltaTime;
     const xpGain = resource.experienceGain * deltaTime;
-    const skillId = defaultSkillMapping[resource.type];
-  
-    // Accumulate fractional resources
     const currentFraction = state.fractionalResources[resource.id] || 0;
     const totalAmount = currentFraction + gatherAmount;
-  
-    // Log the exact amount gathered
-    console.log(`Exact amount gathered: ${totalAmount} of ${resource.name}`);
-  
-    // Calculate whole and fractional parts for resources
     const wholeAmount = Math.floor(totalAmount);
     const newFraction = totalAmount - wholeAmount;
   
-    // Update resources and fractional parts
-    useBankStore.getState().addResource(resource.id, wholeAmount);
+    if (assignedBud) {
+      // Bud is gathering
+      useBankStore.getState().addResource(resource.id, wholeAmount);
   
-    // Accumulate fractional XP
-    const currentXPFraction = state.fractionalXP[skillId] || 0;
-    const totalXP = currentXPFraction + xpGain;
+      // Update Bud's experience
+      const budSkillId = assignedBud.skillId; // Assuming Bud has a skillId property
+      const currentXPFraction = state.fractionalXP[budSkillId] || 0;
+      const totalXP = currentXPFraction + xpGain;
+      const wholeXP = Math.floor(totalXP);
+      const newXPFraction = totalXP - wholeXP;
   
-    // Calculate whole and fractional parts for XP
-    const wholeXP = Math.floor(totalXP);
-    const newXPFraction = totalXP - wholeXP;
+      useHunterStore.getState().increaseSkillExperience(budSkillId, wholeXP);
   
-    // Update XP and fractional parts
-    useHunterStore.getState().increaseSkillExperience(skillId, wholeXP);
+      console.log(`Bud ${assignedBud.id} gathered ${wholeAmount} of ${resource.name}`);
+      console.log(`Bud ${assignedBud.id} gained ${wholeXP} XP`);
   
-    // Log gathered resources and XP
-    console.log(`Gathered ${wholeAmount} of ${resource.name}`);
-    console.log(`Gained ${wholeXP} XP in ${skillId}`);
+      return {
+        ...state,
+        fractionalResources: {
+          ...state.fractionalResources,
+          [resource.id]: newFraction,
+        },
+        fractionalXP: {
+          ...state.fractionalXP,
+          [budSkillId]: newXPFraction,
+        },
+      };
+    } else {
+      // Hunter is gathering
+      const skillId = defaultSkillMapping[resource.type];
+      const currentXPFraction = state.fractionalXP[skillId] || 0;
+      const totalXP = currentXPFraction + xpGain;
+      const wholeXP = Math.floor(totalXP);
+      const newXPFraction = totalXP - wholeXP;
   
-    return {
-      ...state,
-      fractionalResources: {
-        ...state.fractionalResources,
-        [resource.id]: newFraction,
-      },
-      fractionalXP: {
-        ...state.fractionalXP,
-        [skillId]: newXPFraction,
-      },
-    };
+      useBankStore.getState().addResource(resource.id, wholeAmount);
+      useHunterStore.getState().increaseSkillExperience(skillId, wholeXP);
+  
+      console.log(`Hunter gathered ${wholeAmount} of ${resource.name}`);
+      console.log(`Hunter gained ${wholeXP} XP in ${skillId}`);
+  
+      return {
+        ...state,
+        fractionalResources: {
+          ...state.fractionalResources,
+          [resource.id]: newFraction,
+        },
+        fractionalXP: {
+          ...state.fractionalXP,
+          [skillId]: newXPFraction,
+        },
+      };
+    }
   }),
 }));

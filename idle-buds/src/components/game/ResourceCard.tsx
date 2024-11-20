@@ -32,13 +32,15 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skill
       onActivate(resource.id);
     }
   };
-
+  
   const handleAssignBud = (budId: string) => {
     if (budId) {
       if (currentActivity === resource.id) {
         useGameStore.getState().stopGathering();
       }
       moveBudToResource(budId, resource.id);
+      // Start gathering for the Bud
+      useGameStore.getState().startGathering(resource.id);
     }
   };
 
