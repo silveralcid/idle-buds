@@ -7,6 +7,7 @@ import { defaultSkillMapping } from "../data/defaultSkillMapping";
 interface GameState {
   resources: Record<string, number>;
   fractionalResources: Record<string, number>; // Add fractional resources
+  fractionalXP: Record<string, number>; // Add fractional XP
   isGathering: boolean;
   currentActivity: string | null; // Track the current activity
   startGathering: (activityId: string) => void;
@@ -17,6 +18,7 @@ interface GameState {
 export const useGameStore = create<GameState>((set) => ({
   resources: {},
   fractionalResources: {}, // Initialize fractional resources
+  fractionalXP: {}, // Initialize fractional XP
   isGathering: false,
   currentActivity: null,
   startGathering: (activityId) => set((state) => {
@@ -40,19 +42,33 @@ export const useGameStore = create<GameState>((set) => ({
     const currentFraction = state.fractionalResources[resource.id] || 0;
     const totalAmount = currentFraction + gatherAmount;
 
-    // Calculate whole and fractional parts
+    // Calculate whole and fractional parts for resources
     const wholeAmount = Math.floor(totalAmount);
     const newFraction = totalAmount - wholeAmount;
 
     // Update resources and fractional parts
     useBankStore.getState().addResource(resource.id, wholeAmount);
-    useHunterStore.getState().increaseSkillExperience(skillId, xpGain);
+
+    // Accumulate fractional XP
+    const currentXPFraction = state.fractionalXP[skillId] || 0;
+    const totalXP = currentXPFraction + xpGain;
+
+    // Calculate whole and fractional parts for XP
+    const wholeXP = Math.floor(totalXP);
+    const newXPFraction = totalXP - wholeXP;
+
+    // Update XP and fractional parts
+    useHunterStore.getState().increaseSkillExperience(skillId, wholeXP);
 
     return {
       ...state,
       fractionalResources: {
         ...state.fractionalResources,
         [resource.id]: newFraction,
+      },
+      fractionalXP: {
+        ...state.fractionalXP,
+        [skillId]: newXPFraction,
       },
     };
   }),
