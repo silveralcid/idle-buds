@@ -49,7 +49,7 @@ export const useGameStore = create<GameState>((set) => ({
       useBankStore.getState().addResource(resource.id, wholeAmount);
   
       // Update Bud's experience
-      const budSkillId = assignedBud.skillId; // Assuming Bud has a skillId property
+      const budSkillId = assignedBud.skillId;
       const currentXPFraction = state.fractionalXP[budSkillId] || 0;
       const totalXP = currentXPFraction + xpGain;
       const wholeXP = Math.floor(totalXP);
