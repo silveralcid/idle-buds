@@ -1,0 +1,1 @@
+ Instead of having a single universal shop menu (like Melvor), create location-based shops and special resource nodes that players need to "discover" or "unlock" in different areas. 
