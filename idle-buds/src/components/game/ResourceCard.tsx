@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Resource } from '../../types/resource.types';
 import { useHunterStore } from '../../stores/hunter.store';
 import { useGameStore } from '../../stores/game.store';
+import { moveBudToResource, moveBudToParty, moveBudFromResourceToParty } from '../../utils/budManagement';
+import { useResourceAssignmentStore } from '../../stores/resourceAssignment.store';
 
 interface ResourceCardProps {
   resource: Resource;
@@ -14,6 +16,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skill
   const skill = useHunterStore((state) => state.skills[skillId]);
   const currentActivity = useGameStore((state) => state.currentActivity);
   const party = useHunterStore((state) => state.party);
+  const { assignments } = useResourceAssignmentStore();
 
   useEffect(() => {
     if (skill && skill.level >= resource.levelRequired) {
@@ -21,7 +24,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skill
     }
   }, [skill, resource.levelRequired]);
 
-  const handleCardClick = () => {
+  const handleGather = () => {
     if (!isUnlocked) return;
     if (currentActivity === resource.id) {
       useGameStore.getState().stopGathering();
@@ -30,13 +33,24 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skill
     }
   };
 
+  const handleAssignBud = (budId: string) => {
+    if (budId) {
+      moveBudToResource(budId, resource.id);
+    }
+  };
+
+  const handleRemoveBud = () => {
+    const assignedBud = assignments[resource.id];
+    if (assignedBud) {
+      console.log(`Removing Bud from resource: ${assignedBud.id}`);
+      moveBudFromResourceToParty(assignedBud.id, resource.id);
+    }
+  };
+
+  const assignedBud = assignments[resource.id];
+
   return (
-    <div
-      className={`card shadow-lg cursor-pointer ${
-        isUnlocked ? 'opacity-100' : 'opacity-50'
-      } ${currentActivity === resource.id ? 'bg-success' : 'bg-base-200'}`}
-      onClick={handleCardClick}
-    >
+    <div className={`card shadow-lg ${isUnlocked ? 'opacity-100' : 'opacity-50'} ${currentActivity === resource.id ? 'bg-success' : 'bg-base-200'}`}>
       <div className="card-body relative">
         <h3 className="card-title flex justify-between">
           {resource.name}
@@ -71,19 +85,42 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skill
             <span>XP Gain/Tick: {resource.experienceGain}</span>
           </div>
           {isUnlocked && (
-            <div className="absolute top-2 right-2">
-              <label htmlFor="bud-select" className="block text-sm font-medium text-gray-700">
-                Assign Bud:
-              </label>
-              <select id="bud-select" className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                <option value="">Select a Bud</option>
-                {party.map((bud) => (
-                  <option key={bud.id} value={bud.id}>
-                    <img src={bud.spriteRef} alt={bud.name} className="w-8 h-8 inline-block" />
-                    {bud.name}
-                  </option>
-                ))}
-              </select>
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={handleGather}
+                className={`btn ${currentActivity === resource.id ? 'btn-danger' : 'btn-primary'}`}
+              >
+                {currentActivity === resource.id ? 'Stop' : 'Gather'}
+              </button>
+              {assignedBud ? (
+                <div className="flex items-center space-x-2">
+                  <img src={assignedBud.spriteRef} alt={assignedBud.name} className="w-8 h-8" />
+                  <button
+                    onClick={handleRemoveBud}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    &times;
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <label htmlFor="bud-select" className="block text-sm font-medium text-gray-700">
+                    Assign Bud:
+                  </label>
+                  <select
+                    id="bud-select"
+                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                    onChange={(e) => handleAssignBud(e.target.value)}
+                  >
+                    <option value="">Select a Bud</option>
+                    {party.map((bud) => (
+                      <option key={bud.id} value={bud.id}>
+                        {bud.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
           )}
         </div>
