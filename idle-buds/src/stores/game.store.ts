@@ -32,34 +32,41 @@ export const useGameStore = create<GameState>((set) => ({
     if (!state.isGathering || !state.currentActivity) return state;
     const resource = allResources.find(r => r.id === state.currentActivity);
     if (!resource) return state;
-
+  
     // Calculate gather amount and XP gain
     const gatherAmount = resource.gatherRate * deltaTime;
     const xpGain = resource.experienceGain * deltaTime;
     const skillId = defaultSkillMapping[resource.type];
-
+  
     // Accumulate fractional resources
     const currentFraction = state.fractionalResources[resource.id] || 0;
     const totalAmount = currentFraction + gatherAmount;
-
+  
+    // Log the exact amount gathered
+    console.log(`Exact amount gathered: ${totalAmount} of ${resource.name}`);
+  
     // Calculate whole and fractional parts for resources
     const wholeAmount = Math.floor(totalAmount);
     const newFraction = totalAmount - wholeAmount;
-
+  
     // Update resources and fractional parts
     useBankStore.getState().addResource(resource.id, wholeAmount);
-
+  
     // Accumulate fractional XP
     const currentXPFraction = state.fractionalXP[skillId] || 0;
     const totalXP = currentXPFraction + xpGain;
-
+  
     // Calculate whole and fractional parts for XP
     const wholeXP = Math.floor(totalXP);
     const newXPFraction = totalXP - wholeXP;
-
+  
     // Update XP and fractional parts
     useHunterStore.getState().increaseSkillExperience(skillId, wholeXP);
-
+  
+    // Log gathered resources and XP
+    console.log(`Gathered ${wholeAmount} of ${resource.name}`);
+    console.log(`Gained ${wholeXP} XP in ${skillId}`);
+  
     return {
       ...state,
       fractionalResources: {
