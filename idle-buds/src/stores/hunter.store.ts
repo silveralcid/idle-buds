@@ -11,15 +11,15 @@ const initialSkills: Record<string, Skill> = {
   lumbering: {
     id: 'lumbering',
     name: 'Lumbering',
-    level: 5,
-    experience: 0,
+    level: 2,
+    experience: 10,
     experienceToNextLevel: 100,
   },
   mining: {
     id: 'mining',
     name: 'Mining',
-    level: 1,
-    experience: 0,
+    level: 2,
+    experience: 10,
     experienceToNextLevel: 100,
   },
 };

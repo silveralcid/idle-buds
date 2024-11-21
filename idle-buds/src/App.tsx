@@ -3,6 +3,7 @@ import GameContainer from './views/GameContainer';
 import LumberingView from './views/gathering/LumberingView';
 import TestingView from './views/TestingView';
 import { useViewStore } from './stores/view.store';
+import MiningView from './views/gathering/MiningView';
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
@@ -11,6 +12,8 @@ function App() {
     switch (currentView) {
       case 'TestingView':
         return <TestingView />;
+      case 'MiningView':
+        return <MiningView />;
       case 'LumberingView':
       default:
         return <LumberingView />;

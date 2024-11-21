@@ -45,6 +45,12 @@ const Navbar = () => {
             >
               Lumbering
             </button>
+            <button
+              className="btn"
+              onClick={() => setView('MiningView')}
+            >
+              Mining
+            </button>
             <SaveLoadControls />
             {/* Action Buttons */}
             <div className="space-x-2">
