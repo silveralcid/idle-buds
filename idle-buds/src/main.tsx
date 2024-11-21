@@ -24,6 +24,27 @@ const AppWithAutoSave = () => {
 
   useEffect(() => {
     loadGame(); // Load the game state when the component mounts
+
+    const lastActiveTime = parseInt(localStorage.getItem('lastActiveTime') || '0', 10);
+    const currentTime = Date.now();
+    const elapsedTime = (currentTime - lastActiveTime) / 1000; // Convert milliseconds to seconds
+
+    if (elapsedTime > 0) {
+      const gameState = useGameStore.getState();
+      const offlineDuration = calculateOfflineDuration(lastActiveTime);
+      const resourcesGained = calculateResourcesGained(gameState, elapsedTime);
+      const hunterXPGained = calculateHunterXPGained(gameState, elapsedTime);
+      const budXPGained = calculateBudXPGained(gameState, elapsedTime);
+
+      setOfflineData({
+        duration: offlineDuration,
+        resources: resourcesGained,
+        hunterXP: hunterXPGained,
+        budXP: budXPGained,
+      });
+
+      setModalOpen(true);
+    }
   }, [loadGame]);
 
   // Use the auto-save hook

@@ -44,4 +44,17 @@ export const useOfflineProgression = () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [saveGame, loadGame, updateResources]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      saveGame();
+      localStorage.setItem('lastActiveTime', Date.now().toString());
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [saveGame]);
 };
