@@ -57,6 +57,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       set({
         ...savedState,
         lastSaveTime: savedState.lastSaveTime || Date.now(), // Restore lastSaveTime
+        isPaused: true, // Ensure the game is paused when loaded
       });
     }
   },
