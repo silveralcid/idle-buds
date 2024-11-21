@@ -14,18 +14,29 @@ interface ResourceCardProps {
 const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skillId }) => {
   const [isUnlocked, setIsUnlocked] = useState(resource.isUnlocked);
   const skill = useHunterStore((state) => state.skills[skillId]);
-  const currentActivity = useGameStore((state) => state.currentActivity);
-  const budActivity = useGameStore((state) => state.budActivity); // Get budActivity
+  const budActivity = useGameStore((state) => state.budActivity);
   const party = useHunterStore((state) => state.party);
   const { assignments } = useResourceAssignmentStore();
-
+  const currentActivity = useGameStore((state) => state.currentActivity);
   useEffect(() => {
     if (skill && skill.level >= resource.levelRequired) {
       setIsUnlocked(true);
     }
   }, [skill, resource.levelRequired]);
 
-  const handleGather = () => {
+  const handleBudGather = () => {
+    if (!isUnlocked) return;
+    const assignedBud = assignments[resource.id];
+    if (assignedBud) {
+      if (budActivity === resource.id) {
+        useGameStore.getState().stopGathering(true);
+      } else {
+        useGameStore.getState().startGathering(resource.id, true);
+      }
+    }
+  };
+  
+  const handleHunterGather = () => {
     if (!isUnlocked) return;
     if (currentActivity === resource.id) {
       useGameStore.getState().stopGathering(false);
@@ -36,9 +47,6 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skill
 
   const handleAssignBud = (budId: string) => {
     if (budId) {
-      if (budActivity === resource.id) {
-        useGameStore.getState().stopGathering(true);
-      }
       moveBudToResource(budId, resource.id);
       useGameStore.getState().startGathering(resource.id, true);
     }
@@ -55,7 +63,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skill
   const assignedBud = assignments[resource.id];
 
   return (
-    <div className={`card shadow-lg ${isUnlocked ? 'opacity-100' : 'opacity-50'} ${(currentActivity === resource.id || budActivity === resource.id) ? 'bg-success' : 'bg-base-200'}`}>
+    <div className={`card shadow-lg ${isUnlocked ? 'opacity-100' : 'opacity-50'} ${(budActivity === resource.id || currentActivity === resource.id) ? 'bg-success' : 'bg-base-200'}`}>
       <div className="card-body relative">
         <h3 className="card-title flex justify-between">
           {resource.name}
@@ -92,10 +100,10 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skill
           {isUnlocked && (
             <div className="flex justify-between mt-4">
               <button
-                onClick={handleGather}
-                className={`btn ${currentActivity === resource.id ? 'btn-danger' : 'btn-primary'}`}
+                onClick={assignedBud ? handleBudGather : handleHunterGather}
+                className={`btn ${(assignedBud && budActivity === resource.id) || (!assignedBud && currentActivity === resource.id) ? 'btn-danger' : 'btn-primary'}`}
               >
-                {currentActivity === resource.id ? 'Stop' : 'Gather'}
+                {(assignedBud && budActivity === resource.id) || (!assignedBud && currentActivity === resource.id) ? 'Stop' : 'Gather'}
               </button>
               {assignedBud ? (
                 <div className="flex items-center space-x-2">
