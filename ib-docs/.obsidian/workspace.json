@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Game Architecture Document.md",
+                "file": "Core Idle Mechanics.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Game Architecture Document"
+              "title": "Core Idle Mechanics"
             }
           }
         ]
@@ -162,8 +162,12 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "86fe88a0b76c1cdb",
+  "active": "b95f5597eaeb57f8",
   "lastOpenFiles": [
+    "no-read/Melvor Inspo.md",
+    "Core Idle Mechanics.md",
+    "no-read/Game Architecture Document.md",
+    "Art Direction Document.md",
     "Welcome.md",
     "UI.md",
     "Steps.md",
@@ -173,7 +177,6 @@
     "Game Design Document.md",
     "Game Architecture Document.md",
     "Dev Notes.md",
-    "Art Direction Document.md",
     "Art/Stable Diffusion/Generative Art Document.md",
     "Art/Stable Diffusion",
     "Art"
