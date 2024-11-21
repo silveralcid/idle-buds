@@ -5,6 +5,7 @@ import { GameConfig } from '../constants/gameConfig';
 export const useGameLoop = () => {
   const updateResources = useGameStore((state) => state.updateResources);
   const isGathering = useGameStore((state) => state.isGathering);
+  const isPaused = useGameStore((state) => state.isPaused);
 
   useEffect(() => {
     let lastTime = performance.now();
@@ -12,6 +13,10 @@ export const useGameLoop = () => {
     let animationFrameId: number;
 
     const gameLoop = (currentTime: number) => {
+      if (isPaused) {
+        animationFrameId = requestAnimationFrame(gameLoop);
+        return;
+      }
       const deltaTime = (currentTime - lastTime) / 1000;
       if (isGathering) {
         updateResources(deltaTime);
@@ -25,5 +30,5 @@ export const useGameLoop = () => {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [isGathering, updateResources]);
+  }, [isGathering, updateResources, isPaused]);
 };

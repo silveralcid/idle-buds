@@ -29,9 +29,13 @@ export interface GameState {
       stopBudGathering: () => void;
       updateResources: (deltaTime: number) => void;
   
-    // Save / Load / Reset
-      saveGame: () => void;
-      loadGame: () => void;
-      resetGame: () => void;
-      lastSaveTime: number;
-    }
+  // 
+    isPaused: boolean;
+    pauseGame: () => void;
+    unpauseGame: () => void;
+    saveGame: () => void;
+    loadGame: () => void;
+    resetGame: () => void;
+    lastSaveTime: number;
+    togglePause: () => void;
+}

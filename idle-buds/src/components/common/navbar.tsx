@@ -3,15 +3,28 @@ import { createBudInstance } from '../../factories/budFactory';
 import { budSpecies } from '../../data/buds/budSpecies.data';
 import { useHunterStore } from '../../stores/hunter.store'; // Import the hunter store
 import SaveLoadControls from './SaveLoadControls';
+import { useGameStore } from '../../stores/game.store';
 
 const Navbar = () => {
   const setView = useViewStore((state) => state.setView);
   const addBudToParty = useHunterStore((state) => state.addBudToParty); // Access addBudToParty
+  const isPaused = useGameStore((state) => state.isPaused);
+  const pauseGame = useGameStore((state) => state.pauseGame);
+  const unpauseGame = useGameStore((state) => state.unpauseGame);
 
   const addRandomBudToParty = () => {
     const randomSpecies = budSpecies[Math.floor(Math.random() * budSpecies.length)];
     const newBud = createBudInstance(randomSpecies);
     addBudToParty(newBud);
+  };
+
+  const togglePause = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (isPaused) {
+      unpauseGame();
+    } else {
+      pauseGame();
+    }
   };
 
   return (
@@ -33,11 +46,13 @@ const Navbar = () => {
               Lumbering
             </button>
             <SaveLoadControls />
-
             {/* Action Buttons */}
             <div className="space-x-2">
               <button onClick={addRandomBudToParty} className="btn btn-primary">
                 Add Random Bud to Party
+              </button>
+              <button onClick={togglePause} className="btn btn-secondary">
+                {isPaused ? 'Resume' : 'Pause'}
               </button>
             </div>
           </div>

@@ -31,6 +31,12 @@ export const useOfflineProgression = () => {
         const tickRate = 1 / GameConfig.ticksPerSecond;
         const ticksToProcess = Math.floor(elapsedTime / tickRate);
 
+        console.log('Last Active Time:', lastActiveTime);
+        console.log('Current Time:', currentTime);
+        console.log('Elapsed Time (seconds):', elapsedTime);
+        console.log('Tick Rate:', tickRate);
+        console.log('Ticks to Process:', ticksToProcess);
+
         // Process each tick
         for (let i = 0; i < ticksToProcess; i++) {
           updateResources(tickRate);
