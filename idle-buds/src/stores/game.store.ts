@@ -64,6 +64,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       currentActivity: null,
       budActivity: null,
     });
+    console.log('State after reset: ', get());
     useBankStore.getState().resetBank();
     useHunterStore.getState().resetHunter();
     useResourceAssignmentStore.getState().clearAssignments(); // Clear assignments
