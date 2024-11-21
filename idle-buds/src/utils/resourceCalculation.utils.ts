@@ -1,5 +1,7 @@
+import { GameConfig } from '../constants/gameConfig';
+
 export const calculateResourceGain = (gatherRate: number, ticks: number, currentFraction: number) => {
-    const gatherAmount = gatherRate * ticks * 20;
+    const gatherAmount = gatherRate * ticks * GameConfig.gatherRateModifier;
     const totalAmount = currentFraction + gatherAmount;
     const wholeAmount = Math.floor(totalAmount);
     const newFraction = totalAmount - wholeAmount;
@@ -7,7 +9,7 @@ export const calculateResourceGain = (gatherRate: number, ticks: number, current
   };
   
   export const calculateExperienceGain = (xpGainRate: number, ticks: number, currentXPFraction: number) => {
-    const xpGain = xpGainRate * ticks * 20;
+    const xpGain = xpGainRate * ticks * GameConfig.experienceGainModifier;
     const totalXP = currentXPFraction + xpGain;
     const wholeXP = Math.floor(totalXP);
     const newXPFraction = totalXP - wholeXP;

@@ -9,7 +9,8 @@ export const useGameLoop = () => {
 
   useEffect(() => {
     let lastTime = performance.now();
-    const tickRate = 1000 / GameConfig.ticksPerSecond;
+    let accumulatedTime = 0;
+    const tickDuration = GameConfig.tickDuration;
     let animationFrameId: number;
 
     const gameLoop = (currentTime: number) => {
@@ -17,10 +18,17 @@ export const useGameLoop = () => {
         animationFrameId = requestAnimationFrame(gameLoop);
         return;
       }
+
       const deltaTime = (currentTime - lastTime) / 1000;
-      if (isGathering) {
-        updateResources(deltaTime);
+      accumulatedTime += deltaTime * 1000; // Convert to milliseconds
+
+      while (accumulatedTime >= tickDuration) {
+        if (isGathering) {
+          updateResources(tickDuration / 1000); // Pass tick duration in seconds
+        }
+        accumulatedTime -= tickDuration;
       }
+
       lastTime = currentTime;
       animationFrameId = requestAnimationFrame(gameLoop);
     };
