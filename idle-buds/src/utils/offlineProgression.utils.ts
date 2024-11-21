@@ -3,6 +3,7 @@ import { allResources } from '../data/allResources.data';
 import { GameState } from '../types/state.types';
 import { useResourceAssignmentStore } from '../stores/resourceAssignment.store';
 import { defaultSkillMapping } from '../data/defaultSkillMapping';
+import { useGameStore } from '../stores/game.store';
 
 interface OfflineProgressionResult {
   hunterResources: Record<string, number>;
@@ -53,4 +54,21 @@ export const calculateOfflineProgression = (state: GameState, deltaTime: number)
     hunterExperience,
     budExperience
   };
+};
+
+export const handleOfflineProgression = (setProgressionData: (data: any) => void, setModalVisible: (visible: boolean) => void) => {
+    console.log('Calculating offline progression');
+    const lastSaveTime = useGameStore.getState().lastSaveTime;
+    const currentTime = Date.now();
+    const deltaTime = (currentTime - lastSaveTime) / 1000;
+
+    console.log('Last save time:', new Date(lastSaveTime).toLocaleString());
+    console.log('Current time:', new Date(currentTime).toLocaleString());
+    console.log('Delta time (seconds):', deltaTime);
+
+    const state = useGameStore.getState();
+    const progressionData = calculateOfflineProgression(state, deltaTime);
+    console.log('Progression data:', progressionData);
+    setProgressionData(progressionData);
+    setModalVisible(true);
 };
