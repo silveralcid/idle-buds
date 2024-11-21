@@ -3,7 +3,8 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.tsx';
 import { useAutoSave } from './hooks/useAutoSave';
-import { loadGameState } from './utils/saveLoad.utils';
+import { useOfflineProgression } from './hooks/useOfflineProgression'; // Import the hook
+import { loadGameState } from './utils/saveLoad.utils.ts';
 
 const AppWithAutoSave = () => {
   useEffect(() => {
@@ -14,6 +15,7 @@ const AppWithAutoSave = () => {
   }, []);
 
   useAutoSave();
+  useOfflineProgression(); // Use the hook
 
   return (
     <StrictMode>
