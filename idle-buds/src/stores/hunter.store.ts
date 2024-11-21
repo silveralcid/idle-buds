@@ -4,7 +4,8 @@ import { Skill } from '../types/skill.types';
 import { budInstance } from '../types/budInstance.types';
 import { increaseSkillExperience } from '../utils/skillManagement.utils';
 import { increaseBudExperience } from '../utils/budManagement.utils';
-import { HunterState } from '../types/hunterState.types';
+import { HunterState } from '../types/state.types';
+
 
 const initialSkills: Record<string, Skill> = {
   lumbering: {
@@ -61,4 +62,8 @@ export const useHunterStore = create<HunterState>((set) => ({
     skills: { ...initialSkills },
   })),
   increaseBudExperience: (budId, amount) => increaseBudExperience(budId, amount),
+  resetHunter: () => set({
+    party: [],
+    skills: { ...initialSkills },
+  }),
 }));

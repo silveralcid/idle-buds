@@ -1,9 +1,13 @@
 import { create } from "zustand";
 import { updateHunterResources, updateBudResources } from "../utils/resourceUpdate.utils";
-import { GameState } from "../types/gameState.types";
+import { saveGameState, loadGameState, resetGameState } from "../utils/saveLoad.utils";
+import { useBankStore } from "./bank.store";
+import { useHunterStore } from "./hunter.store";
+import { GameState } from "../types/state.types";
+
 
 // Use the functions inside the store
-export const useGameStore = create<GameState>((set) => ({
+export const useGameStore = create<GameState>((set, get) => ({
   resources: {},
   fractionalResources: {},
   fractionalXP: {},
@@ -34,13 +38,33 @@ export const useGameStore = create<GameState>((set) => ({
   })),
   updateResources: (deltaTime: number) => set((state) => {
     let newState = { ...state };
-
     // Update Hunter Resources
     newState = updateHunterResources(newState, deltaTime);
-
     // Update Bud Resources
     newState = updateBudResources(newState, deltaTime);
-
     return newState;
   }),
+  saveGame: () => {
+    const state = get();
+    saveGameState(state);
+  },
+  loadGame: () => {
+    const savedState = loadGameState();
+    if (savedState) {
+      set(savedState);
+    }
+  },
+  resetGame: () => {
+    resetGameState();
+    set({
+      resources: {},
+      fractionalResources: {},
+      fractionalXP: {},
+      isGathering: false,
+      currentActivity: null,
+      budActivity: null,
+    });
+    useBankStore.getState().resetBank();
+    useHunterStore.getState().resetHunter();
+  },
 }));

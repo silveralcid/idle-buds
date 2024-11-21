@@ -2,6 +2,7 @@ import { useViewStore } from '../../stores/view.store';
 import { createBudInstance } from '../../factories/budFactory';
 import { budSpecies } from '../../data/buds/budSpecies.data';
 import { useHunterStore } from '../../stores/hunter.store'; // Import the hunter store
+import SaveLoadControls from './SaveLoadControls';
 
 const Navbar = () => {
   const setView = useViewStore((state) => state.setView);
@@ -44,6 +45,7 @@ const Navbar = () => {
       {/* Center */}
       <div className="navbar-center">
         <a className="btn btn-ghost normal-case text-xl">Idle Buds</a>
+        <SaveLoadControls />
       </div>
     </div>
   );

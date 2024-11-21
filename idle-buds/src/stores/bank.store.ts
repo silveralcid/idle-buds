@@ -3,6 +3,7 @@ import { create } from 'zustand';
 interface BankState {
   resources: Record<string, number>;
   addResource: (resourceId: string, amount: number) => void;
+  resetBank: () => void;
 }
 
 export const useBankStore = create<BankState>((set) => ({
@@ -13,4 +14,5 @@ export const useBankStore = create<BankState>((set) => ({
       [resourceId]: (state.resources[resourceId] || 0) + amount,
     },
   })),
+  resetBank: () => set({ resources: {} }),
 }));

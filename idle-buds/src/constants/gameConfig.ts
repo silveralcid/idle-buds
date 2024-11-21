@@ -8,4 +8,7 @@ export const GameConfig = {
   // Bud Management
     budBoxCapacity: 100,
     partyCapacity: 2,
+
+  // Auto Save
+    autoSaveInterval: 5000, // 5 seconds
   };
