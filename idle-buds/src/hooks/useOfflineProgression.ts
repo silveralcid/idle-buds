@@ -10,12 +10,11 @@ export const useOfflineProgression = (setModalVisible: (visible: boolean) => voi
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
-        saveGame();
         if (typeof stopAutoSave === 'function') {
           stopAutoSave();
         }
         pauseGame();
-      } else if (document.visibilityState === 'visible') {
+      } else {
         setModalVisible(true);
       }
     };

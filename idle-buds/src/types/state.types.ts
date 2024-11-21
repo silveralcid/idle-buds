@@ -38,4 +38,5 @@ export interface GameState {
     resetGame: () => void;
     lastSaveTime: number;
     togglePause: () => void;
+    isInitialLoad: boolean;
 }

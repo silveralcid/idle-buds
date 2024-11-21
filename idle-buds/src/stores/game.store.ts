@@ -16,8 +16,12 @@ export const useGameStore = create<GameState>((set, get) => ({
   budActivity: null,
   lastSaveTime: Date.now(),
   isPaused: false,
+  isInitialLoad: true,
   pauseGame: () => set((state) => ({ isPaused: true })),
-  unpauseGame: () => set((state) => ({ isPaused: false })),
+  unpauseGame: () => set((state) => ({ 
+    isPaused: false,
+    isInitialLoad: false 
+  })),
   startGathering: (activityId, isBud) => set((state) => {
     if (isBud) {
       if (state.budActivity !== activityId) {
@@ -58,6 +62,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         ...savedState.game,
         lastSaveTime: savedState.timestamp,
         isPaused: true,
+        isInitialLoad: false
       });
     }
   },
@@ -73,6 +78,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       budActivity: null,
       lastSaveTime: resetTime,
       isPaused: false,
+      isInitialLoad: true
     });
     saveGameState(); // Save immediately after reset
     console.log('State after reset: ', get());

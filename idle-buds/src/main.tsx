@@ -8,7 +8,7 @@ import { useGameStore } from './stores/game.store';
 import OfflineProgressionModal from './components/common/OfflineProgressionModal';
 
 const AppWithAutoSaveAndOfflineProgression = () => {
-  const [isModalVisible, setModalVisible] = useState(true);
+  const [isModalVisible, setModalVisible] = useState(false);
 
   useAutoSave();
   useOfflineProgression(setModalVisible);

@@ -13,11 +13,14 @@ export function saveGameState() {
     const hunterState = useHunterStore.getState();
     const resourceAssignmentState = useResourceAssignmentStore.getState();
     
+    const currentTime = Date.now();
+    useGameStore.setState({ lastSaveTime: currentTime });
+    
     const saveData = {
         version: SAVE_VERSION,
-        timestamp: Date.now(),
+        timestamp: currentTime,
         state: {
-            game: gameState,
+            game: { ...gameState, lastSaveTime: currentTime },
             bank: bankState,
             hunter: hunterState,
             resourceAssignment: resourceAssignmentState,
