@@ -15,7 +15,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="navbar bg-base-100 shadow-lg">
+    <div className="navbar bg-base-100 shadow-lg" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
       {/* Left side */}
       <div className="navbar-start">
         <div className="dropdown">
@@ -32,9 +32,11 @@ const Navbar = () => {
             >
               Lumbering
             </button>
+            <SaveLoadControls />
+
             {/* Action Buttons */}
             <div className="space-x-2">
-              <button onClick={addRandomBudToParty} className="p-2 bg-green-500 text-white rounded">
+              <button onClick={addRandomBudToParty} className="btn btn-primary">
                 Add Random Bud to Party
               </button>
             </div>
@@ -45,7 +47,6 @@ const Navbar = () => {
       {/* Center */}
       <div className="navbar-center">
         <a className="btn btn-ghost normal-case text-xl">Idle Buds</a>
-        <SaveLoadControls />
       </div>
     </div>
   );

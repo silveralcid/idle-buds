@@ -63,3 +63,35 @@ export const resetGameState = () => ({
     budActivity: null,
 });
   
+
+export function exportSave() {
+  const savedState = localStorage.getItem(SAVE_KEY);
+  if (!savedState) {
+      console.warn('No save data found to export.');
+      return;
+  }
+
+  const blob = new Blob([savedState], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'idle_buds_save.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+
+export function importSave(file: File) {
+  const reader = new FileReader();
+  reader.onload = (event) => {
+      try {
+          const saveData = JSON.parse(event.target?.result as string);
+          localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+          loadGameState(); // Reload the game state from the imported data
+          console.log('Game state imported successfully.');
+      } catch (error) {
+          console.error('Failed to import save:', error);
+      }
+  };
+  reader.readAsText(file);
+}
