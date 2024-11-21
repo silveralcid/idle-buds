@@ -2,25 +2,21 @@ import { useEffect } from 'react';
 import { useGameStore } from '../stores/game.store';
 import { useAutoSave } from './useAutoSave';
 
-export const useOfflineProgression = () => {
+export const useOfflineProgression = (setModalVisible: (visible: boolean) => void) => {
   const saveGame = useGameStore((state) => state.saveGame);
   const pauseGame = useGameStore((state) => state.pauseGame);
-  const stopAutoSave = useAutoSave(); // This should now be a function
+  const stopAutoSave = useAutoSave();
 
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
-        // Save the game state
         saveGame();
-        // Stop auto-save
         if (typeof stopAutoSave === 'function') {
-          stopAutoSave(); // Call the function if it's callable
+          stopAutoSave();
         }
-        // Pause the game
         pauseGame();
       } else if (document.visibilityState === 'visible') {
-        // Resume auto-save if needed
-        // Unpause the game if needed
+        setModalVisible(true);
       }
     };
 
@@ -29,5 +25,5 @@ export const useOfflineProgression = () => {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [saveGame, pauseGame, stopAutoSave]);
+  }, [saveGame, pauseGame, stopAutoSave, setModalVisible]);
 };
