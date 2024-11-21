@@ -1,5 +1,5 @@
 import { useResourceAssignmentStore } from '../stores/resourceAssignment.store';
-import { moveBudToResource, moveBudFromResourceToParty } from '../utils/budManagement';
+import { moveBudToResource, moveBudFromResourceToParty } from '../utils/budManagement.utils';
 
 export const useBudAssignment = (resourceId: string) => {
   const { assignments } = useResourceAssignmentStore();
