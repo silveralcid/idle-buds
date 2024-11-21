@@ -5,6 +5,9 @@ import { useResourceAssignmentStore } from '../stores/resourceAssignment.store';
 import { defaultSkillMapping } from '../data/defaultSkillMapping';
 import { useGameStore } from '../stores/game.store';
 import { GameConfig } from '../constants/gameConfig';
+import { useBankStore } from '../stores/bank.store';
+import { useHunterStore } from '../stores/hunter.store';
+import { increaseBudExperience } from '../utils/budManagement.utils';
 
 interface OfflineProgressionResult {
   hunterResources: Record<string, number>;
@@ -82,6 +85,32 @@ export const handleOfflineProgression = (setProgressionData: (data: any) => void
   const state = useGameStore.getState();
   const progressionData = calculateOfflineProgression(state, deltaTime);
   console.log('Progression data:', progressionData);
+
+  // Update Bank Store with hunter and bud resources
+  const bankStore = useBankStore.getState();
+  Object.entries(progressionData.hunterResources).forEach(([resourceId, amount]) => {
+    console.log(`Adding ${amount} of resource ${resourceId} to bank store`);
+    bankStore.addResource(resourceId, amount);
+  });
+  Object.entries(progressionData.budResources).forEach(([resourceId, amount]) => {
+    console.log(`Adding ${amount} of bud resource ${resourceId} to bank store`);
+    bankStore.addResource(resourceId, amount);
+  });
+
+  // Update Hunter XP
+  const hunterStore = useHunterStore.getState();
+  Object.entries(progressionData.hunterExperience).forEach(([skillId, xp]) => {
+    console.log(`Increasing hunter skill ${skillId} by ${xp} XP`);
+    hunterStore.increaseSkillExperience(skillId, xp);
+  });
+
+  // Update Assigned Bud XP
+  Object.entries(progressionData.budExperience).forEach(([budId, xp]) => {
+    console.log(`Increasing bud ${budId} by ${xp} XP`);
+    increaseBudExperience(budId, xp);
+  });
+
   setProgressionData(progressionData);
+  console.log('Progression data set and modal visibility updated');
   setModalVisible(true);
 };
