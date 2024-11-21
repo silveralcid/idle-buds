@@ -5,6 +5,7 @@ interface ResourceAssignmentState {
   assignments: Record<string, budInstance | null>;
   assignBudToResource: (resourceId: string, bud: budInstance) => void;
   removeBudFromResource: (resourceId: string) => void; // Add this line
+  clearAssignments: () => void;
 }
 
 export const useResourceAssignmentStore = create<ResourceAssignmentState>((set) => ({
@@ -17,4 +18,5 @@ export const useResourceAssignmentStore = create<ResourceAssignmentState>((set) 
     delete newAssignments[resourceId];
     return { assignments: newAssignments };
   }), // Implement this function
+  clearAssignments: () => set({ assignments: {} }),
 }));

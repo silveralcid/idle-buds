@@ -1,12 +1,33 @@
-export const saveGameState = (state: any) => {
-    localStorage.setItem('gameState', JSON.stringify(state));
-  };
+import { useBankStore } from "../stores/bank.store";
+import { useGameStore } from "../stores/game.store";
+import { useHunterStore } from "../stores/hunter.store";
+import { GameState } from "../types/state.types";
+
+export function saveGameState(state: GameState) {
+    const gameState = useGameStore.getState();
+    const bankState = useBankStore.getState();
+    const hunterState = useHunterStore.getState();
   
-  export const loadGameState = (): any => {
+    const combinedState = {
+      game: gameState,
+      bank: bankState,
+      hunter: hunterState,
+    };
+  
+    localStorage.setItem('gameState', JSON.stringify(combinedState));
+};
+  
+export const loadGameState = () => {
+    // Retrieve the saved state from local storage or another source
     const savedState = localStorage.getItem('gameState');
-    return savedState ? JSON.parse(savedState) : null;
+    return savedState ? JSON.parse(savedState) : {};
   };
   
-  export const resetGameState = () => {
-    localStorage.removeItem('gameState');
-  };
+export const resetGameState = () => ({
+    resources: {},
+    fractionalResources: {},
+    fractionalXP: {},
+    isGathering: false,
+    currentActivity: null,
+    budActivity: null,
+  });

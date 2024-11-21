@@ -4,6 +4,7 @@ import { saveGameState, loadGameState, resetGameState } from "../utils/saveLoad.
 import { useBankStore } from "./bank.store";
 import { useHunterStore } from "./hunter.store";
 import { GameState } from "../types/state.types";
+import { useResourceAssignmentStore } from "./resourceAssignment.store";
 
 
 // Use the functions inside the store
@@ -49,7 +50,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     saveGameState(state);
   },
   loadGame: () => {
-    const savedState = loadGameState();
+    const savedState = loadGameState() || {}; // Ensure loadGameState returns an object
     if (savedState) {
       set(savedState);
     }
@@ -66,5 +67,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
     useBankStore.getState().resetBank();
     useHunterStore.getState().resetHunter();
+    useResourceAssignmentStore.getState().clearAssignments(); // Clear assignments
+
   },
 }));
