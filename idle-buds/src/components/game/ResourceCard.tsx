@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Resource } from '../../types/resource.types';
 import { useHunterStore } from '../../stores/hunter.store';
+import { useGathering } from '../../hooks/useGathering';
+import { useBudAssignment } from '../../hooks/useBudAssignment';
 import { useGameStore } from '../../stores/game.store';
-import { moveBudToResource, moveBudToParty, moveBudFromResourceToParty } from '../../utils/budManagement';
-import { useResourceAssignmentStore } from '../../stores/resourceAssignment.store';
 
 interface ResourceCardProps {
   resource: Resource;
@@ -14,10 +14,12 @@ interface ResourceCardProps {
 const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skillId }) => {
   const [isUnlocked, setIsUnlocked] = useState(resource.isUnlocked);
   const skill = useHunterStore((state) => state.skills[skillId]);
+  const { assignedBud, removeBud, handleAssignBud } = useBudAssignment(resource.id);
+  const { startGathering, stopGathering } = useGathering(resource.id, isUnlocked);
   const budActivity = useGameStore((state) => state.budActivity);
-  const party = useHunterStore((state) => state.party);
-  const { assignments } = useResourceAssignmentStore();
   const currentActivity = useGameStore((state) => state.currentActivity);
+  const party = useHunterStore((state) => state.party);
+
   useEffect(() => {
     if (skill && skill.level >= resource.levelRequired) {
       setIsUnlocked(true);
@@ -26,41 +28,21 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skill
 
   const handleBudGather = () => {
     if (!isUnlocked) return;
-    const assignedBud = assignments[resource.id];
-    if (assignedBud) {
-      if (budActivity === resource.id) {
-        useGameStore.getState().stopBudGathering();
-      } else {
-        useGameStore.getState().startGathering(resource.id, true);
-      }
+    if (budActivity === resource.id) {
+      stopGathering(true);
+    } else {
+      startGathering(true);
     }
   };
-  
+
   const handleHunterGather = () => {
     if (!isUnlocked) return;
     if (currentActivity === resource.id) {
-      useGameStore.getState().stopHunterGathering();
+      stopGathering(false);
     } else {
-      onActivate(resource.id);
+      startGathering(false);
     }
   };
-
-  const handleAssignBud = (budId: string) => {
-    if (budId) {
-      moveBudToResource(budId, resource.id);
-      useGameStore.getState().startGathering(resource.id, true);
-    }
-  };
-
-  const handleRemoveBud = () => {
-    const assignedBud = assignments[resource.id];
-    if (assignedBud) {
-      console.log(`Removing Bud from resource: ${assignedBud.id}`);
-      moveBudFromResourceToParty(assignedBud.id, resource.id);
-    }
-  };
-
-  const assignedBud = assignments[resource.id];
 
   return (
     <div className={`card shadow-lg ${isUnlocked ? 'opacity-100' : 'opacity-50'} ${(budActivity === resource.id || currentActivity === resource.id) ? 'bg-success' : 'bg-base-200'}`}>
@@ -114,7 +96,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skill
                     <div>XP: {assignedBud.experience}/{assignedBud.experienceToNextLevel}</div>
                   </div>
                   <button
-                    onClick={handleRemoveBud}
+                    onClick={removeBud}
                     className="text-red-500 hover:text-red-700"
                   >
                     &times;
