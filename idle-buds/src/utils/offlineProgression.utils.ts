@@ -113,4 +113,8 @@ export const handleOfflineProgression = (setProgressionData: (data: any) => void
   setProgressionData(progressionData);
   console.log('Progression data set and modal visibility updated');
   setModalVisible(true);
+
+  // Resume the game
+  useGameStore.getState().unpauseGame();
+  console.log('Game resumed after applying offline progression');
 };
