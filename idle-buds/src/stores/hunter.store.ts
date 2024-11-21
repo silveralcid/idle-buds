@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { GameConfig } from '../constants/gameConfig';
 import { Skill } from '../types/skill.types';
 import { budInstance } from '../types/budInstance.types';
+import { useResourceAssignmentStore } from './resourceAssignment.store';
 
 interface HunterState {
   skills: Record<string, Skill>;
@@ -94,34 +95,34 @@ export const useHunterStore = create<HunterState>((set) => ({
   refreshSkills: () => set(() => ({
     skills: { ...initialSkills },
   })),
-  increaseBudExperience: (budId, amount) => set((state) => {
-    const bud = state.party.find((b) => b.id === budId);
-    if (!bud) return state;
-
+  increaseBudExperience: (budId, amount) => {
+    const { assignments } = useResourceAssignmentStore.getState();
+    const bud = assignments[Object.keys(assignments).find(key => assignments[key]?.id === budId) as string];
+    if (!bud) return;
+  
     const newExperience = bud.experience + amount;
     if (newExperience >= bud.experienceToNextLevel) {
-      return {
-        party: state.party.map((b) =>
-          b.id === budId
-            ? {
-                ...b,
-                experience: newExperience - bud.experienceToNextLevel,
-                level: b.level + 1,
-                experienceToNextLevel: bud.experienceToNextLevel * 1.1, // Example scaling
-              }
-            : b
-        ),
-      };
+      useResourceAssignmentStore.setState((state) => ({
+        assignments: {
+          ...state.assignments,
+          [Object.keys(assignments).find(key => assignments[key]?.id === budId) as string]: {
+            ...bud,
+            experience: newExperience - bud.experienceToNextLevel,
+            level: bud.level + 1,
+            experienceToNextLevel: bud.experienceToNextLevel * 1.1, // Example scaling
+          },
+        },
+      }));
+    } else {
+      useResourceAssignmentStore.setState((state) => ({
+        assignments: {
+          ...state.assignments,
+          [Object.keys(assignments).find(key => assignments[key]?.id === budId) as string]: {
+            ...bud,
+            experience: newExperience,
+          },
+        },
+      }));
     }
-    return {
-      party: state.party.map((b) =>
-        b.id === budId
-          ? {
-              ...b,
-              experience: newExperience,
-            }
-          : b
-      ),
-    };
-  }),
+  },
 }));
