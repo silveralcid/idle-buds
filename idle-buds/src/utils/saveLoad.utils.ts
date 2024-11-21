@@ -3,7 +3,7 @@ import { useGameStore } from "../stores/game.store";
 import { useHunterStore } from "../stores/hunter.store";
 import { GameState } from "../types/state.types";
 
-export function saveGameState(state: GameState) {
+export function saveGameState() {
     const gameState = useGameStore.getState();
     const bankState = useBankStore.getState();
     const hunterState = useHunterStore.getState();

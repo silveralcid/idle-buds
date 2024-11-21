@@ -46,8 +46,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     return newState;
   }),
   saveGame: () => {
-    const state = get();
-    saveGameState(state);
+    saveGameState();
   },
   loadGame: () => {
     const savedState = loadGameState() || {}; // Ensure loadGameState returns an object
