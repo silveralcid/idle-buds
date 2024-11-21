@@ -9,9 +9,18 @@ import OfflineProgressionModal from './components/common/OfflineProgressionModal
 
 const AppWithAutoSaveAndOfflineProgression = () => {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [progressionData, setProgressionData] = useState({
+    hunterResources: {},
+    budResources: {},
+    hunterExperience: {},
+    budExperience: {}
+  });
+
+  console.log('Initial modal visibility:', isModalVisible);
+  console.log('Initial progression data:', progressionData);
 
   useAutoSave();
-  useOfflineProgression(setModalVisible);
+  useOfflineProgression(setModalVisible, setProgressionData);
 
   const loadGame = useGameStore((state) => state.loadGame);
 
@@ -20,12 +29,13 @@ const AppWithAutoSaveAndOfflineProgression = () => {
   }, [loadGame]);
 
   const handleCloseModal = () => {
+    console.log('Closing modal');
     setModalVisible(false);
   };
 
   return (
     <StrictMode>
-      <OfflineProgressionModal isVisible={isModalVisible} onClose={handleCloseModal} />
+      <OfflineProgressionModal isVisible={isModalVisible} onClose={handleCloseModal} progressionData={progressionData} />
       <App />
     </StrictMode>
   );
