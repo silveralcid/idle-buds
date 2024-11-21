@@ -33,4 +33,5 @@ export interface GameState {
       saveGame: () => void;
       loadGame: () => void;
       resetGame: () => void;
+      lastSaveTime: number;
     }

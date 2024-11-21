@@ -15,6 +15,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   isGathering: false,
   currentActivity: null,
   budActivity: null,
+  lastSaveTime: Date.now(),
   startGathering: (activityId, isBud) => set((state) => {
     if (isBud) {
       if (state.budActivity !== activityId) {
@@ -51,7 +52,10 @@ export const useGameStore = create<GameState>((set, get) => ({
   loadGame: () => {
     const savedState = loadGameState() || {}; // Ensure loadGameState returns an object
     if (savedState) {
-      set(savedState);
+      set({
+        ...savedState,
+        lastSaveTime: savedState.lastSaveTime || Date.now(), // Restore lastSaveTime
+      });
     }
   },
   resetGame: () => {
@@ -63,6 +67,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       isGathering: false,
       currentActivity: null,
       budActivity: null,
+      lastSaveTime: Date.now(),
     });
     console.log('State after reset: ', get());
     useBankStore.getState().resetBank();
