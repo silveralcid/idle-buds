@@ -22,6 +22,13 @@ const initialSkills: Record<string, Skill> = {
     experience: 10,
     experienceToNextLevel: 100,
   },
+  smithing: {
+    id: 'smithing',
+    name: 'Smithing',
+    level: 2,
+    experience: 10,
+    experienceToNextLevel: 100,
+  },
 };
 
 export const useHunterStore = create<HunterState>((set) => ({
