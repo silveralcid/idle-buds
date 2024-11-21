@@ -8,6 +8,7 @@ export function createBudInstance(base: budBase): budInstance {
     id: uuidv4(),
     level: 1,
     experience: 0,
+    experienceToNextLevel: 100,
     gender: Math.random() > 0.5 ? 'male' : 'female' as 'male' | 'female' | 'none',
     // Additional properties can be added here
   };

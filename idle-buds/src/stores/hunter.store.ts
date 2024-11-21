@@ -12,6 +12,7 @@ interface HunterState {
   party: budInstance[];
   addBudToParty: (bud: budInstance) => void;
   removeBudFromParty: (budId: string) => void;
+  increaseBudExperience: (budId: string, amount: number) => void; // Add this line
 }
 
 const initialSkills: Record<string, Skill> = {
@@ -32,18 +33,17 @@ const initialSkills: Record<string, Skill> = {
 };
 
 export const useHunterStore = create<HunterState>((set) => ({
-    party: [],
-    addBudToParty: (bud) => set((state) => {
-      if (state.party.length < GameConfig.partyCapacity) {
-        return { party: [...state.party, bud] };
-      }
-      console.warn('Party is full. Cannot add more Buds.');
-      return state;
-    }),
-    removeBudFromParty: (budId) => set((state) => ({
-      party: state.party.filter((bud) => bud.id !== budId),
-    })),
-    
+  party: [],
+  addBudToParty: (bud) => set((state) => {
+    if (state.party.length < GameConfig.partyCapacity) {
+      return { party: [...state.party, bud] };
+    }
+    console.warn('Party is full. Cannot add more Buds.');
+    return state;
+  }),
+  removeBudFromParty: (budId) => set((state) => ({
+    party: state.party.filter((bud) => bud.id !== budId),
+  })),
   skills: { ...initialSkills },
   increaseSkillExperience: (skillId, amount) => set((state) => {
     const skill = state.skills[skillId];
@@ -94,4 +94,34 @@ export const useHunterStore = create<HunterState>((set) => ({
   refreshSkills: () => set(() => ({
     skills: { ...initialSkills },
   })),
+  increaseBudExperience: (budId, amount) => set((state) => {
+    const bud = state.party.find((b) => b.id === budId);
+    if (!bud) return state;
+
+    const newExperience = bud.experience + amount;
+    if (newExperience >= bud.experienceToNextLevel) {
+      return {
+        party: state.party.map((b) =>
+          b.id === budId
+            ? {
+                ...b,
+                experience: newExperience - bud.experienceToNextLevel,
+                level: b.level + 1,
+                experienceToNextLevel: bud.experienceToNextLevel * 1.1, // Example scaling
+              }
+            : b
+        ),
+      };
+    }
+    return {
+      party: state.party.map((b) =>
+        b.id === budId
+          ? {
+              ...b,
+              experience: newExperience,
+            }
+          : b
+      ),
+    };
+  }),
 }));

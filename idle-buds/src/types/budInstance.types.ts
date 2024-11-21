@@ -5,6 +5,7 @@ export interface budInstance extends budBase {
     nickname?: string;
     level: number;
     experience: number;
+    experienceToNextLevel: number;
     gender: 'male' | 'female' | 'none';
     // palette: 'normal' | 'spring' | 'summer' | 'fall' | 'winter';
     // isShiny: boolean;

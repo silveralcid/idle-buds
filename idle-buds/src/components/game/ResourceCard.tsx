@@ -100,6 +100,11 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skill
               {assignedBud ? (
                 <div className="flex items-center space-x-2">
                   <img src={assignedBud.spriteRef} alt={assignedBud.name} className="w-8 h-8" />
+                  <div className="text-sm">
+                    <div>{assignedBud.name}</div>
+                    <div>Level: {assignedBud.level}</div>
+                    <div>XP: {assignedBud.experience}/{assignedBud.experienceToNextLevel}</div>
+                  </div>
                   <button
                     onClick={handleRemoveBud}
                     className="text-red-500 hover:text-red-700"

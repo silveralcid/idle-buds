@@ -48,14 +48,14 @@ export const useGameStore = create<GameState>((set) => ({
       // Bud is gathering
       useBankStore.getState().addResource(resource.id, wholeAmount);
   
-      // Update Bud's experience
-      const budSkillId = assignedBud.skillId;
-      const currentXPFraction = state.fractionalXP[budSkillId] || 0;
+      // Update Bud's overall experience
+      const currentXPFraction = state.fractionalXP[assignedBud.id] || 0;
       const totalXP = currentXPFraction + xpGain;
       const wholeXP = Math.floor(totalXP);
       const newXPFraction = totalXP - wholeXP;
   
-      useHunterStore.getState().increaseSkillExperience(budSkillId, wholeXP);
+      // Assuming a function to increase Bud's overall experience
+      useHunterStore.getState().increaseBudExperience(assignedBud.id, wholeXP);
   
       console.log(`Bud ${assignedBud.id} gathered ${wholeAmount} of ${resource.name}`);
       console.log(`Bud ${assignedBud.id} gained ${wholeXP} XP`);
@@ -68,7 +68,7 @@ export const useGameStore = create<GameState>((set) => ({
         },
         fractionalXP: {
           ...state.fractionalXP,
-          [budSkillId]: newXPFraction,
+          [assignedBud.id]: newXPFraction,
         },
       };
     } else {
