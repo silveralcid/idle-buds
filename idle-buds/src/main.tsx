@@ -1,12 +1,20 @@
 import './index.css';
-import { StrictMode } from 'react';
+import { StrictMode, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
-import { useAutoSave } from './hooks/useAutoSave'; // Import the auto-save hook
+import { useAutoSave } from './hooks/useAutoSave';
+import { useOfflineProgression } from './hooks/useOfflineProgression';
+import { useGameStore } from './stores/game.store';
 
-const AppWithAutoSave = () => {
-  // Use the auto-save hook
+const AppWithAutoSaveAndOfflineProgression = () => {
   useAutoSave();
+  useOfflineProgression();
+
+  const loadGame = useGameStore((state) => state.loadGame);
+
+  useEffect(() => {
+    loadGame();
+  }, [loadGame]);
 
   return (
     <StrictMode>
@@ -15,4 +23,4 @@ const AppWithAutoSave = () => {
   );
 };
 
-createRoot(document.getElementById('root')!).render(<AppWithAutoSave />);
+createRoot(document.getElementById('root')!).render(<AppWithAutoSaveAndOfflineProgression />);

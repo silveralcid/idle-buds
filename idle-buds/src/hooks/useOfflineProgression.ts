@@ -1,46 +1,26 @@
 import { useEffect } from 'react';
 import { useGameStore } from '../stores/game.store';
-import { GameConfig } from '../constants/gameConfig';
+import { useAutoSave } from './useAutoSave';
 
 export const useOfflineProgression = () => {
   const saveGame = useGameStore((state) => state.saveGame);
-  const loadGame = useGameStore((state) => state.loadGame);
-  const updateResources = useGameStore((state) => state.updateResources);
+  const pauseGame = useGameStore((state) => state.pauseGame);
+  const stopAutoSave = useAutoSave(); // This should now be a function
 
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
-        // Save the game state and timestamp
+        // Save the game state
         saveGame();
-        localStorage.setItem('lastActiveTime', Date.now().toString());
-      } else if (document.visibilityState === 'visible') {
-        // Load the game state and calculate offline progression
-        loadGame();
-        const lastActiveTime = parseInt(localStorage.getItem('lastActiveTime') || '0', 10);
-        const currentTime = Date.now();
-        let elapsedTime = (currentTime - lastActiveTime) / 1000; // Convert to seconds
-
-        // Cap the offline time
-        const maxOfflineTime = 24 * 60 * 60; // 24 hours in seconds
-        const minOfflineTime = 60; // 1 minute in seconds
-
-        if (elapsedTime < minOfflineTime) return; // Ignore short offline times
-        elapsedTime = Math.min(elapsedTime, maxOfflineTime); // Cap offline time
-
-        // Calculate the number of ticks to process
-        const tickRate = 1 / GameConfig.ticksPerSecond;
-        const ticksToProcess = Math.floor(elapsedTime / tickRate);
-
-        console.log('Last Active Time:', lastActiveTime);
-        console.log('Current Time:', currentTime);
-        console.log('Elapsed Time (seconds):', elapsedTime);
-        console.log('Tick Rate:', tickRate);
-        console.log('Ticks to Process:', ticksToProcess);
-
-        // Process each tick
-        for (let i = 0; i < ticksToProcess; i++) {
-          updateResources(tickRate);
+        // Stop auto-save
+        if (typeof stopAutoSave === 'function') {
+          stopAutoSave(); // Call the function if it's callable
         }
+        // Pause the game
+        pauseGame();
+      } else if (document.visibilityState === 'visible') {
+        // Resume auto-save if needed
+        // Unpause the game if needed
       }
     };
 
@@ -49,18 +29,5 @@ export const useOfflineProgression = () => {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [saveGame, loadGame, updateResources]);
-
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      saveGame();
-      localStorage.setItem('lastActiveTime', Date.now().toString());
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [saveGame]);
+  }, [saveGame, pauseGame, stopAutoSave]);
 };
