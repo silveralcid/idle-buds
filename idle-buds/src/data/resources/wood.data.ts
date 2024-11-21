@@ -28,7 +28,7 @@ export const woodResources: Resource[] = [
     levelRequired: 2,
     isUnlocked: false,
     region: 'Forest',
-    gatherRate: 1,
+    gatherRate: 1.5,
     gatherEfficiency: 1,
     nodeHealth: 100,
     maxHealth: 100,
