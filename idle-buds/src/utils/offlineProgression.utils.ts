@@ -4,6 +4,7 @@ import { GameState } from '../types/state.types';
 import { useResourceAssignmentStore } from '../stores/resourceAssignment.store';
 import { defaultSkillMapping } from '../data/defaultSkillMapping';
 import { useGameStore } from '../stores/game.store';
+import { GameConfig } from '../constants/gameConfig';
 
 interface OfflineProgressionResult {
   hunterResources: Record<string, number>;
@@ -23,12 +24,15 @@ export const calculateOfflineProgression = (state: GameState, deltaTime: number)
   console.log('All Resources:', allResources);
   console.log('Default Skill Mapping:', defaultSkillMapping);
 
+  const tickDuration = GameConfig.tickDuration / 1000; // Convert to seconds
+  const ticks = deltaTime / tickDuration;
+
   if (state.currentActivity) {
     const resource = allResources.find(r => r.id === state.currentActivity);
     if (resource) {
-      const { wholeAmount: hunterResourceGain, newFraction: newHunterFraction } = calculateResourceGain(resource.gatherRate, deltaTime, state.fractionalResources[resource.id] || 0);
+      const { wholeAmount: hunterResourceGain, newFraction: newHunterFraction } = calculateResourceGain(resource.gatherRate, ticks, state.fractionalResources[resource.id] || 0);
       const skillId = defaultSkillMapping[resource.type];
-      const { wholeXP: hunterXP, newXPFraction: newHunterXPFraction } = calculateExperienceGain(resource.experienceGain, deltaTime, state.fractionalXP[skillId] || 0);
+      const { wholeXP: hunterXP, newXPFraction: newHunterXPFraction } = calculateExperienceGain(resource.experienceGain, ticks, state.fractionalXP[skillId] || 0);
 
       hunterResources[resource.id] = hunterResourceGain;
       hunterExperience[skillId] = hunterXP;
@@ -45,8 +49,8 @@ export const calculateOfflineProgression = (state: GameState, deltaTime: number)
       const assignedBud = assignments[state.budActivity];
 
       if (assignedBud) {
-        const { wholeAmount: budResourceGain, newFraction: newBudFraction } = calculateResourceGain(resource.gatherRate, deltaTime, state.fractionalResources[resource.id] || 0);
-        const { wholeXP: budXP, newXPFraction: newBudXPFraction } = calculateExperienceGain(resource.experienceGain, deltaTime, state.fractionalXP[assignedBud.id] || 0);
+        const { wholeAmount: budResourceGain, newFraction: newBudFraction } = calculateResourceGain(resource.gatherRate, ticks, state.fractionalResources[resource.id] || 0);
+        const { wholeXP: budXP, newXPFraction: newBudXPFraction } = calculateExperienceGain(resource.experienceGain, ticks, state.fractionalXP[assignedBud.id] || 0);
 
         budResources[resource.id] = budResourceGain;
         budExperience[assignedBud.id] = budXP;
