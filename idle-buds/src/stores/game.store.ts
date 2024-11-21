@@ -13,7 +13,8 @@ interface GameState {
   currentActivity: string | null; // Hunter's current activity
   budActivity: string | null; // Bud's current activity
   startGathering: (activityId: string, isBud: boolean) => void;
-  stopGathering: (isBud: boolean) => void;
+  stopHunterGathering: () => void;
+  stopBudGathering: () => void;
   updateResources: (deltaTime: number) => void;
 }
 
@@ -114,9 +115,15 @@ export const useGameStore = create<GameState>((set) => ({
     }
     return state;
   }),
-  stopGathering: (isBud) => set((state) => ({
-    isGathering: false,
-    ...(isBud ? { budActivity: null } : { currentActivity: null }),
+  stopHunterGathering: () => set((state) => ({
+    ...state,
+    currentActivity: null,
+    isGathering: state.budActivity !== null, // Only set isGathering to false if no Bud is gathering
+  })),
+  stopBudGathering: () => set((state) => ({
+    ...state,
+    budActivity: null,
+    isGathering: state.currentActivity !== null, // Only set isGathering to false if no Hunter is gathering
   })),
   updateResources: (deltaTime: number) => set((state) => {
     let newState = { ...state };
