@@ -8,12 +8,6 @@ const TestingView = () => {
   const { skills, setSkillLevel, setSkillExperience, addBudToParty, party } = useHunterStore();
   const { resources, addResource } = useBankStore(); // Access resources and addResource function
 
-  const addRandomBudToParty = () => {
-    const randomSpecies = budSpecies[Math.floor(Math.random() * budSpecies.length)];
-    const newBud = createBudInstance(randomSpecies);
-    addBudToParty(newBud);
-  };
-
   const addFlatResource = (resourceName: string, amount: number) => {
     addResource(resourceName, amount);
   };
@@ -97,13 +91,6 @@ const TestingView = () => {
             ))}
           </tbody>
         </table>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="space-x-2">
-        <button onClick={addRandomBudToParty} className="p-2 bg-green-500 text-white rounded">
-          Add Random Bud to Party
-        </button>
       </div>
     </div>
   );
