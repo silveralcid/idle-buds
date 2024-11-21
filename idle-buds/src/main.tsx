@@ -5,6 +5,7 @@ import App from './App';
 import OfflineProgressionModal from './components/common/OfflineProgressionModal';
 import { calculateOfflineDuration, calculateResourcesGained, calculateHunterXPGained, calculateBudXPGained } from './utils/offlineProgression.utils';
 import { useGameStore } from './stores/game.store';
+import { useAutoSave } from './hooks/useAutoSave'; // Import the auto-save hook
 
 const AppWithAutoSave = () => {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -17,6 +18,16 @@ const AppWithAutoSave = () => {
 
   // Define lastActiveTime
   const [lastActiveTime, setLastActiveTime] = useState(Date.now());
+
+  // Load game state on mount
+  const loadGame = useGameStore((state) => state.loadGame);
+
+  useEffect(() => {
+    loadGame(); // Load the game state when the component mounts
+  }, [loadGame]);
+
+  // Use the auto-save hook
+  useAutoSave();
 
   const handleVisibilityChange = () => {
     if (document.visibilityState === 'visible') {
