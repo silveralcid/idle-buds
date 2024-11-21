@@ -52,17 +52,18 @@ export const useGameStore = create<GameState>((set, get) => ({
     saveGameState();
   },
   loadGame: () => {
-    const savedState = loadGameState() || {}; // Ensure loadGameState returns an object
+    const savedState = loadGameState();
     if (savedState) {
       set({
-        ...savedState,
-        lastSaveTime: savedState.lastSaveTime || Date.now(), // Restore lastSaveTime
-        isPaused: true, // Ensure the game is paused when loaded
+        ...savedState.game,
+        lastSaveTime: savedState.timestamp,
+        isPaused: true,
       });
     }
   },
   resetGame: () => {
     resetGameState();
+    const resetTime = Date.now();
     set({
       resources: {},
       fractionalResources: {},
@@ -70,13 +71,14 @@ export const useGameStore = create<GameState>((set, get) => ({
       isGathering: false,
       currentActivity: null,
       budActivity: null,
-      lastSaveTime: Date.now(),
-      isPaused: false, // Reset isPaused state
+      lastSaveTime: resetTime,
+      isPaused: false,
     });
+    saveGameState(); // Save immediately after reset
     console.log('State after reset: ', get());
     useBankStore.getState().resetBank();
     useHunterStore.getState().resetHunter();
-    useResourceAssignmentStore.getState().clearAssignments(); // Clear assignments
+    useResourceAssignmentStore.getState().clearAssignments();
   },
   togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
 }));

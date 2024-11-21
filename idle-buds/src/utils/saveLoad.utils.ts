@@ -35,23 +35,22 @@ export const loadGameState = () => {
 
         const saveData = JSON.parse(savedState);
         
-        // Version check
         if (saveData.version !== SAVE_VERSION) {
             console.warn('Save version mismatch. Some features may not work correctly.');
         }
 
-        // Actually update your stores with the loaded data
         const { game, bank, hunter, resourceAssignment } = saveData.state;
-        useGameStore.setState(game);
+        
         useBankStore.setState(bank);
         useHunterStore.setState(hunter);
         useResourceAssignmentStore.setState(resourceAssignment);
-        return saveData.state;
+        
+        return saveData;
     } catch (error) {
         console.error('Failed to load game:', error);
         return null;
     }
-}
+};
 
   
 export const resetGameState = () => ({
