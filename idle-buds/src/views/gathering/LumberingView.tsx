@@ -15,7 +15,7 @@ const LumberingView = () => {
     const currentActivity = useGameStore.getState().currentActivity;
     if (currentActivity !== resourceId) {
       console.log(`Activating gathering for resource: ${resourceId}`);
-      startGathering(resourceId);
+      startGathering(resourceId, false);
     }
   };
 

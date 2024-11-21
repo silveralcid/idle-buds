@@ -7,12 +7,13 @@ import { useResourceAssignmentStore } from "./resourceAssignment.store";
 
 interface GameState {
   resources: Record<string, number>;
-  fractionalResources: Record<string, number>; // Add fractional resources
-  fractionalXP: Record<string, number>; // Add fractional XP
+  fractionalResources: Record<string, number>;
+  fractionalXP: Record<string, number>;
   isGathering: boolean;
-  currentActivity: string | null; // Track the current activity
-  startGathering: (activityId: string) => void;
-  stopGathering: () => void;
+  currentActivity: string | null; // Hunter's current activity
+  budActivity: string | null; // Bud's current activity
+  startGathering: (activityId: string, isBud: boolean) => void;
+  stopGathering: (isBud: boolean) => void;
   updateResources: (deltaTime: number) => void;
 }
 
@@ -22,80 +23,100 @@ export const useGameStore = create<GameState>((set) => ({
   fractionalXP: {}, // Initialize fractional XP
   isGathering: false,
   currentActivity: null,
-  startGathering: (activityId) => set((state) => {
-    if (state.currentActivity !== activityId) {
-      return { isGathering: true, currentActivity: activityId };
+  budActivity: null,
+  startGathering: (activityId, isBud) => set((state) => {
+    if (isBud) {
+      if (state.budActivity !== activityId) {
+        return { isGathering: true, budActivity: activityId };
+      }
+    } else {
+      if (state.currentActivity !== activityId) {
+        return { isGathering: true, currentActivity: activityId };
+      }
     }
     return state;
   }),
-  stopGathering: () => set({ isGathering: false, currentActivity: null }),
+  stopGathering: (isBud) => set((state) => ({
+    isGathering: false,
+    ...(isBud ? { budActivity: null } : { currentActivity: null }),
+  })),
+
   updateResources: (deltaTime: number) => set((state) => {
-    if (!state.isGathering || !state.currentActivity) return state;
-    const resource = allResources.find(r => r.id === state.currentActivity);
-    if (!resource) return state;
+    let newState = { ...state };
   
-    const { assignments } = useResourceAssignmentStore.getState();
-    const assignedBud = assignments[state.currentActivity];
+    // Process Hunter's gathering
+    if (state.currentActivity) {
+      const resource = allResources.find(r => r.id === state.currentActivity);
+      if (resource) {
+        const gatherAmount = resource.gatherRate * deltaTime;
+        const xpGain = resource.experienceGain * deltaTime;
+        const currentFraction = state.fractionalResources[resource.id] || 0;
+        const totalAmount = currentFraction + gatherAmount;
+        const wholeAmount = Math.floor(totalAmount);
+        const newFraction = totalAmount - wholeAmount;
   
-    const gatherAmount = resource.gatherRate * deltaTime;
-    const xpGain = resource.experienceGain * deltaTime;
-    const currentFraction = state.fractionalResources[resource.id] || 0;
-    const totalAmount = currentFraction + gatherAmount;
-    const wholeAmount = Math.floor(totalAmount);
-    const newFraction = totalAmount - wholeAmount;
+        // Hunter gathering logic
+        const skillId = defaultSkillMapping[resource.type];
+        const currentXPFraction = state.fractionalXP[skillId] || 0;
+        const totalXP = currentXPFraction + xpGain;
+        const wholeXP = Math.floor(totalXP);
+        const newXPFraction = totalXP - wholeXP;
   
-    if (assignedBud) {
-      // Bud is gathering
-      useBankStore.getState().addResource(resource.id, wholeAmount);
+        useBankStore.getState().addResource(resource.id, wholeAmount);
+        useHunterStore.getState().increaseSkillExperience(skillId, wholeXP);
   
-      // Update Bud's overall experience
-      const currentXPFraction = state.fractionalXP[assignedBud.id] || 0;
-      const totalXP = currentXPFraction + xpGain;
-      const wholeXP = Math.floor(totalXP);
-      const newXPFraction = totalXP - wholeXP;
-  
-      // Assuming a function to increase Bud's overall experience
-      useHunterStore.getState().increaseBudExperience(assignedBud.id, wholeXP);
-  
-      console.log(`Bud ${assignedBud.id} gathered ${wholeAmount} of ${resource.name}`);
-      console.log(`Bud ${assignedBud.id} gained ${wholeXP} XP`);
-  
-      return {
-        ...state,
-        fractionalResources: {
-          ...state.fractionalResources,
-          [resource.id]: newFraction,
-        },
-        fractionalXP: {
-          ...state.fractionalXP,
-          [assignedBud.id]: newXPFraction,
-        },
-      };
-    } else {
-      // Hunter is gathering
-      const skillId = defaultSkillMapping[resource.type];
-      const currentXPFraction = state.fractionalXP[skillId] || 0;
-      const totalXP = currentXPFraction + xpGain;
-      const wholeXP = Math.floor(totalXP);
-      const newXPFraction = totalXP - wholeXP;
-  
-      useBankStore.getState().addResource(resource.id, wholeAmount);
-      useHunterStore.getState().increaseSkillExperience(skillId, wholeXP);
-  
-      console.log(`Hunter gathered ${wholeAmount} of ${resource.name}`);
-      console.log(`Hunter gained ${wholeXP} XP in ${skillId}`);
-  
-      return {
-        ...state,
-        fractionalResources: {
-          ...state.fractionalResources,
-          [resource.id]: newFraction,
-        },
-        fractionalXP: {
-          ...state.fractionalXP,
-          [skillId]: newXPFraction,
-        },
-      };
+        newState = {
+          ...newState,
+          fractionalResources: {
+            ...newState.fractionalResources,
+            [resource.id]: newFraction,
+          },
+          fractionalXP: {
+            ...newState.fractionalXP,
+            [skillId]: newXPFraction,
+          },
+        };
+      }
     }
+  
+    // Process Bud's gathering
+    if (state.budActivity) {
+      const resource = allResources.find(r => r.id === state.budActivity);
+      if (resource) {
+        const { assignments } = useResourceAssignmentStore.getState();
+        const assignedBud = assignments[state.budActivity];
+  
+        if (assignedBud) {
+          const gatherAmount = resource.gatherRate * deltaTime;
+          const xpGain = resource.experienceGain * deltaTime;
+          const currentFraction = state.fractionalResources[resource.id] || 0;
+          const totalAmount = currentFraction + gatherAmount;
+          const wholeAmount = Math.floor(totalAmount);
+          const newFraction = totalAmount - wholeAmount;
+  
+          const currentXPFraction = state.fractionalXP[assignedBud.id] || 0;
+          const totalXP = currentXPFraction + xpGain;
+          const wholeXP = Math.floor(totalXP);
+          const newXPFraction = totalXP - wholeXP;
+  
+          useBankStore.getState().addResource(resource.id, wholeAmount);
+          useHunterStore.getState().increaseBudExperience(assignedBud.id, wholeXP);
+  
+          newState = {
+            ...newState,
+            fractionalResources: {
+              ...newState.fractionalResources,
+              [resource.id]: newFraction,
+            },
+            fractionalXP: {
+              ...newState.fractionalXP,
+              [assignedBud.id]: newXPFraction,
+            },
+          };
+        }
+      }
+    }
+  
+    return newState;
   }),
 }));
