@@ -1,10 +1,10 @@
-import { GameState } from '../types/gameState.types';
 import { allResources } from '../data/allResources.data';
 import { useBankStore } from '../stores/bank.store';
 import { useHunterStore } from '../stores/hunter.store';
 import { useResourceAssignmentStore } from '../stores/resourceAssignment.store';
 import { calculateResourceGain, calculateExperienceGain } from '../utils/resourceCalculation.utils';
 import { defaultSkillMapping } from '../data/defaultSkillMapping';
+import { GameState } from '../types/state.types';
 
 export const updateHunterResources = (state: GameState, deltaTime: number) => {
   if (state.currentActivity) {

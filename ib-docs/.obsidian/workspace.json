@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Core Idle Mechanics.md",
+                "file": "no-read/Melvor Inspo.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Core Idle Mechanics"
+              "title": "Melvor Inspo"
             }
           }
         ]
@@ -162,10 +162,11 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "b95f5597eaeb57f8",
+  "active": "86fe88a0b76c1cdb",
   "lastOpenFiles": [
-    "no-read/Melvor Inspo.md",
     "Core Idle Mechanics.md",
+    "no-read/Core Idle Mechanics.md",
+    "no-read/Melvor Inspo.md",
     "no-read/Game Architecture Document.md",
     "Art Direction Document.md",
     "Welcome.md",

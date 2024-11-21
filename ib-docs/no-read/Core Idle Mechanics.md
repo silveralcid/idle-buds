@@ -7,10 +7,12 @@ To implement an **offline progression system** and a **game loop** similar to th
 The game loop ensures the game processes updates at regular intervals.
 
 ### **Key Components**
+
 - Use `setInterval` or `requestAnimationFrame` for the loop.
 - Track the time between ticks to process updates accurately.
 
 ### **Example Code**
+
 ```javascript
 class Game {
   constructor() {
@@ -53,10 +55,12 @@ game.startGameLoop();
 Offline progression calculates how much time has passed since the user last played and processes updates accordingly.
 
 ### **Key Components**
+
 - Save a timestamp when the user exits or pauses the game.
 - On returning, calculate the elapsed time and process updates in chunks.
 
 ### **Example Code**
+
 ```javascript
 class OfflineProgressionGame extends Game {
   constructor() {
@@ -86,7 +90,7 @@ class OfflineProgressionGame extends Game {
       console.log(`Processed offline tick ${i + 1}`);
       // Add your game-specific logic here (e.g., resource generation)
     }
-    
+
     // Update last saved time to avoid reprocessing
     this.lastSavedTime += ticksToProcess * this.tickRate;
   }
@@ -109,10 +113,12 @@ setTimeout(() => {
 Ticks are discrete units of time used to update game state.
 
 ### **Key Components**
+
 - Define a maximum number of ticks to process in one session.
 - Use a `tick()` method to handle game logic for each tick.
 
 ### **Example Code**
+
 ```javascript
 class TickManagedGame extends OfflineProgressionGame {
   constructor() {
@@ -127,14 +133,16 @@ class TickManagedGame extends OfflineProgressionGame {
 
   processTicks(ticks) {
     const ticksToProcess = Math.min(ticks, this.maxTicksPerSession);
-    
+
     for (let i = 0; i < ticksToProcess; i++) {
       this.tick();
       console.log(`Tick ${i + 1}/${ticksToProcess} processed.`);
     }
-    
+
     if (ticks > ticksToProcess) {
-      console.warn("Exceeded max ticks per session. Remaining ticks will be skipped.");
+      console.warn(
+        "Exceeded max ticks per session. Remaining ticks will be skipped."
+      );
     }
   }
 }
@@ -151,16 +159,17 @@ tickGame.processTicks(1200); // Attempt to process more than max allowed ticks
 Integrate the game loop with offline progression by processing offline progress on startup and saving the state on exit.
 
 ### **Example Code**
+
 ```javascript
 class FullGame extends TickManagedGame {
   constructor() {
     super();
-    
+
     window.addEventListener("beforeunload", () => this.saveGameState());
-    
+
     // Process offline progress on startup
     this.processOfflineProgress();
-    
+
     // Start the game loop
     this.startGameLoop();
   }
@@ -179,6 +188,7 @@ const fullGame = new FullGame();
 ---
 
 ## **Summary**
+
 - Use a **game loop** (`setInterval`) to handle real-time updates.
 - Implement **offline progression** by calculating elapsed time and simulating missed ticks.
 - Manage ticks with caps (`maxTicksPerSession`) to prevent performance issues.
