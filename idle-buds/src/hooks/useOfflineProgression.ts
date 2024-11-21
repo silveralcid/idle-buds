@@ -6,7 +6,7 @@ import { calculateOfflineProgression, handleOfflineProgression } from '../utils/
 export const useOfflineProgression = (setModalVisible: (visible: boolean) => void, setProgressionData: (data: any) => void) => {
   const saveGame = useGameStore((state) => state.saveGame);
   const pauseGame = useGameStore((state) => state.pauseGame);
-  const stopAutoSave = useAutoSave();
+  const { stopAutoSave } = useAutoSave();
 
   useEffect(() => {
     const handleVisibilityChange = () => {

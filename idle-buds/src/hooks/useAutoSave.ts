@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useGameStore } from '../stores/game.store';
 import { GameConfig } from '../constants/gameConfig';
 
@@ -6,17 +6,27 @@ export const useAutoSave = () => {
   const saveGame = useGameStore((state) => state.saveGame);
   const isPaused = useGameStore((state) => state.isPaused);
   const isInitialLoad = useGameStore((state) => state.isInitialLoad);
-  let autoSaveInterval: ReturnType<typeof setInterval>;
+  const autoSaveInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => {
-    if (!isPaused && !isInitialLoad) {
-      autoSaveInterval = setInterval(() => {
+  const startAutoSave = () => {
+    if (!isPaused && !isInitialLoad && !autoSaveInterval.current) {
+      autoSaveInterval.current = setInterval(() => {
         saveGame();
       }, GameConfig.autoSaveInterval);
-
-      return () => clearInterval(autoSaveInterval);
     }
+  };
+
+  const stopAutoSave = () => {
+    if (autoSaveInterval.current) {
+      clearInterval(autoSaveInterval.current);
+      autoSaveInterval.current = null;
+    }
+  };
+
+  useEffect(() => {
+    startAutoSave();
+    return () => stopAutoSave();
   }, [saveGame, isPaused, isInitialLoad]);
 
-  return () => clearInterval(autoSaveInterval);
+  return { startAutoSave, stopAutoSave };
 };

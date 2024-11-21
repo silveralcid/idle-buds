@@ -80,11 +80,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       isPaused: false,
       isInitialLoad: true
     });
-    saveGameState(); // Save immediately after reset
-    console.log('State after reset: ', get());
     useBankStore.getState().resetBank();
     useHunterStore.getState().resetHunter();
     useResourceAssignmentStore.getState().clearAssignments();
+    saveGameState();
   },
   togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
 }));
