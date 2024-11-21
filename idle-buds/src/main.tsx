@@ -6,6 +6,7 @@ import { useAutoSave } from './hooks/useAutoSave';
 import { useOfflineProgression } from './hooks/useOfflineProgression';
 import { useGameStore } from './stores/game.store';
 import OfflineProgressionModal from './components/common/OfflineProgressionModal';
+import { calculateOfflineProgression } from './utils/offlineProgression.utils';
 
 const AppWithAutoSaveAndOfflineProgression = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -26,6 +27,18 @@ const AppWithAutoSaveAndOfflineProgression = () => {
 
   useEffect(() => {
     loadGame();
+    
+    // Calculate offline progression on initial load
+    const lastSaveTime = useGameStore.getState().lastSaveTime;
+    const currentTime = Date.now();
+    const deltaTime = (currentTime - lastSaveTime) / 1000;
+
+    if (deltaTime > 0) {
+      const state = useGameStore.getState();
+      const progressionData = calculateOfflineProgression(state, deltaTime);
+      setProgressionData(progressionData);
+      setModalVisible(true);
+    }
   }, [loadGame]);
 
   const handleCloseModal = () => {

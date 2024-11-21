@@ -23,11 +23,19 @@ const OfflineProgressionModal: React.FC<OfflineProgressionModalProps> = ({ isVis
   const saveDate = new Date(lastSaveTime);
   const formattedDate = saveDate.toLocaleString();
 
+  const currentTime = new Date();
+  const timeDifference = currentTime.getTime() - saveDate.getTime();
+
+  const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+  const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
   return (
     <div className="modal modal-open">
       <div className="modal-box">
         <h3 className="font-bold text-lg">Welcome Back!</h3>
         <p className="py-4">Last saved on: {formattedDate}</p>
+        <p className="py-2">You were gone for: {hours} hours, {minutes} minutes, and {seconds} seconds.</p>
         <p className="py-2">While you were away, your Buds have been busy gathering resources and gaining experience.</p>
         
         <div className="py-2">
