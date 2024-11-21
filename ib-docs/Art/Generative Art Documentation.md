@@ -1,7 +1,4 @@
 
-64 vs 128?
-
-What color palette
 # Experimentation
 ## Stable Diffusion Starting Point
 ## Aseprite Starting Point
