@@ -24,6 +24,8 @@ export function saveGameState() {
             bank: bankState,
             hunter: hunterState,
             resourceAssignment: resourceAssignmentState,
+            currentActivity: gameState.currentActivity, 
+            budActivity: gameState.budActivity
         }
     };
   
@@ -47,6 +49,10 @@ export const loadGameState = () => {
         useBankStore.setState(bank);
         useHunterStore.setState(hunter);
         useResourceAssignmentStore.setState(resourceAssignment);
+        useGameStore.setState({
+            currentActivity: game.currentActivity,
+            budActivity: game.budActivity
+        });
         
         return saveData;
     } catch (error) {

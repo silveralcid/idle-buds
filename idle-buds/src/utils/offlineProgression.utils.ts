@@ -18,6 +18,12 @@ export const calculateOfflineProgression = (state: GameState, deltaTime: number)
   const hunterExperience: Record<string, number> = {};
   const budExperience: Record<string, number> = {};
 
+  // Add logging to check the state of activities and resources
+  console.log('Current Activity:', state.currentActivity);
+  console.log('Bud Activity:', state.budActivity);
+  console.log('All Resources:', allResources);
+  console.log('Default Skill Mapping:', defaultSkillMapping);
+
   // Calculate hunter's resource and experience gains
   if (state.currentActivity) {
     const resource = allResources.find(r => r.id === state.currentActivity);
