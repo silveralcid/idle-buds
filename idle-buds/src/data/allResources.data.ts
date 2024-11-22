@@ -1,11 +1,11 @@
-import { Resource } from '../types/resourceNode.types';
-import { woodResources } from './nodes/wood.data';
-import { oreResources } from './nodes/ore.data';
+import { ResourceNode } from '../types/resourceNode.types';
+import { lumberingResources } from './nodes/lumbering.data';
+import { miningResources } from './nodes/mining.data';
 
 // Import other resource types as needed
 
-export const allResources: Resource[] = [
-  ...woodResources,
-  ...oreResources,
+export const allResources: ResourceNode[] = [
+  ...lumberingResources,
+  ...miningResources,
   // Add other resource arrays here
 ];

@@ -1,6 +1,6 @@
 import React from 'react';
 import ResourceCard from '../../components/game/ResourceCard';
-import { woodResources } from '../../data/nodes/wood.data';
+import { woodResources } from '../../data/nodes/lumbering.data';
 import { useGameStore } from '../../stores/game.store';
 import { useHunterStore } from '../../stores/hunter.store';
 import { useGameLoop } from '../../hooks/useGameLoop'; // Import the hook
