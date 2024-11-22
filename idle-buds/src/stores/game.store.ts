@@ -5,6 +5,9 @@ import { useBankStore } from "./bank.store";
 import { useHunterStore } from "./hunter.store";
 import { GameState } from "../types/state.types";
 import { useNodeAssignmentStore } from "./nodeAssignment.store"; 
+import { smeltedRecipes } from '../data/recipes/smeltedRecipes.data';
+import { meleeRecipes } from '../data/recipes/meleeRecipes.data';
+import { processCrafting } from '../utils/crafting.utils';
 
 // Use the functions inside the store
 export const useGameStore = create<GameState>((set, get) => ({
@@ -17,12 +20,45 @@ export const useGameStore = create<GameState>((set, get) => ({
   lastSaveTime: Date.now(),
   isPaused: false,
   isInitialLoad: true,
+  currentRecipeId: null,
+  setCurrentRecipe: (recipeId: string | null) => set({ currentRecipeId: recipeId }),
   pauseGame: () => set((state) => ({ isPaused: true })),
   unpauseGame: () => set((state) => ({ 
     isPaused: false,
     isInitialLoad: false 
   })),
   startGathering: (activityId, isBud) => set((state) => {
+    // If activityId is empty, we're stopping
+    if (!activityId) {
+      return {
+        ...state,
+        currentActivity: null,
+        currentRecipeId: null,
+        fractionalItems: {
+          ...state.fractionalItems,
+          [state.currentActivity || '']: 0
+        }
+      };
+    }
+
+    const recipe = state.currentRecipeId ? 
+      [...smeltedRecipes, ...meleeRecipes].find(r => r.id === state.currentRecipeId) : 
+      null;
+      
+    if (recipe) {
+      // Check if player has required items
+      const hasItems = recipe.inputs.every(input => 
+        input.itemIds.some(itemId => 
+          (useBankStore.getState().items[itemId] || 0) >= input.amount
+        )
+      );
+      
+      if (!hasItems) {
+        console.warn('Missing required items for crafting');
+        return state;
+      }
+    }
+
     if (isBud) {
       if (state.budActivity !== activityId) {
         return { isGathering: true, budActivity: activityId };
@@ -46,6 +82,42 @@ export const useGameStore = create<GameState>((set, get) => ({
   })),
   updateResources: (deltaTime: number) => set((state) => {
     let newState = { ...state };
+    
+    // Handle crafting if there's a current recipe
+    if (state.currentRecipeId && state.currentActivity) {
+      const recipe = [...smeltedRecipes, ...meleeRecipes].find(r => r.id === state.currentRecipeId);
+      if (recipe) {
+        const result = processCrafting(
+          recipe, 
+          deltaTime, 
+          state.fractionalItems[state.currentActivity] || 0
+        );
+        
+        if (!result.success) {
+          // Stop crafting if we can't craft anymore
+          newState.currentActivity = null;
+          newState.currentRecipeId = null;
+          newState.fractionalItems = {
+            ...newState.fractionalItems,
+            [state.currentActivity]: 0
+          };
+        } else {
+          newState.fractionalItems = {
+            ...newState.fractionalItems,
+            [state.currentActivity]: result.fractionalProgress
+          };
+          
+          // If craft was completed, update the recipe state
+          if (result.completed) {
+            console.log('Craft completed!');
+          }
+        }
+        
+        // Return early since we handled the crafting
+        return newState;
+      }
+    }
+    
     // Update Hunter Resources
     newState = updateHunterResources(newState, deltaTime);
     // Update Bud Resources

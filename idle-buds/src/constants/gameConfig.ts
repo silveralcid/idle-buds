@@ -15,7 +15,8 @@ export const GameConfig = {
   // Auto Save
     autoSaveInterval: 5000, // 5 seconds
     
-  // Gain Modifiers
+  // Modifiers
     gatherRateModifier: 10,
     experienceGainModifier: 10,
+    craftingRateModifier: 10,
   };

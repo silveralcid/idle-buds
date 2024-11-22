@@ -3,6 +3,23 @@ import { ResourceNode } from "../../types/resourceNode.types";
 
 export const miningNodes: ResourceNode[] = [
   {
+    id: 'coal_vein',
+    name: 'Coal Vein',
+    type: 'mining',
+    tier: 1,
+    levelRequired: 1,
+    isUnlocked: true,
+    region: 'Secret Backdoor',
+    gatherRate: 1,
+    gatherEfficiency: 1,
+    nodeHealth: 100,
+    maxHealth: 100,
+    regenRate: 0.1,
+    isRenewable: true,
+    experienceGain: 5,
+    resourceNodeYields: ['coal'], // Updated to match item ID
+  },
+  {
     id: 'copper_vein',
     name: 'Copper Vein',
     type: 'mining',

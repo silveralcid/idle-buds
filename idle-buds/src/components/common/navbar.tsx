@@ -51,6 +51,12 @@ const Navbar = () => {
             >
               Mining
             </button>
+            <button
+              className="btn"
+              onClick={() => setView('SmithingView')}
+            >
+              Smithing
+            </button>
             <SaveLoadControls />
             {/* Action Buttons */}
             <div className="space-x-2">
