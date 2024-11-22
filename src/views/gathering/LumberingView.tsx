@@ -14,6 +14,7 @@ const LumberingView = () => {
   const lumberingSkill = useHunterStore((state) => state.skills.lumbering);
   const party = useBudStore(getParty);
   const budActivities = useActivityStore((state) => state.budActivities);
+  const startActivity = useActivityStore((state) => state.startActivity);
 
   return (
     <div className="h-full flex flex-col gap-4">
@@ -28,11 +29,13 @@ const LumberingView = () => {
 
       <div className="grid grid-cols-2 gap-4 flex-grow overflow-auto">
         {lumberingNodes.map((resource) => {
-          const assignedBud = Object.values(budActivities).find(
-            activity => activity.nodeId === resource.id
-          );
-          const assignedBudIds = assignedBud ? [assignedBud.budId] : [];
-          
+          const assignedBudId = Object.entries(budActivities).find(
+            ([budId, activity]) => activity.nodeId === resource.id
+          )?.[0];
+
+          const assignedBud = assignedBudId ? party.find(bud => bud.id === assignedBudId) : null;
+          const assignedBudIds = assignedBud ? [assignedBud.id] : [];
+
           const { startGathering: startHunterGathering } = useHunterGathering(
             resource.id,
             resource.isUnlocked
@@ -48,7 +51,14 @@ const LumberingView = () => {
               onAssignBud={(budId) => {
                 const bud = party.find((b) => b.id === budId);
                 if (bud) {
-                  startBudGathering(budId);
+                  const success = startBudGathering(budId);
+                  if (success) {
+                    startActivity('bud', {
+                      type: 'gathering',
+                      nodeId: resource.id,
+                      budId: bud.id
+                    });
+                  }
                 }
               }}
               onRemoveBud={(budId) => {
