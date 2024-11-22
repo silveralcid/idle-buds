@@ -1,7 +1,7 @@
 import { calculateResourceGain, calculateExperienceGain } from './resourceCalculation.utils';
 import { allResources } from '../data/allResources.data';
 import { GameState } from '../types/state.types';
-import { useResourceAssignmentStore } from '../stores/resourceAssignment.store';
+import { useNodeAssignmentStore } from '../stores/nodeAssignment.store';
 import { defaultSkillMapping } from '../data/defaultSkillMapping';
 import { useGameStore } from '../stores/game.store';
 import { GameConfig } from '../constants/gameConfig';
@@ -48,7 +48,7 @@ export const calculateOfflineProgression = (state: GameState, deltaTime: number)
   if (state.budActivity) {
     const resource = allResources.find(r => r.id === state.budActivity);
     if (resource) {
-      const { assignments } = useResourceAssignmentStore.getState();
+      const { assignments } = useNodeAssignmentStore.getState();
       const assignedBud = assignments[state.budActivity];
 
       if (assignedBud) {
@@ -88,13 +88,13 @@ export const handleOfflineProgression = (setProgressionData: (data: any) => void
 
   // Update Bank Store with hunter and bud resources
   const bankStore = useBankStore.getState();
-  Object.entries(progressionData.hunterResources).forEach(([resourceId, amount]) => {
-    console.log(`Adding ${amount} of resource ${resourceId} to bank store`);
-    bankStore.addResource(resourceId, amount);
+  Object.entries(progressionData.hunterResources).forEach(([itemId, amount]) => {
+    console.log(`Adding ${amount} of resource ${itemId} to bank store`);
+    bankStore.addItem(itemId, amount);
   });
-  Object.entries(progressionData.budResources).forEach(([resourceId, amount]) => {
-    console.log(`Adding ${amount} of bud resource ${resourceId} to bank store`);
-    bankStore.addResource(resourceId, amount);
+  Object.entries(progressionData.budResources).forEach(([itemId, amount]) => {
+    console.log(`Adding ${amount} of bud resource ${itemId} to bank store`);
+    bankStore.addItem(itemId, amount);
   });
 
   // Update Hunter XP

@@ -6,7 +6,7 @@ import { useBankStore } from '../stores/bank.store';
 const HunterInfo = () => {
   const skills = useHunterStore((state) => state.skills);
   const currentActivity = useGameStore((state) => state.currentActivity);
-  const resources = useBankStore((state) => state.resources);
+  const items = useBankStore((state) => state.items);
   const party = useHunterStore((state) => state.party);
 
   return (
@@ -49,9 +49,9 @@ const HunterInfo = () => {
       <div>
         <h3 className="font-bold text-lg mb-2">Bank</h3>
         <div className="space-y-1">
-          {Object.entries(resources).map(([resourceName, amount]) => (
-            <div key={resourceName} className="flex justify-between items-center text-sm bg-base-200 p-2 rounded-lg">
-              <span className="capitalize">{resourceName}</span>
+          {Object.entries(items).map(([itemName, amount]) => (
+            <div key={itemName} className="flex justify-between items-center text-sm bg-base-200 p-2 rounded-lg">
+              <span className="capitalize">{itemName}</span>
               <span>{amount}</span>
             </div>
           ))}

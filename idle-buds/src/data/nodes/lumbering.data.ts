@@ -1,7 +1,7 @@
 import { ResourceNode } from "../../types/resourceNode.types";
   
 
-export const lumberingResources: ResourceNode[] = [
+export const lumberingNodes: ResourceNode[] = [
   {
     id: 'oak_tree',
     name: 'Oak Tree',

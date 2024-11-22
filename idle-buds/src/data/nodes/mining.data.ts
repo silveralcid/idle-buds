@@ -1,7 +1,7 @@
 import { ResourceNode } from "../../types/resourceNode.types";
 
 
-export const miningResources: ResourceNode[] = [
+export const miningNodes: ResourceNode[] = [
   {
     id: 'copper_vein',
     name: 'Copper Vein',

@@ -1,15 +1,17 @@
 import React from 'react';
 import ResourceCard from '../../components/game/ResourceCard';
-import { oreResources } from '../../data/nodes/mining.data';
 import { useGameStore } from '../../stores/game.store';
 import { useHunterStore } from '../../stores/hunter.store';
 import { useGameLoop } from '../../hooks/useGameLoop';
+import { useNodeAssignmentStore } from '../../stores/nodeAssignment.store';
+import { allResources } from '../../data/allResources.data';
 
 const MiningView = () => {
   useGameLoop();
 
   const startGathering = useGameStore((state) => state.startGathering);
   const miningSkill = useHunterStore((state) => state.skills.mining);
+  const { assignments, assignBudToNode, removeBudFromNode } = useNodeAssignmentStore();
 
   const handleActivate = (resourceId: string) => {
     const currentActivity = useGameStore.getState().currentActivity;
@@ -31,10 +33,13 @@ const MiningView = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-4 flex-grow overflow-auto">
-        {oreResources.map((resource) => (
+        {allResources.map((resource) => (
           <ResourceCard
             key={resource.id}
             resource={resource}
+            assignedBuds={assignments[resource.id] || []}
+            onAssignBud={(bud) => assignBudToNode(resource.id, bud)}
+            onRemoveBud={(budId) => removeBudFromNode(resource.id, budId)}
             onActivate={handleActivate}
             skillId="mining"
           />

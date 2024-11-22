@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Resource } from '../../types/resourceNode.types';
+import { ResourceNode } from '../../types/resourceNode.types';
 import { useHunterStore } from '../../stores/hunter.store';
 import { useGathering } from '../../hooks/useGathering';
 import { useBudAssignment } from '../../hooks/useBudAssignment';
 import { useGameStore } from '../../stores/game.store';
 
 interface ResourceCardProps {
-  resource: Resource;
+  resource: ResourceNode;
   onActivate: (resourceId: string) => void;
   skillId: string;
 }
@@ -65,10 +65,6 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skill
             <span>Level Required: {resource.levelRequired}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span>Rarity: {resource.rarity}</span>
-            <span>Value: {resource.value}</span>
-          </div>
-          <div className="flex justify-between text-sm">
             <span>Tier: {resource.tier}</span>
             <span>Renewable: {resource.isRenewable ? 'Yes' : 'No'}</span>
           </div>
@@ -78,6 +74,9 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skill
           </div>
           <div className="flex justify-between text-sm">
             <span>XP Gain/Tick: {resource.experienceGain}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span>Yields: {resource.resourceNodeYields.join(', ')}</span>
           </div>
           {isUnlocked && (
             <div className="flex justify-between mt-4">

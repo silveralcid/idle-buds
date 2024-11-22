@@ -1,7 +1,7 @@
 import { allResources } from '../data/allResources.data';
 import { useBankStore } from '../stores/bank.store';
 import { useHunterStore } from '../stores/hunter.store';
-import { useResourceAssignmentStore } from '../stores/resourceAssignment.store';
+import { useNodeAssignmentStore } from '../stores/nodeAssignment.store';
 import { calculateResourceGain, calculateExperienceGain } from '../utils/resourceCalculation.utils';
 import { defaultSkillMapping } from '../data/defaultSkillMapping';
 import { GameState } from '../types/state.types';
@@ -16,7 +16,7 @@ export const updateHunterResources = (state: GameState, deltaTime: number) => {
       const skillId = defaultSkillMapping[resource.type];
       const { wholeXP, newXPFraction } = calculateExperienceGain(resource.experienceGain, ticks, state.fractionalXP[skillId] || 0);
 
-      useBankStore.getState().addResource(resource.id, wholeAmount);
+      useBankStore.getState().addItem(resource.id, wholeAmount);
       useHunterStore.getState().increaseSkillExperience(skillId, wholeXP);
 
       return {
@@ -39,7 +39,7 @@ export const updateBudResources = (state: GameState, deltaTime: number) => {
   if (state.budActivity) {
     const resource = allResources.find(r => r.id === state.budActivity);
     if (resource) {
-      const { assignments } = useResourceAssignmentStore.getState();
+      const { assignments } = useNodeAssignmentStore.getState();
       const assignedBud = assignments[state.budActivity];
 
       if (assignedBud) {
@@ -47,7 +47,7 @@ export const updateBudResources = (state: GameState, deltaTime: number) => {
         const { wholeAmount, newFraction } = calculateResourceGain(resource.gatherRate, ticks, state.fractionalResources[resource.id] || 0);
         const { wholeXP, newXPFraction } = calculateExperienceGain(resource.experienceGain, ticks, state.fractionalXP[assignedBud.id] || 0);
 
-        useBankStore.getState().addResource(resource.id, wholeAmount);
+        useBankStore.getState().addItem(resource.id, wholeAmount);
         useHunterStore.getState().increaseBudExperience(assignedBud.id, wholeXP);
 
         return {

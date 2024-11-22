@@ -1,6 +1,6 @@
 import { useBudBoxStore } from '../stores/budBox.store';
 import { useHunterStore } from '../stores/hunter.store';
-import { useResourceAssignmentStore } from '../stores/resourceAssignment.store';
+import { useResourceAssignmentStore } from '../stores/nodeAssignment.store';
 
 export const moveBudToParty = (budId: string) => {
   const { buds, removeBud } = useBudBoxStore.getState();

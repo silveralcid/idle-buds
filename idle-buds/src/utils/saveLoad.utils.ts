@@ -1,7 +1,7 @@
 import { useBankStore } from "../stores/bank.store";
 import { useGameStore } from "../stores/game.store";
 import { useHunterStore } from "../stores/hunter.store";
-import { useResourceAssignmentStore } from "../stores/resourceAssignment.store";
+import { useNodeAssignmentStore } from "../stores/nodeAssignment.store";
 import { GameState } from "../types/state.types";
 
 const SAVE_VERSION = '1.0.0';
@@ -11,7 +11,7 @@ export function saveGameState() {
     const gameState = useGameStore.getState();
     const bankState = useBankStore.getState();
     const hunterState = useHunterStore.getState();
-    const resourceAssignmentState = useResourceAssignmentStore.getState();
+    const nodeAssignmentState = useNodeAssignmentStore.getState();
     
     const currentTime = Date.now();
     useGameStore.setState({ lastSaveTime: currentTime });
@@ -23,7 +23,7 @@ export function saveGameState() {
             game: { ...gameState, lastSaveTime: currentTime },
             bank: bankState,
             hunter: hunterState,
-            resourceAssignment: resourceAssignmentState,
+            nodeAssignment: nodeAssignmentState,
             currentActivity: gameState.currentActivity, 
             budActivity: gameState.budActivity
         }
@@ -44,11 +44,11 @@ export const loadGameState = () => {
             console.warn('Save version mismatch. Some features may not work correctly.');
         }
 
-        const { game, bank, hunter, resourceAssignment } = saveData.state;
+        const { game, bank, hunter, nodeAssignment } = saveData.state;
         
         useBankStore.setState(bank);
         useHunterStore.setState(hunter);
-        useResourceAssignmentStore.setState(resourceAssignment);
+        useNodeAssignmentStore.setState(nodeAssignment);
         useGameStore.setState({
             currentActivity: game.currentActivity,
             budActivity: game.budActivity
