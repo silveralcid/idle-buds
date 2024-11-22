@@ -1,4 +1,4 @@
 export type ResourceNodeType =
-  | 'wood'      
-  | 'ore'  
+  | 'lumbering'      
+  | 'mining'  
 ;    
