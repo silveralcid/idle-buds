@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Prompts.md",
+                "file": "Game Design Document.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Prompts"
+              "title": "Game Design Document"
             }
           }
         ]
@@ -164,9 +164,9 @@
   },
   "active": "57b0fb558f6e93e8",
   "lastOpenFiles": [
+    "Prompts.md",
     "no-read/Implement New Gathering and Assignment System.md",
     "Implement New Gathering and Assignment System.md",
-    "Prompts.md",
     "Game Design Document.md",
     "Art/Generative Art Documentation.md",
     "Art/Retro Diffusion Documentation.md",
