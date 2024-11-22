@@ -122,7 +122,17 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, skillId, assigned
                   />
                   <div className="text-sm">
                     <div className="font-semibold">{assignedBud.name}</div>
-                    <div>Level: {assignedBud.level}</div>
+                    <div className="flex flex-col gap-1">
+                      <div>Level: {assignedBud.level}</div>
+                      <div className="w-32">
+                        <div className="text-xs text-opacity-70">XP: {assignedBud.experience}/{assignedBud.experienceToNextLevel}</div>
+                        <progress 
+                          className="progress progress-info w-full h-1.5" 
+                          value={assignedBud.experience} 
+                          max={assignedBud.experienceToNextLevel}
+                        />
+                      </div>
+                    </div>
                   </div>
                   <button
                     onClick={handleUnassignBud}
