@@ -10,7 +10,7 @@ export interface Workbench {
 
 
     // Progression and Unlocking
-    tier: number; // Tier level for progression
+    tier?: number; // Tier level for progression
     levelRequired: number; // Level required to gather
     isUnlocked: boolean; // Whether the node is unlocked
     specialRequirements?: string[]; // Optional field for any special conditions (e.g., "Requires specific tool")

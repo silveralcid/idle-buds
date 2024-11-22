@@ -1,6 +1,17 @@
 import { BaseItem } from "../../types/itemBase.types";
 export const miningItems: BaseItem[] = [
   {
+    id: 'coal',
+    name: 'Coal',
+    type: 'resource',
+    description: 'A chunk of raw coal, used for crafting and refining.',
+    rarity: 'common',
+    value: 5,
+    isStackable: true,
+    maxStackSize: undefined, // Infinite stack size
+    tags: ['crafting', 'mining'],
+  },
+  {
     id: 'copper_ore',
     name: 'Copper Ore',
     type: 'resource',
