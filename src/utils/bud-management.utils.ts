@@ -33,10 +33,10 @@ export const moveBudToNode = (budId: string, nodeId: string): boolean => {
   const budStore = useBudStore.getState();
   const activityStore = useActivityStore.getState();
   
-  // Check if bud exists in party
-  const bud = budStore.buds.party.find(b => b.id === budId);
+  // Check if bud exists
+  const bud = budStore.getBud(budId);
   if (!bud) {
-    console.warn('❌ Bud not found in party:', { budId });
+    console.warn('❌ Bud not found:', { budId });
     return false;
   }
 
@@ -47,18 +47,17 @@ export const moveBudToNode = (budId: string, nodeId: string): boolean => {
     return false;
   }
 
-  // Assign bud to node
+  // Assign bud to node and start activity in one transaction
   const success = budStore.assignBudToNode(budId, nodeId);
-  if (!success) return false;
-
-  // Start activity
-  activityStore.startActivity('bud', {
-    type: 'gathering',
-    nodeId,
-    budId
-  });
+  if (success) {
+    activityStore.startActivity('bud', {
+      type: 'gathering',
+      nodeId,
+      budId
+    });
+  }
   
-  return true;
+  return success;
 };
 
 export const moveBudFromNodeToParty = (budId: string, nodeId: string): boolean => {
@@ -68,8 +67,11 @@ export const moveBudFromNodeToParty = (budId: string, nodeId: string): boolean =
   // Stop the activity first
   activityStore.stopActivity('bud', budId);
   
-  // Then update bud store
-  return budStore.unassignBud(budId);
+  // Move directly to party using the store action
+  budStore.addToParty(budId);
+  budStore.unassignBud(budId);
+  
+  return true;
 };
 
 export const gainBudExperience = (budId: string, amount: number): void => {

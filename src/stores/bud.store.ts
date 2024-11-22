@@ -38,6 +38,10 @@ interface BudActions {
   
   // Add this new action
   createAndAddBud: (base: budBase) => budInstance;
+  
+  // Add these new actions
+  removeFromParty: (budId: string) => void;
+  addToParty: (budId: string) => void;
 }
 
 export const useBudStore = create<BudState & BudActions>((set, get) => ({
@@ -182,10 +186,10 @@ export const useBudStore = create<BudState & BudActions>((set, get) => ({
   // Activity Management
   assignBudToNode: (budId: string, nodeId: string) => {
     const state = get();
-    const bud = state.buds.party.find(b => b.id === budId);
+    const bud = state.getBud(budId);
     
     if (!bud) {
-      console.warn('❌ Cannot assign bud: not found in party', { budId });
+      console.warn('❌ Cannot assign bud: not found', { budId });
       return false;
     }
 
@@ -195,9 +199,11 @@ export const useBudStore = create<BudState & BudActions>((set, get) => ({
       return false;
     }
 
+    // First remove from party, then assign to activity
     set((state) => ({
       buds: {
         ...state.buds,
+        party: state.buds.party.filter(b => b.id !== budId),
         activities: {
           ...state.buds.activities,
           [budId]: { type: 'gathering', nodeId }
@@ -245,6 +251,35 @@ export const useBudStore = create<BudState & BudActions>((set, get) => ({
     
     console.log('✅ Created and added bud to box:', { budId: bud.id });
     return bud;
+  },
+
+  // Add these new implementations
+  removeFromParty: (budId) => {
+    console.log('🔄 Removing bud from party:', { budId });
+    set((state) => ({
+      buds: {
+        ...state.buds,
+        party: state.buds.party.filter(b => b.id !== budId)
+      }
+    }));
+  },
+
+  addToParty: (budId) => {
+    console.log('🔄 Adding bud to party:', { budId });
+    const state = get();
+    const bud = state.getBud(budId);
+    
+    if (!bud) {
+      console.warn('❌ Cannot add bud to party: not found', { budId });
+      return;
+    }
+
+    set((state) => ({
+      buds: {
+        ...state.buds,
+        party: [...state.buds.party, bud]
+      }
+    }));
   }
 }));
 

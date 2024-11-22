@@ -17,28 +17,12 @@ export const useBudGathering = (nodeId: string, isUnlocked: boolean) => {
     
     const success = moveBudToNode(budId, nodeId);
     console.log('📍 moveBudToNode result:', success);
-    
-    if (success) {
-      startActivity('bud', {
-        type: 'gathering',
-        nodeId,
-        budId
-      });
-      console.log('✅ Gathering started successfully');
-    }
     return success;
   };
 
   const stopGathering = (budId: string) => {
     console.log('🔴 Stopping gathering:', { budId, nodeId });
-    
-    if (budActivities[budId]?.nodeId === nodeId) {
-      stopActivity('bud', budId);
-      const success = moveBudFromNodeToParty(budId, nodeId);
-      console.log('📍 Gathering stopped:', success);
-      return success;
-    }
-    return false;
+    return moveBudFromNodeToParty(budId, nodeId);
   };
 
   const isGathering = (budId: string) => 
