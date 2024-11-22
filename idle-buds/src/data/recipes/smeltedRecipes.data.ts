@@ -7,8 +7,8 @@ export const smeltedRecipes: Recipe[] = [
     workbenchType: "smelting",
     itemType: "crafting",
     inputs: [
-      { itemId: "copper_ore", amount: 1 },
-      { itemId: "coal", amount: 1 },
+      { itemIds: ["copper_ore"], amount: 1 },
+      { itemIds: ["coal"], amount: 1 },
     ],
     outputs: [
       { itemId: "copper_bar", amount: 1 },
@@ -23,8 +23,8 @@ export const smeltedRecipes: Recipe[] = [
     workbenchType: "smelting",
     itemType: "crafting",
     inputs: [
-      { itemId: "iron_ore", amount: 1 },
-      { itemId: "coal", amount: 1 },
+      { itemIds: ["iron_ore"], amount: 1 },
+      { itemIds: ["coal"], amount: 1 },
     ],
     outputs: [
       { itemId: "iron_bar", amount: 1 },
@@ -39,8 +39,8 @@ export const smeltedRecipes: Recipe[] = [
     workbenchType: "smelting",
     itemType: "crafting",
     inputs: [
-      { itemId: "silver_ore", amount: 1 },
-      { itemId: "coal", amount: 2 },
+      { itemIds: ["silver_ore"], amount: 1 },
+      { itemIds: ["coal"], amount: 2 },
     ],
     outputs: [
       { itemId: "silver_bar", amount: 1 },
@@ -55,8 +55,8 @@ export const smeltedRecipes: Recipe[] = [
     workbenchType: "smelting",
     itemType: "crafting",
     inputs: [
-      { itemId: "gold_ore", amount: 1 },
-      { itemId: "coal", amount: 2 },
+      { itemIds: ["gold_ore"], amount: 1 },
+      { itemIds: ["coal"], amount: 2 },
     ],
     outputs: [
       { itemId: "gold_bar", amount: 1 },
@@ -71,8 +71,8 @@ export const smeltedRecipes: Recipe[] = [
     workbenchType: "smelting",
     itemType: "crafting",
     inputs: [
-      { itemId: "platinum_ore", amount: 1 },
-      { itemId: "coal", amount: 3 },
+      { itemIds: ["platinum_ore"], amount: 1 },
+      { itemIds: ["coal"], amount: 3 },
     ],
     outputs: [
       { itemId: "platinum_bar", amount: 1 },
@@ -87,8 +87,8 @@ export const smeltedRecipes: Recipe[] = [
     workbenchType: "smelting",
     itemType: "crafting",
     inputs: [
-      { itemId: "mithril_ore", amount: 1 },
-      { itemId: "coal", amount: 3 },
+      { itemIds: ["mithril_ore"], amount: 1 },
+      { itemIds: ["coal"], amount: 3 },
     ],
     outputs: [
       { itemId: "mithril_bar", amount: 1 },
@@ -104,8 +104,8 @@ export const smeltedRecipes: Recipe[] = [
     workbenchType: "smelting",
     itemType: "crafting",
     inputs: [
-      { itemId: "adamantite_ore", amount: 1 },
-      { itemId: "coal", amount: 4 },
+      { itemIds: ["adamantite_ore"], amount: 1 },
+      { itemIds: ["coal"], amount: 4 },
     ],
     outputs: [
       { itemId: "adamantite_bar", amount: 1 },
@@ -120,9 +120,9 @@ export const smeltedRecipes: Recipe[] = [
     workbenchType: "smelting",
     itemType: "crafting",
     inputs: [
-      { itemId: "runite_ore", amount: 1 },
-      { itemId: "coal", amount: 4 },
-    ],  
+      { itemIds: ["runite_ore"], amount: 1 },
+      { itemIds: ["coal"], amount: 4 },
+    ],
     outputs: [
       { itemId: "runite_bar", amount: 1 },
     ],
