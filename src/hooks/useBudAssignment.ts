@@ -1,25 +1,37 @@
-import { useAssignmentStore } from '../stores/assignment.store';
-import { AssignmentType } from '../types/assignment.types';
-import { useHunterStore } from '../stores/hunter.store';
 import { useCallback } from 'react';
+import { useActivityStore } from '../stores/activity.store';
+import { useBudStore } from '../stores/bud.store';
+import { moveBudToNode, moveBudFromNodeToParty } from '../utils/bud-management.utils';
 
-export const useBudAssignment = (nodeId: string, type: AssignmentType) => {
-  const { assignBud, unassignBud, getNodeAssignment } = useAssignmentStore();
-  const party = useHunterStore(state => state.party);
+export const useBudAssignment = (nodeId: string, type: 'gathering' | 'crafting') => {
+  const getBudActivity = useActivityStore(state => state.getBudActivity);
+  const budsInParty = useBudStore(state => state.buds.party);
 
-  const assignment = getNodeAssignment(nodeId);
-  const assignedBud = assignment ? party.find(b => b.id === assignment.budId) : null;
+  // Find assignment by checking activity store
+  const findAssignedBud = () => {
+    for (const bud of budsInParty) {
+      const activity = getBudActivity(bud.id);
+      if (activity?.nodeId === nodeId) {
+        return { budId: bud.id, bud };
+      }
+    }
+    return null;
+  };
+
+  const assignment = findAssignedBud();
+  const assignedBud = assignment?.bud ?? null;
 
   const assign = useCallback((budId: string, activityId?: string) => {
     if (!budId) return false;
-    return assignBud(budId, type, nodeId, activityId);
-  }, [nodeId, type, assignBud]);
+    return moveBudToNode(budId, nodeId);
+  }, [nodeId]);
 
   const unassign = useCallback(() => {
     if (assignment) {
-      unassignBud(assignment.budId);
+      return moveBudFromNodeToParty(assignment.budId, nodeId);
     }
-  }, [assignment, unassignBud]);
+    return false;
+  }, [assignment, nodeId]);
 
   return {
     assignedBud,

@@ -1,88 +1,70 @@
-import { useBudBoxStore } from '../stores/budBox.store';
-import { useHunterStore } from '../stores/hunter.store';
-import { useNodeAssignmentStore } from '../stores/nodeAssignment.store';
+import { useActivityStore } from '../stores/activity.store';
+import { useBudStore } from '../stores/bud.store';
 
-export const moveBudToParty = (budId: string) => {
-  const { buds, removeBud } = useBudBoxStore.getState();
-  const { addBudToParty } = useHunterStore.getState();
-  const bud = buds.find((b) => b.id === budId);
-  if (bud) {
-    console.log(`Moving Bud to party: ${bud.id}`);
-    removeBud(budId);
-    addBudToParty(bud);
+export const moveBudToParty = (budId: string): boolean => {
+  const budStore = useBudStore.getState();
+  const activityStore = useActivityStore.getState();
+  const bud = budStore.getBud(budId);
+  
+  if (!bud) return false;
+  
+  const success = budStore.addBudToParty(budId);
+  if (success) {
+    activityStore.stopActivity('bud', budId);
   }
+  
+  return success;
 };
 
-export const moveBudToBudBox = (budId: string) => {
-  const { party, removeBudFromParty } = useHunterStore.getState();
-  const { addBud } = useBudBoxStore.getState();
-
-  const bud = party.find((b: any) => b.id === budId);
-  if (bud) {
-    removeBudFromParty(budId);
-    addBud(bud);
-  }
+export const moveBudToBox = (budId: string): boolean => {
+  const budStore = useBudStore.getState();
+  const activityStore = useActivityStore.getState();
+  const bud = budStore.getBud(budId);
+  
+  if (!bud) return false;
+  
+  activityStore.stopActivity('bud', budId);
+  budStore.moveBudToBox(budId);
+  return true;
 };
 
-export const moveBudToNode = (budId: string, nodeId: string) => {
-  const { party, removeBudFromParty } = useHunterStore.getState();
-  const { assignBudToNode } = useNodeAssignmentStore.getState();
+export const moveBudToNode = (budId: string, nodeId: string): boolean => {
+  const budStore = useBudStore.getState();
+  const activityStore = useActivityStore.getState();
+  
+  const bud = budStore.getBud(budId);
+  if (!bud) return false;
 
-  const bud = party.find((b: any) => b.id === budId);
-  if (bud) {
-    removeBudFromParty(budId);
-    assignBudToNode(nodeId, bud);
+  // Ensure bud is in party first
+  if (!budStore.buds.party.some(b => b.id === budId)) {
+    const success = budStore.addBudToParty(budId);
+    if (!success) return false;
   }
+
+  // Start the gathering activity for this bud
+  activityStore.startActivity('bud', {
+    type: 'gathering',
+    nodeId,
+    budId
+  });
+  
+  return true;
 };
 
-export const moveBudFromNodeToParty = (budId: string, nodeId: string) => {
-  const { assignments, removeBudFromNode } = useNodeAssignmentStore.getState();
-  const { addBudToParty } = useHunterStore.getState();
-
-  const bud = assignments[nodeId];
-  if (bud && bud.id === budId) {
-    console.log(`Moving Bud from node to party: ${bud.id}`);
-    removeBudFromNode(nodeId);
-
-    // Access fresh state after removal to ensure consistency
-    const updatedAssignments = useNodeAssignmentStore.getState().assignments;
-    if (!updatedAssignments[nodeId]) {
-      addBudToParty(bud);
-    } else {
-      console.warn(`Failed to remove Bud from node: ${nodeId}`);
-    }
-  } else {
-    console.warn(`Bud not found in node: ${nodeId}`);
+export const moveBudFromNodeToParty = (budId: string, nodeId: string): boolean => {
+  const activityStore = useActivityStore.getState();
+  const activity = activityStore.budActivities[budId];
+  
+  if (!activity || activity.nodeId !== nodeId) {
+    console.warn(`No matching activity found for bud ${budId} at node ${nodeId}`);
+    return false;
   }
+  
+  activityStore.stopActivity('bud', budId);
+  return true;
 };
 
-export const increaseBudExperience = (budId: string, amount: number) => {
-  const { assignments } = useNodeAssignmentStore.getState();
-  const bud = assignments[Object.keys(assignments).find(key => assignments[key]?.id === budId) as string];
-  if (!bud) return;
-
-  const newExperience = bud.experience + amount;
-  if (newExperience >= bud.experienceToNextLevel) {
-    useNodeAssignmentStore.setState((state) => ({
-      assignments: {
-        ...state.assignments,
-        [Object.keys(assignments).find(key => assignments[key]?.id === budId) as string]: {
-          ...bud,
-          experience: newExperience - bud.experienceToNextLevel,
-          level: bud.level + 1,
-          experienceToNextLevel: bud.experienceToNextLevel * 1.1, // Example scaling
-        },
-      },
-    }));
-  } else {
-    useNodeAssignmentStore.setState((state) => ({
-      assignments: {
-        ...state.assignments,
-        [Object.keys(assignments).find(key => assignments[key]?.id === budId) as string]: {
-          ...bud,
-          experience: newExperience,
-        },
-      },
-    }));
-  }
+export const gainBudExperience = (budId: string, amount: number): void => {
+  const budStore = useBudStore.getState();
+  budStore.gainExperience(budId, amount);
 };

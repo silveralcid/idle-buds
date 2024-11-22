@@ -12,7 +12,7 @@ export const useAutoSave = () => {
     if (!isPaused && !isInitialLoad && !autoSaveInterval.current) {
       autoSaveInterval.current = setInterval(() => {
         saveGame();
-      }, GameConfig.autoSaveInterval);
+      }, GameConfig.SAVE.AUTO_INTERVAL);
     }
   };
 

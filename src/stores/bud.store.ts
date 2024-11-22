@@ -1,26 +1,39 @@
 import { create } from 'zustand';
 import { budInstance } from '../types/budInstance.types';
 import { GameConfig } from '../constants/gameConfig';
+import { calculateExperienceRequirement } from '../utils/experience.utils';
 
 interface BudState {
   buds: {
     box: budInstance[];
     party: budInstance[];
   };
+}
+
+interface BudActions {
+  // Bud Management
   addBudToBox: (bud: budInstance) => void;
   addBudToParty: (budId: string) => boolean;
   moveBudToBox: (budId: string) => void;
   getBud: (budId: string) => budInstance | null;
+  
+  // Experience & Stats
+  gainExperience: (budId: string, amount: number) => void;
+  
+  // State Management
   updateBud: (budId: string, updates: Partial<budInstance>) => void;
   resetBuds: () => void;
+  saveBudState: () => object;
+  loadBudState: (state: any) => void;
 }
 
-export const useBudStore = create<BudState>((set, get) => ({
+export const useBudStore = create<BudState & BudActions>((set, get) => ({
   buds: {
     box: [],
     party: []
   },
 
+  // Bud Management
   addBudToBox: (bud) => set((state) => ({
     buds: {
       ...state.buds,
@@ -32,7 +45,7 @@ export const useBudStore = create<BudState>((set, get) => ({
     const state = get();
     const bud = state.buds.box.find(b => b.id === budId);
     
-    if (!bud || state.buds.party.length >= GameConfig.partyCapacity) {
+    if (!bud || state.buds.party.length >= GameConfig.BUD.STORAGE.PARTY_CAPACITY) {
       return false;
     }
 
@@ -66,16 +79,50 @@ export const useBudStore = create<BudState>((set, get) => ({
            null;
   },
 
+  // Experience & Stats
+  gainExperience: (budId, amount) => {
+    const bud = get().getBud(budId);
+    if (!bud) return;
+
+    const newExperience = bud.experience + amount;
+    const experienceToNextLevel = calculateExperienceRequirement(bud.level);
+
+    if (newExperience >= experienceToNextLevel) {
+      const remainingExp = newExperience - experienceToNextLevel;
+      get().updateBud(budId, {
+        level: bud.level + 1,
+        experience: remainingExp,
+        experienceToNextLevel: calculateExperienceRequirement(bud.level + 1)
+      });
+    } else {
+      get().updateBud(budId, { experience: newExperience });
+    }
+  },
+
+  // State Management
   updateBud: (budId, updates) => set((state) => {
-    const newState = { ...state };
     const updateBudInArray = (buds: budInstance[]) => 
       buds.map(b => b.id === budId ? { ...b, ...updates } : b);
 
-    newState.buds.box = updateBudInArray(state.buds.box);
-    newState.buds.party = updateBudInArray(state.buds.party);
-    
-    return newState;
+    return {
+      buds: {
+        box: updateBudInArray(state.buds.box),
+        party: updateBudInArray(state.buds.party)
+      }
+    };
   }),
 
-  resetBuds: () => set({ buds: { box: [], party: [] } })
+  resetBuds: () => set({ buds: { box: [], party: [] } }),
+
+  saveBudState: () => {
+    const state = get();
+    return {
+      buds: state.buds
+    };
+  },
+
+  loadBudState: (savedState) => {
+    if (!savedState?.buds) return;
+    set({ buds: savedState.buds });
+  }
 }));
