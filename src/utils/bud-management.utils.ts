@@ -1,6 +1,7 @@
 import { useActivityStore } from '../stores/activity.store';
 import { useBudStore } from '../stores/bud.store';
 import { useHunterStore } from '../stores/hunter.store';
+import { useAssignmentStore } from '../stores/assignment.store';
 
 export const moveBudToParty = (budId: string): boolean => {
   const budStore = useBudStore.getState();
@@ -30,47 +31,41 @@ export const moveBudToBox = (budId: string): boolean => {
 };
 
 export const moveBudToNode = (budId: string, nodeId: string): boolean => {
-  const budStore = useBudStore.getState();
+  const assignmentStore = useAssignmentStore.getState();
   const activityStore = useActivityStore.getState();
   
-  // Check if bud exists
-  const bud = budStore.getBud(budId);
-  if (!bud) {
-    console.warn('❌ Bud not found:', { budId });
+  // Check if bud exists and is available
+  const currentAssignment = assignmentStore.getBudAssignment(budId);
+  if (currentAssignment) {
+    console.warn('❌ Bud is already assigned:', currentAssignment);
     return false;
   }
 
-  // Check for existing activity
-  const currentActivity = activityStore.getBudActivity(budId);
-  if (currentActivity) {
-    console.warn('❌ Bud is already in an activity:', { budId, activity: currentActivity });
-    return false;
-  }
-
-  // Assign bud to node and start activity in one transaction
-  const success = budStore.assignBudToNode(budId, nodeId);
-  if (success) {
-    activityStore.startActivity('bud', {
-      type: 'gathering',
-      nodeId,
-      budId
-    });
-  }
+  // Assign bud to node
+  assignmentStore.assignBud(budId, 'gathering', nodeId);
   
-  return success;
+  // Start activity
+  activityStore.startActivity('bud', {
+    type: 'gathering',
+    nodeId,
+    budId
+  });
+
+  console.log('✅ Moved bud to node:', { budId, nodeId });
+  return true;
 };
 
 export const moveBudFromNodeToParty = (budId: string, nodeId: string): boolean => {
-  const budStore = useBudStore.getState();
+  const assignmentStore = useAssignmentStore.getState();
   const activityStore = useActivityStore.getState();
   
-  // Stop the activity first
+  // Stop activity first
   activityStore.stopActivity('bud', budId);
   
-  // Move directly to party using the store action
-  budStore.addToParty(budId);
-  budStore.unassignBud(budId);
+  // Remove assignment
+  assignmentStore.unassignBud(budId);
   
+  console.log('✅ Moved bud from node to party:', { budId, nodeId });
   return true;
 };
 
