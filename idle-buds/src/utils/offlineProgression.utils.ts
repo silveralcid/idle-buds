@@ -8,6 +8,7 @@ import { GameConfig } from '../constants/gameConfig';
 import { useBankStore } from '../stores/bank.store';
 import { useHunterStore } from '../stores/hunter.store';
 import { increaseBudExperience } from './budManagement.utils';
+import { miningItems } from '../data/items/ore.data';
 
 interface OfflineProgressionResult {
   offlineHunterItemYield: Record<string, number>;
@@ -37,10 +38,11 @@ export const calculateOfflineProgression = (state: GameState, deltaTime: number)
       const skillId = defaultSkillMapping[resource.type];
       const { wholeXP: hunterXP, newXPFraction: newHunterXPFraction } = calculateExperienceGain(resource.experienceGain, ticks, state.fractionalXP[skillId] || 0);
 
-      offlineHunterItemYield[resource.id] = hunterResourceGain;
+      resource.resourceNodeYields.forEach(itemId => {
+        offlineHunterItemYield[itemId] = hunterResourceGain;
+        state.fractionalItems[itemId] = newHunterFraction;
+      });
       offlineHunterExperience[skillId] = hunterXP;
-
-      state.fractionalItems[resource.id] = newHunterFraction;
       state.fractionalXP[skillId] = newHunterXPFraction;
     }
   }
@@ -55,10 +57,11 @@ export const calculateOfflineProgression = (state: GameState, deltaTime: number)
         const { wholeAmount: budResourceGain, newFraction: newBudFraction } = calculateResourceGain(resource.gatherRate, ticks, state.fractionalItems[resource.id] || 0);
         const { wholeXP: budXP, newXPFraction: newBudXPFraction } = calculateExperienceGain(resource.experienceGain, ticks, state.fractionalXP[assignedBud.id] || 0);
 
-        offlineBudItemYield[resource.id] = budResourceGain;
+        resource.resourceNodeYields.forEach(itemId => {
+          offlineBudItemYield[itemId] = budResourceGain;
+          state.fractionalItems[itemId] = newBudFraction;
+        });
         offlineBudExperience[assignedBud.id] = budXP;
-
-        state.fractionalItems[resource.id] = newBudFraction;
         state.fractionalXP[assignedBud.id] = newBudXPFraction;
       }
     }
@@ -78,13 +81,16 @@ export const handleOfflineProgression = (setProgressionData: (data: any) => void
   const currentTime = Date.now();
   const deltaTime = (currentTime - lastSaveTime) / 1000;
 
-  console.log('Last save time:', new Date(lastSaveTime).toLocaleString());
-  console.log('Current time:', new Date(currentTime).toLocaleString());
-  console.log('Delta time (seconds):', deltaTime);
-
   const state = useGameStore.getState();
   const progressionData = calculateOfflineProgression(state, deltaTime);
-  console.log('Progression data:', progressionData);
+  
+  // Map the progression data to match the modal's expected format
+  const formattedProgressionData = {
+    hunterResources: progressionData.offlineHunterItemYield,
+    budResources: progressionData.offlineBudItemYield,
+    hunterExperience: progressionData.offlineHunterExperience,
+    budExperience: progressionData.offlineBudExperience
+  };
 
   // Update Bank Store with hunter and bud resources
   const bankStore = useBankStore.getState();
@@ -110,11 +116,10 @@ export const handleOfflineProgression = (setProgressionData: (data: any) => void
     increaseBudExperience(budId, xp);
   });
 
-  setProgressionData(progressionData);
-  console.log('Progression data set and modal visibility updated');
+  setProgressionData(formattedProgressionData);
   setModalVisible(true);
 
   // Resume the game
   useGameStore.getState().unpauseGame();
   console.log('Game resumed after applying offline progression');
-};
+}
