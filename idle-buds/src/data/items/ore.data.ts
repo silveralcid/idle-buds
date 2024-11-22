@@ -1,5 +1,4 @@
 import { BaseItem } from "../../types/itemBase.types";
-import { ItemType } from "../../enums/itemType.enums";
 export const miningItems: BaseItem[] = [
   {
     id: 'copper_ore',
