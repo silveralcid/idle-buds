@@ -1,13 +1,15 @@
 import React from 'react';
 import { useHunterStore } from '../stores/hunter.store';
-import { useGameStore } from '../stores/game.store';
+import { useActivityStore } from '../stores/activity.store';
 import { useBankStore } from '../stores/bank.store';
 
 const HunterInfo = () => {
   const skills = useHunterStore((state) => state.skills);
-  const currentActivity = useGameStore((state) => state.currentActivity);
+  const stats = useHunterStore((state) => state.stats);
   const items = useBankStore((state) => state.items);
   const party = useHunterStore((state) => state.party);
+  const hunterActivity = useActivityStore((state) => state.hunterActivity);
+  const budActivities = useActivityStore((state) => state.budActivities);
 
   return (
     <div className="space-y-4">
@@ -15,8 +17,12 @@ const HunterInfo = () => {
       <div>
         <h3 className="font-bold text-lg mb-2">Current Activity</h3>
         <div className="bg-base-200 p-2 rounded-lg">
-          <div className="capitalize">Hunter Activity: {currentActivity || 'None'}</div>
-          <div className="capitalize">Bud Activity: Placeholder for Bud Activity</div>
+          <div className="capitalize">
+            Hunter Activity: {hunterActivity ? hunterActivity.nodeId : 'None'}
+          </div>
+          <div className="capitalize">
+            Active Buds: {Object.keys(budActivities).length}
+          </div>
         </div>
       </div>
 
@@ -36,12 +42,12 @@ const HunterInfo = () => {
       <div>
         <h3 className="font-bold text-lg mb-2">Stats</h3>
         <div className="grid grid-cols-2 gap-2 text-sm">
-          <div>Health: 100</div>
-          <div>Wisdom: 50</div>
-          <div>Attack: 75</div>
-          <div>Defense: 60</div>
-          <div>Dexterity: 80</div>
-          <div>Points: 10</div>
+          {Object.entries(stats).map(([statName, value]) => (
+            <div key={statName} className="flex justify-between">
+              <span className="capitalize">{statName}:</span>
+              <span>{value}</span>
+            </div>
+          ))}
         </div>
       </div>
 

@@ -26,6 +26,7 @@ interface ActivityActions {
   getBudActivity: (budId: string) => (Activity & { budId: string }) | null;
   updateProgress: (deltaTime: number) => void;
   resetActivities: () => void;
+  getProgress: (nodeId: string) => number;
 }
 
 const useActivityStoreBase = create<ActivityState & ActivityActions>((set, get) => ({
@@ -105,6 +106,19 @@ const useActivityStoreBase = create<ActivityState & ActivityActions>((set, get) 
     budActivities: {},
     fractionalProgress: {}
   }),
+
+  getProgress: (nodeId: string) => {
+    const state = get();
+    const hunterProgress = state.fractionalProgress['hunter']?.items[nodeId] || 0;
+    
+    // Check all bud activities for the highest progress
+    const budProgress = Object.keys(state.budActivities).reduce((max, budId) => {
+      const progress = state.fractionalProgress[budId]?.items[nodeId] || 0;
+      return Math.max(max, progress);
+    }, 0);
+
+    return Math.max(hunterProgress, budProgress) * 100;
+  },
 }));
 
 export const useActivityStore = createSelectors(useActivityStoreBase);
