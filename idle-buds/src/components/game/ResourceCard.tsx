@@ -98,7 +98,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, assignedBuds, onA
                     <div>XP: {assignedBud.experience}/{assignedBud.experienceToNextLevel}</div>
                   </div>
                   <button
-                    onClick={() => onRemoveBud(assignedBud.id)}
+                    onClick={() => removeBud()}
                     className="text-red-500 hover:text-red-700"
                   >
                     &times;

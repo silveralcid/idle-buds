@@ -43,9 +43,16 @@ export const moveBudFromNodeToParty = (budId: string, nodeId: string) => {
   if (bud && bud.id === budId) {
     console.log(`Moving Bud from node to party: ${bud.id}`);
     removeBudFromNode(nodeId);
-    addBudToParty(bud);
+
+    // Access fresh state after removal to ensure consistency
+    const updatedAssignments = useNodeAssignmentStore.getState().assignments;
+    if (!updatedAssignments[nodeId]) {
+      addBudToParty(bud);
+    } else {
+      console.warn(`Failed to remove Bud from node: ${nodeId}`);
+    }
   } else {
-    console.warn(`Bud not found in resource: ${budId}`);
+    console.warn(`Bud not found in node: ${nodeId}`);
   }
 };
 
