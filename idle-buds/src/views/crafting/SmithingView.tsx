@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import WorkbenchCard from '../../components/game/WorkbenchCard';
 import { useGameStore } from '../../stores/game.store';
 import { useHunterStore } from '../../stores/hunter.store';
@@ -7,6 +7,8 @@ import { useNodeAssignmentStore } from '../../stores/nodeAssignment.store';
 import { workbenches } from '../../data/workbenches/workbench.data';
 
 const SmithingView = () => {
+  const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
+
   useGameLoop();
 
   const startCrafting = useGameStore((state) => state.startGathering); // We'll reuse gathering for now
@@ -20,6 +22,10 @@ const SmithingView = () => {
       console.log(`Activating crafting for workbench: ${workbenchId}`);
       startCrafting(workbenchId, false);
     }
+  };
+
+  const handleRecipeSelect = (recipeId: string | null) => {
+    setSelectedRecipeId(recipeId);
   };
 
   // Filter workbenches for smithing and smelting types
@@ -56,6 +62,8 @@ const SmithingView = () => {
               onRemoveBud={(budId) => removeBudFromNode(budId)}
               onActivate={handleActivate}
               skillId="smithing"
+              selectedRecipeId={selectedRecipeId}
+              onRecipeSelect={handleRecipeSelect}
             />
           );
         })}

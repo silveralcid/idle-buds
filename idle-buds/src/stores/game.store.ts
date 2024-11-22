@@ -5,6 +5,8 @@ import { useBankStore } from "./bank.store";
 import { useHunterStore } from "./hunter.store";
 import { GameState } from "../types/state.types";
 import { useNodeAssignmentStore } from "./nodeAssignment.store"; 
+import { smeltedRecipes } from '../data/recipes/smeltedRecipes.data';
+import { meleeRecipes } from '../data/recipes/meleeRecipes.data';
 
 // Use the functions inside the store
 export const useGameStore = create<GameState>((set, get) => ({
@@ -17,12 +19,32 @@ export const useGameStore = create<GameState>((set, get) => ({
   lastSaveTime: Date.now(),
   isPaused: false,
   isInitialLoad: true,
+  currentRecipeId: null,
+  setCurrentRecipe: (recipeId: string | null) => set({ currentRecipeId: recipeId }),
   pauseGame: () => set((state) => ({ isPaused: true })),
   unpauseGame: () => set((state) => ({ 
     isPaused: false,
     isInitialLoad: false 
   })),
   startGathering: (activityId, isBud) => set((state) => {
+    const recipe = state.currentRecipeId ? 
+      [...smeltedRecipes, ...meleeRecipes].find(r => r.id === state.currentRecipeId) : 
+      null;
+      
+    if (recipe) {
+      // Check if player has required items
+      const hasItems = recipe.inputs.every(input => 
+        input.itemIds.some(itemId => 
+          (useBankStore.getState().items[itemId] || 0) >= input.amount
+        )
+      );
+      
+      if (!hasItems) {
+        console.warn('Missing required items for crafting');
+        return state;
+      }
+    }
+
     if (isBud) {
       if (state.budActivity !== activityId) {
         return { isGathering: true, budActivity: activityId };

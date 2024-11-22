@@ -39,4 +39,6 @@ export interface GameState {
     lastSaveTime: number;
     togglePause: () => void;
     isInitialLoad: boolean;
+    currentRecipeId: string | null;
+    setCurrentRecipe: (recipeId: string | null) => void;
 }
