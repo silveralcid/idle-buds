@@ -10,10 +10,6 @@ import { useBankStore } from '../../stores/bank.store';
 
 interface WorkbenchCardProps {
   workbench: Workbench;
-  assignedBuds: string[];
-  onAssignBud: (budId: string) => void;
-  onRemoveBud: (budId: string) => void;
-  onActivate: (workbenchId: string) => void;
   skillId: string;
   onRecipeSelect: (recipeId: string | null) => void;
   selectedRecipeId: string | null;
@@ -21,17 +17,13 @@ interface WorkbenchCardProps {
 
 const WorkbenchCard: React.FC<WorkbenchCardProps> = ({
   workbench,
-  assignedBuds,
-  onAssignBud,
-  onRemoveBud,
-  onActivate,
   skillId,
   onRecipeSelect,
   selectedRecipeId,
 }) => {
   const [isUnlocked, setIsUnlocked] = useState(workbench.isUnlocked);
   const skill = useHunterStore((state) => state.skills[skillId]);
-  const { assignedBud, removeBud, handleAssignBud } = useBudAssignment(workbench.id);
+  const { assignedBud, assign, unassign } = useBudAssignment(workbench.id, 'crafting');
   const budActivity = useGameStore((state) => state.budActivity);
   const currentActivity = useGameStore((state) => state.currentActivity);
   const party = useHunterStore((state) => state.party);
@@ -72,20 +64,20 @@ const WorkbenchCard: React.FC<WorkbenchCardProps> = ({
   const handleBudCraft = () => {
     if (!isUnlocked || !selectedRecipeId) return;
     if (budActivity === workbench.id) {
-      onActivate('');
+      unassign();
     } else {
       useGameStore.getState().setCurrentRecipe(selectedRecipeId);
-      onActivate(workbench.id);
+      assign(workbench.id);
     }
   };
 
   const handleHunterCraft = () => {
     if (!isUnlocked || !selectedRecipeId) return;
     if (currentActivity === workbench.id) {
-      onActivate('');
+      unassign();
     } else {
       useGameStore.getState().setCurrentRecipe(selectedRecipeId);
-      onActivate(workbench.id);
+      assign(workbench.id);
     }
   };
 
@@ -116,6 +108,12 @@ const WorkbenchCard: React.FC<WorkbenchCardProps> = ({
       }
     }
   }, [selectedRecipeId, items, recipes]);
+
+  const handleAssignBud = (budId: string) => {
+    if (selectedRecipeId) {
+      assign(budId, selectedRecipeId);
+    }
+  };
 
   return (
     <div
@@ -196,7 +194,7 @@ const WorkbenchCard: React.FC<WorkbenchCardProps> = ({
                   </div>
                 </div>
                 <button
-                  onClick={() => removeBud()}
+                  onClick={() => unassign()}
                   className="text-red-500 hover:text-red-700"
                 >
                   &times;

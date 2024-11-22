@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useGameStore } from '../stores/game.store';
 import { useAutoSave } from './useAutoSave';
-import { handleOfflineProgression } from '../utils/offlineProgression.utils';
+import { handleOfflineProgression } from '../utils/offline-progression.utils';
 export const useOfflineProgression = (setModalVisible: (visible: boolean) => void, setProgressionData: (data: any) => void) => {
   const saveGame = useGameStore((state) => state.saveGame);
   const pauseGame = useGameStore((state) => state.pauseGame);

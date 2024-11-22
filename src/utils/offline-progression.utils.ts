@@ -1,4 +1,4 @@
-import { calculateResourceGain, calculateExperienceGain } from './resourceCalculation.utils';
+import { calculateResourceGain, calculateExperienceGain } from './gathering-calculation.utils';
 import { allResources } from '../data/allResources.data';
 import { GameState } from '../types/state.types';
 import { useNodeAssignmentStore } from '../stores/nodeAssignment.store';
@@ -7,7 +7,7 @@ import { useGameStore } from '../stores/game.store';
 import { GameConfig } from '../constants/gameConfig';
 import { useBankStore } from '../stores/bank.store';
 import { useHunterStore } from '../stores/hunter.store';
-import { increaseBudExperience } from './budManagement.utils';
+import { increaseBudExperience } from './bud-management.utils';
 import { miningItems } from '../data/items/ore.data';
 
 interface OfflineProgressionResult {

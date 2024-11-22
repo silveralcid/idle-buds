@@ -1,28 +1,31 @@
-import { useNodeAssignmentStore } from '../stores/nodeAssignment.store';
-import { moveBudToNode, moveBudFromNodeToParty } from '../utils/budManagement.utils';
+import { useAssignmentStore } from '../stores/assignment.store';
+import { AssignmentType } from '../types/assignment.types';
+import { useHunterStore } from '../stores/hunter.store';
+import { useCallback } from 'react';
 
-export const useBudAssignment = (nodeId: string) => {
-  const { assignments = {} } = useNodeAssignmentStore() || {};
-  const assignedBud = assignments[nodeId] || null;
+export const useBudAssignment = (nodeId: string, type: AssignmentType) => {
+  const { assignBud, unassignBud, getNodeAssignment } = useAssignmentStore();
+  const party = useHunterStore(state => state.party);
 
-  const assignBud = (budId: string) => {
-    if (budId) {
-      moveBudToNode(budId, nodeId);
+  const assignment = getNodeAssignment(nodeId);
+  const assignedBud = assignment ? party.find(b => b.id === assignment.budId) : null;
+
+  const assign = useCallback((budId: string, activityId?: string) => {
+    if (!budId) return false;
+    return assignBud(budId, type, nodeId, activityId);
+  }, [nodeId, type, assignBud]);
+
+  const unassign = useCallback(() => {
+    if (assignment) {
+      unassignBud(assignment.budId);
     }
-  };
+  }, [assignment, unassignBud]);
 
-  const removeBud = () => {
-    if (assignedBud) {
-      console.log(`Removing Bud from resource: ${assignedBud.id}`);
-      moveBudFromNodeToParty(assignedBud.id, nodeId);
-    }
+  return {
+    assignedBud,
+    assignment,
+    assign,
+    unassign,
+    isAssigned: !!assignment
   };
-
-  const handleAssignBud = (budId: string) => {
-    if (budId) {
-      assignBud(budId);
-    }
-  };
-
-  return { assignedBud, assignBud, removeBud, handleAssignBud };
 };

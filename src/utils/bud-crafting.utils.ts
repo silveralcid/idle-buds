@@ -2,7 +2,7 @@ import { Recipe } from '../types/recipe.types';
 import { useBankStore } from '../stores/bank.store';
 import { useHunterStore } from '../stores/hunter.store';
 import { GameConfig } from '../constants/gameConfig';
-import { calculateResourceGain } from './resourceCalculation.utils';
+import { calculateResourceGain } from './gathering-calculation.utils';
 
 export const processCrafting = (recipe: Recipe, deltaTime: number, fractionalProgress: number = 0) => {
   console.log('Processing craft:', {

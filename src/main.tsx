@@ -6,7 +6,7 @@ import { useAutoSave } from './hooks/useAutoSave';
 import { useOfflineProgression } from './hooks/useOfflineProgression';
 import { useGameStore } from './stores/game.store';
 import OfflineProgressionModal from './components/common/OfflineProgressionModal';
-import { handleOfflineProgression } from './utils/offlineProgression.utils';
+import { handleOfflineProgression } from './utils/offline-progression.utils';
 import { miningItems } from './data/items/ore.data';
 import { lumberingItems } from './data/items/log.data';
 

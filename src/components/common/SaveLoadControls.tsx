@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useGameStore } from '../../stores/game.store';
-import { exportSave, importSave } from '../../utils/saveLoad.utils';
+import { exportSave, importSave } from '../../utils/save-management.utils';
 
 const SaveLoadControls = () => {
   const saveGame = useGameStore((state) => state.saveGame);
