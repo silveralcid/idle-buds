@@ -47,13 +47,27 @@ const WorkbenchCard: React.FC<WorkbenchCardProps> = ({
   }, [skill, workbench.levelRequired]);
 
   useEffect(() => {
-    if (currentActivity === workbench.id || budActivity === workbench.id) {
-      const progress = fractionalItems[workbench.id] || 0;
-      setCraftProgress(progress);
-    } else {
+    const isActive = currentActivity === workbench.id || budActivity === workbench.id;
+    
+    if (!isActive) {
       setCraftProgress(0);
+      return;
     }
-  }, [fractionalItems, workbench.id, currentActivity, budActivity]);
+
+    const progress = fractionalItems[workbench.id] || 0;
+    setCraftProgress(progress);
+
+    return () => {
+      if (!isActive) {
+        setCraftProgress(0);
+      }
+    };
+  }, [
+    fractionalItems,
+    workbench.id,
+    currentActivity,
+    budActivity
+  ]);
 
   const handleBudCraft = () => {
     if (!isUnlocked || !selectedRecipeId) return;
@@ -138,10 +152,13 @@ const WorkbenchCard: React.FC<WorkbenchCardProps> = ({
           <div className="mt-4 space-y-4">
             {(currentActivity === workbench.id || budActivity === workbench.id) && (
               <div className="w-full mb-2">
-                <div className="w-full bg-base-300 rounded-full h-2">
+                <div className="w-full bg-base-300 rounded-full h-2 overflow-hidden">
                   <div
-                    className="bg-primary h-2 rounded-full transition-all duration-200"
-                    style={{ width: `${craftProgress * 100}%` }}
+                    className="bg-primary h-2 rounded-full transition-all duration-200 ease-linear"
+                    style={{ 
+                      width: `${Math.min(craftProgress * 100, 100)}%`,
+                      transition: 'width 200ms linear'
+                    }}
                   />
                 </div>
                 <div className="text-xs text-center mt-1">
