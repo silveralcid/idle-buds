@@ -1,6 +1,6 @@
-import { Resource } from '../types/resource.types';
-import { woodResources } from './resources/wood.data';
-import { oreResources } from './resources/ore.data';
+import { Resource } from '../types/resourceNode.types';
+import { woodResources } from './nodes/wood.data';
+import { oreResources } from './nodes/ore.data';
 
 // Import other resource types as needed
 

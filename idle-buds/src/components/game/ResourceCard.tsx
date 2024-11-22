@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Resource } from '../../types/resource.types';
+import { Resource } from '../../types/resourceNode.types';
 import { useHunterStore } from '../../stores/hunter.store';
 import { useGathering } from '../../hooks/useGathering';
 import { useBudAssignment } from '../../hooks/useBudAssignment';

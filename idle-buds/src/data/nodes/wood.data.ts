@@ -1,4 +1,4 @@
-import { Resource } from '../../types/resource.types';
+import { Resource } from '../../types/resourceNode.types';
 
 export const woodResources: Resource[] = [
   {

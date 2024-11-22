@@ -1,6 +1,6 @@
 import React from 'react';
 import ResourceCard from '../../components/game/ResourceCard';
-import { oreResources } from '../../data/resources/ore.data';
+import { oreResources } from '../../data/nodes/ore.data';
 import { useGameStore } from '../../stores/game.store';
 import { useHunterStore } from '../../stores/hunter.store';
 import { useGameLoop } from '../../hooks/useGameLoop';
