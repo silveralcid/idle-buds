@@ -1,4 +1,4 @@
-import { GameConfig } from '../constants/gameConfig';
+import { GameConfig } from '../constants/game-config';
 
 /**
  * Calculates the experience required for the next level using a quadratic progression

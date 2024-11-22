@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useGameStore } from '../stores/game.store';
 import { useActivityStore } from '../stores/activity.store';
-import { GameConfig } from '../constants/gameConfig';
+import { GameConfig } from '../constants/game-config';
 import { processGathering } from '../utils/gathering.utils';
 
 export const useGameLoop = () => {

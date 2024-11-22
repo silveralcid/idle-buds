@@ -1,6 +1,6 @@
 import { ResourceNode } from "../types/resourceNode.types";
 import { calculateResourceGain, calculateExperienceGain } from "./gathering-calculation.utils";
-import { GameConfig } from "../constants/gameConfig";
+import { GameConfig } from "../constants/game-config";
 
 interface GatheringResult {
   wholeAmount: number;

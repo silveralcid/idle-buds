@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { budInstance } from '../types/budInstance.types';
-import { GameConfig } from '../constants/gameConfig';
+import { GameConfig } from '../constants/game-config';
 import { calculateExperienceRequirement } from '../utils/experience.utils';
 
 interface BudState {

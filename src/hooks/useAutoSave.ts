@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useGameStore } from '../stores/game.store';
-import { GameConfig } from '../constants/gameConfig';
+import { GameConfig } from '../constants/game-config';
 
 export const useAutoSave = () => {
   const saveGame = useGameStore((state) => state.saveGame);

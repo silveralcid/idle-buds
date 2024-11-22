@@ -1,4 +1,4 @@
-import { GameConfig } from "../constants/gameConfig";
+import { GameConfig } from "../constants/game-config";
 
 export const calculateResourceGain = (
   gatherRate: number, 

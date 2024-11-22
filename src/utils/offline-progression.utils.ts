@@ -1,125 +1,105 @@
-import { calculateResourceGain, calculateExperienceGain } from './gathering-calculation.utils';
-import { allResources } from '../data/allResources.data';
-import { GameState } from '../types/state.types';
-import { useNodeAssignmentStore } from '../stores/nodeAssignment.store';
-import { defaultSkillMapping } from '../data/defaultSkillMapping';
+import { useActivityStore } from '../stores/activity.store';
 import { useGameStore } from '../stores/game.store';
-import { GameConfig } from '../constants/gameConfig';
 import { useBankStore } from '../stores/bank.store';
 import { useHunterStore } from '../stores/hunter.store';
-import { increaseBudExperience } from './bud-management.utils';
-import { miningItems } from '../data/items/ore.data';
+import { useBudStore } from '../stores/bud.store';
+import { calculateGathering } from './gathering-core.utils';
+import { allResources } from '../data/allResources.data';
+import { GameConfig } from '../constants/game-config';
 
 interface OfflineProgressionResult {
-  offlineHunterItemYield: Record<string, number>;
-  offlineBudItemYield: Record<string, number>;
-  offlineHunterExperience: Record<string, number>;
-  offlineBudExperience: Record<string, number>;
+  hunterResources: Record<string, number>;
+  budResources: Record<string, number>;
+  hunterExperience: Record<string, number>;
+  budExperience: Record<string, number>;
 }
 
-export const calculateOfflineProgression = (state: GameState, deltaTime: number): OfflineProgressionResult => {
-  const offlineHunterItemYield: Record<string, number> = {};
-  const offlineBudItemYield: Record<string, number> = {};
-  const offlineHunterExperience: Record<string, number> = {};
-  const offlineBudExperience: Record<string, number> = {};
+export const calculateOfflineProgression = (deltaTime: number): OfflineProgressionResult => {
+  const activityStore = useActivityStore.getState();
+  const hunterResources: Record<string, number> = {};
+  const budResources: Record<string, number> = {};
+  const hunterExperience: Record<string, number> = {};
+  const budExperience: Record<string, number> = {};
 
-  console.log('Current Activity:', state.currentActivity);
-  console.log('Bud Activity:', state.budActivity);
-  console.log('All Resources:', allResources);
-  console.log('Default Skill Mapping:', defaultSkillMapping);
-
-  const tickDuration = GameConfig.tickDuration / 1000; // Convert to seconds
-  const ticks = deltaTime / tickDuration;
-
-  if (state.currentActivity) {
-    const resource = allResources.find(r => r.id === state.currentActivity);
+  // Process hunter activity
+  if (activityStore.hunterActivity) {
+    const resource = allResources.find(r => r.id === activityStore.hunterActivity?.nodeId);
     if (resource) {
-      const { wholeAmount: hunterResourceGain, newFraction: newHunterFraction } = calculateResourceGain(resource.gatherRate, ticks, state.fractionalItems[resource.id] || 0);
-      const skillId = defaultSkillMapping[resource.type];
-      const { wholeXP: hunterXP, newXPFraction: newHunterXPFraction } = calculateExperienceGain(resource.experienceGain, ticks, state.fractionalXP[skillId] || 0);
+      const gatherResult = calculateGathering(
+        resource,
+        deltaTime,
+        0, // Reset fractional progress for offline calculations
+        0
+      );
 
       resource.resourceNodeYields.forEach(itemId => {
-        offlineHunterItemYield[itemId] = hunterResourceGain;
-        state.fractionalItems[itemId] = newHunterFraction;
+        hunterResources[itemId] = gatherResult.wholeAmount;
       });
-      offlineHunterExperience[skillId] = hunterXP;
-      state.fractionalXP[skillId] = newHunterXPFraction;
+      hunterExperience[resource.type] = gatherResult.wholeXP;
     }
   }
-  
-  if (state.budActivity) {
-    const resource = allResources.find(r => r.id === state.budActivity);
+
+  // Process bud activities
+  Object.entries(activityStore.budActivities).forEach(([budId, activity]) => {
+    const resource = allResources.find(r => r.id === activity.nodeId);
     if (resource) {
-      const { assignments } = useNodeAssignmentStore.getState();
-      const assignedBud = assignments[state.budActivity];
+      const gatherResult = calculateGathering(
+        resource,
+        deltaTime,
+        0,
+        0,
+        1 // Default efficiency for offline progression
+      );
 
-      if (assignedBud) {
-        const { wholeAmount: budResourceGain, newFraction: newBudFraction } = calculateResourceGain(resource.gatherRate, ticks, state.fractionalItems[resource.id] || 0);
-        const { wholeXP: budXP, newXPFraction: newBudXPFraction } = calculateExperienceGain(resource.experienceGain, ticks, state.fractionalXP[assignedBud.id] || 0);
-
-        resource.resourceNodeYields.forEach(itemId => {
-          offlineBudItemYield[itemId] = budResourceGain;
-          state.fractionalItems[itemId] = newBudFraction;
-        });
-        offlineBudExperience[assignedBud.id] = budXP;
-        state.fractionalXP[assignedBud.id] = newBudXPFraction;
-      }
+      resource.resourceNodeYields.forEach(itemId => {
+        budResources[itemId] = (budResources[itemId] || 0) + gatherResult.wholeAmount;
+      });
+      budExperience[budId] = gatherResult.wholeXP;
     }
-  }
+  });
 
   return {
-    offlineHunterItemYield,
-    offlineBudItemYield,
-    offlineHunterExperience,
-    offlineBudExperience
+    hunterResources,
+    budResources,
+    hunterExperience,
+    budExperience
   };
 };
 
-export const handleOfflineProgression = (setProgressionData: (data: any) => void, setModalVisible: (visible: boolean) => void) => {
-  console.log('Calculating offline progression');
+export const handleOfflineProgression = (
+  setProgressionData: (data: OfflineProgressionResult) => void,
+  setModalVisible: (visible: boolean) => void
+) => {
   const lastSaveTime = useGameStore.getState().lastSaveTime;
   const currentTime = Date.now();
-  const deltaTime = (currentTime - lastSaveTime) / 1000;
+  const deltaTime = (currentTime - lastSaveTime) / 1000; // Convert to seconds
 
-  const state = useGameStore.getState();
-  const progressionData = calculateOfflineProgression(state, deltaTime);
-  
-  // Map the progression data to match the modal's expected format
-  const formattedProgressionData = {
-    hunterResources: progressionData.offlineHunterItemYield,
-    budResources: progressionData.offlineBudItemYield,
-    hunterExperience: progressionData.offlineHunterExperience,
-    budExperience: progressionData.offlineBudExperience
-  };
+  const progressionData = calculateOfflineProgression(deltaTime);
 
-  // Update Bank Store with hunter and bud resources
+  // Update Bank Store
   const bankStore = useBankStore.getState();
-  Object.entries(progressionData.offlineHunterItemYield).forEach(([itemId, amount]) => {
-    console.log(`Adding ${amount} of resource ${itemId} to bank store`);
+  Object.entries(progressionData.hunterResources).forEach(([itemId, amount]) => {
     bankStore.addItem(itemId, amount);
   });
-  Object.entries(progressionData.offlineBudItemYield).forEach(([itemId, amount]) => {
-    console.log(`Adding ${amount} of bud resource ${itemId} to bank store`);
+  Object.entries(progressionData.budResources).forEach(([itemId, amount]) => {
     bankStore.addItem(itemId, amount);
   });
 
   // Update Hunter XP
   const hunterStore = useHunterStore.getState();
-  Object.entries(progressionData.offlineHunterExperience).forEach(([skillId, xp]) => {
-    console.log(`Increasing hunter skill ${skillId} by ${xp} XP`);
+  Object.entries(progressionData.hunterExperience).forEach(([skillId, xp]) => {
     hunterStore.increaseSkillExperience(skillId, xp);
   });
 
-  // Update Assigned Bud XP
-  Object.entries(progressionData.offlineBudExperience).forEach(([budId, xp]) => {
-    console.log(`Increasing bud ${budId} by ${xp} XP`);
-    increaseBudExperience(budId, xp);
+  // Update Bud XP
+  const budStore = useBudStore.getState();
+  Object.entries(progressionData.budExperience).forEach(([budId, xp]) => {
+    budStore.gainExperience(budId, xp);
   });
 
-  setProgressionData(formattedProgressionData);
+  setProgressionData(progressionData);
   setModalVisible(true);
 
-  // Resume the game
+  // Resume game
   useGameStore.getState().unpauseGame();
-  console.log('Game resumed after applying offline progression');
-}
+};

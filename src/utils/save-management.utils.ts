@@ -1,36 +1,43 @@
 import { useBankStore } from "../stores/bank.store";
 import { useGameStore } from "../stores/game.store";
 import { useHunterStore } from "../stores/hunter.store";
-import { useNodeAssignmentStore } from "../stores/nodeAssignment.store";
-import { GameState } from "../types/state.types";
-
-const SAVE_VERSION = '1.0.0';
-const SAVE_KEY = 'idle_buds_save';
+import { useActivityStore } from "../stores/activity.store";
+import { useBudStore } from "../stores/bud.store";
+import { GameConfig } from "../constants/game-config";
+import { SAVE_KEY } from "../constants/save-key";
 
 export function saveGameState() {
     const gameState = useGameStore.getState();
     const bankState = useBankStore.getState();
-    const hunterState = useHunterStore.getState();
-    const nodeAssignmentState = useNodeAssignmentStore.getState();
+    const hunterState = useHunterStore.getState().saveHunterState();
+    const activityState = useActivityStore.getState();
+    const budState = useBudStore.getState().saveBudState();
     
     const currentTime = Date.now();
     useGameStore.setState({ lastSaveTime: currentTime });
     
     const saveData = {
-        version: SAVE_VERSION,
+        version: GameConfig.SAVE.VERSION,
         timestamp: currentTime,
         state: {
             game: { ...gameState, lastSaveTime: currentTime },
             bank: bankState,
             hunter: hunterState,
-            nodeAssignment: nodeAssignmentState,
-            currentActivity: gameState.currentActivity, 
-            budActivity: gameState.budActivity
+            buds: budState,
+            activities: {
+                hunterActivity: activityState.hunterActivity,
+                budActivities: activityState.budActivities,
+                fractionalProgress: activityState.fractionalProgress
+            }
         }
     };
   
-    localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
-    console.log('Game state saved');
+    try {
+        localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+        console.log('Game state saved successfully');
+    } catch (error) {
+        console.error('Failed to save game state:', error);
+    }
 }
 
 export const loadGameState = () => {
@@ -40,18 +47,27 @@ export const loadGameState = () => {
 
         const saveData = JSON.parse(savedState);
         
-        if (saveData.version !== SAVE_VERSION) {
+        if (saveData.version !== GameConfig.SAVE.VERSION) {
             console.warn('Save version mismatch. Some features may not work correctly.');
         }
 
-        const { game, bank, hunter, nodeAssignment } = saveData.state;
+        const { game, bank, hunter, buds, activities } = saveData.state;
+        
+        // Load states in the correct order to maintain dependencies
+        useGameStore.setState({
+            ...game,
+            isInitialLoad: false
+        });
         
         useBankStore.setState(bank);
-        useHunterStore.setState(hunter);
-        useNodeAssignmentStore.setState(nodeAssignment);
-        useGameStore.setState({
-            currentActivity: game.currentActivity,
-            budActivity: game.budActivity
+        useHunterStore.getState().loadHunterState(hunter);
+        useBudStore.getState().loadBudState(buds);
+        
+        // Load activity state last since it depends on other states
+        useActivityStore.setState({
+            hunterActivity: activities.hunterActivity,
+            budActivities: activities.budActivities,
+            fractionalProgress: activities.fractionalProgress
         });
         
         return saveData;
@@ -61,45 +77,72 @@ export const loadGameState = () => {
     }
 };
 
-  
-export const resetGameState = () => ({
-    resources: {},
-    fractionalResources: {},
-    fractionalXP: {},
-    isGathering: false,
-    currentActivity: null,
-    budActivity: null,
-});
-  
+export const resetGameState = () => {
+    const resetTime = Date.now();
+    
+    // Reset all stores in the correct order to maintain dependencies
+    useActivityStore.getState().resetActivities();
+    useBudStore.getState().resetBuds();
+    useBankStore.getState().resetBank();
+    useHunterStore.getState().resetHunter();
+    
+    // Return initial game state
+    return {
+        lastSaveTime: resetTime,
+        isPaused: false,
+        isInitialLoad: true,
+        lastTickTime: resetTime,
+        tickRate: GameConfig.TICK.RATE.DEFAULT
+    };
+};
 
-export function exportSave() {
-  const savedState = localStorage.getItem(SAVE_KEY);
-  if (!savedState) {
-      console.warn('No save data found to export.');
+export const exportSave = () => {
+  try {
+    const saveData = localStorage.getItem(SAVE_KEY);
+    if (!saveData) {
+      console.error('No save data found');
       return;
+    }
+
+    // Create blob and download
+    const blob = new Blob([saveData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `idle-buds-save-${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Failed to export save:', error);
   }
+};
 
-  const blob = new Blob([savedState], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'idle_buds_save.json';
-  a.click();
-  URL.revokeObjectURL(url);
-}
+export const importSave = async (file: File) => {
+  try {
+    const text = await file.text();
+    const saveData = JSON.parse(text);
+    
+    // Validate save data structure
+    if (!saveData.version || !saveData.state) {
+      throw new Error('Invalid save file format');
+    }
 
+    // Version check
+    if (saveData.version !== GameConfig.SAVE.VERSION) {
+      console.warn('Save version mismatch. Some features may not work correctly.');
+    }
 
-export function importSave(file: File) {
-  const reader = new FileReader();
-  reader.onload = (event) => {
-      try {
-          const saveData = JSON.parse(event.target?.result as string);
-          localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
-          loadGameState(); // Reload the game state from the imported data
-          console.log('Game state imported successfully.');
-      } catch (error) {
-          console.error('Failed to import save:', error);
-      }
-  };
-  reader.readAsText(file);
-}
+    // Store the save data
+    localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+    
+    // Reload the game state
+    const loadResult = loadGameState();
+    if (loadResult) {
+      console.log('Save imported successfully');
+    }
+  } catch (error) {
+    console.error('Failed to import save:', error);
+  }
+};
