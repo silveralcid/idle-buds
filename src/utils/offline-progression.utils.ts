@@ -1,8 +1,8 @@
-import { useActivityStore } from '../stores/activity.store';
+import { useActivityStore } from '../stores/active-bud.store';
 import { useGameStore } from '../stores/game.store';
 import { useBankStore } from '../stores/bank.store';
 import { useHunterStore } from '../stores/hunter.store';
-import { useBudStore } from '../stores/bud.store';
+import { useBudStore } from '../stores/box-bud.store';
 import { calculateGathering } from './gathering-core.utils';
 import { allResources } from '../data/allResources.data';
 import { GameConfig } from '../constants/game-config';

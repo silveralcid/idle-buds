@@ -3,7 +3,7 @@ import { createBudInstance } from '../../factories/budFactory';
 import { budSpecies } from '../../data/buds/budSpecies.data';
 import SaveLoadControls from './SaveLoadControls';
 import { useGameStore } from '../../stores/game.store';
-import { useBudStore } from '../../stores/bud.store';
+import { useBudStore } from '../../stores/box-bud.store';
 const Navbar = () => {
   const setView = useViewStore((state) => state.setView);
   const addBudToParty = useBudStore((state) => state.addBudToParty); // Access addBudToParty

@@ -1,5 +1,5 @@
 // src/hooks/useBudGathering.ts
-import { useActivityStore } from '../stores/activity.store';
+import { useActivityStore } from '../stores/active-bud.store';
 import { moveBudToNode, moveBudFromNodeToParty } from '../utils/bud-management.utils';
 
 export const useBudGathering = (nodeId: string, isUnlocked: boolean) => {

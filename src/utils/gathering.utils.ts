@@ -1,10 +1,10 @@
 import { useHunterStore } from '../stores/hunter.store';
 import { defaultSkillMapping } from '../data/defaultSkillMapping';
-import { useActivityStore } from '../stores/activity.store';
+import { useActivityStore } from '../stores/active-bud.store';
 import { calculateGathering } from './gathering-core.utils';
 import { useBankStore } from '../stores/bank.store';
 import { allResources } from '../data/allResources.data';
-import { useBudStore } from '../stores/bud.store';
+import { useBudStore } from '../stores/box-bud.store';
 
 export const processGathering = (deltaTime: number): void => {
   console.groupCollapsed(`⚙️ Gathering Process (deltaTime: ${deltaTime})`);

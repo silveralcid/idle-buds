@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { saveGameState, loadGameState, resetGameState } from "../utils/save-management.utils";
 import { useBankStore } from "./bank.store";
 import { useHunterStore } from "./hunter.store";
-import { useActivityStore } from "./activity.store";
-import { useBudStore } from "./bud.store";
+import { useActivityStore } from "./active-bud.store";
+import { useBudStore } from "./box-bud.store";
 
 
 interface GameState {

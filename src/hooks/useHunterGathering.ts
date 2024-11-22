@@ -1,5 +1,5 @@
 // src/hooks/useHunterGathering.ts
-import { useActivityStore } from '../stores/activity.store';
+import { useActivityStore } from '../stores/active-bud.store';
 
 export const useHunterGathering = (nodeId: string, isUnlocked: boolean) => {
   const hunterActivity = useActivityStore((state) => state.hunterActivity);

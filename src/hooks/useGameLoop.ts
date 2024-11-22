@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useGameStore } from '../stores/game.store';
-import { useActivityStore } from '../stores/activity.store';
+import { useActivityStore } from '../stores/active-bud.store';
 import { GameConfig } from '../constants/game-config';
 import { processGathering } from '../utils/gathering.utils';
 

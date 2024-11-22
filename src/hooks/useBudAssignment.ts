@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import { useActivityStore } from '../stores/activity.store';
-import { useBudStore } from '../stores/bud.store';
+import { useActivityStore } from '../stores/active-bud.store';
+import { useBudStore } from '../stores/box-bud.store';
 import { moveBudToNode, moveBudFromNodeToParty } from '../utils/bud-management.utils';
 
 export const useBudAssignment = (nodeId: string, type: 'gathering' | 'crafting') => {

@@ -1,8 +1,8 @@
 import React from 'react';
 import { useHunterStore } from '../stores/hunter.store';
-import { useActivityStore } from '../stores/activity.store';
+import { useActivityStore } from '../stores/active-bud.store';
 import { useBankStore } from '../stores/bank.store';
-import { getParty, useBudStore } from '../stores/bud.store';
+import { getParty, useBudStore } from '../stores/box-bud.store';
 
 const HunterInfo = () => {
   const skills = useHunterStore((state) => state.skills);

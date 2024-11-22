@@ -1,7 +1,7 @@
 import ResourceCard from '../../components/game/ResourceCard';
 import { useHunterStore } from '../../stores/hunter.store';
 import { useGameLoop } from '../../hooks/useGameLoop';
-import { useActivityStore } from '../../stores/activity.store';
+import { useActivityStore } from '../../stores/active-bud.store';
 import { useHunterGathering } from '../../hooks/useHunterGathering';
 import { useBudGathering } from '../../hooks/useBudGathering';
 import { miningNodes } from '../../data/nodes/mining.data';

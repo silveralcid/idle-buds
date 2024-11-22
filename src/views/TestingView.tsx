@@ -3,7 +3,7 @@ import { useHunterStore } from '../stores/hunter.store';
 import { useBankStore } from '../stores/bank.store'; // Import the bank store
 import { createBudInstance } from '../factories/budFactory';
 import { budSpecies } from '../data/buds/budSpecies.data';
-import { getParty, useBudStore } from '../stores/bud.store';
+import { getParty, useBudStore } from '../stores/box-bud.store';
 
 const TestingView = () => {
   const { skills, setSkillLevel, setSkillExperience } = useHunterStore();

@@ -1,8 +1,8 @@
 import { useBankStore } from "../stores/bank.store";
 import { useGameStore } from "../stores/game.store";
 import { useHunterStore } from "../stores/hunter.store";
-import { useActivityStore } from "../stores/activity.store";
-import { useBudStore } from "../stores/bud.store";
+import { useActivityStore } from "../stores/active-bud.store";
+import { useBudStore } from "../stores/box-bud.store";
 import { GameConfig } from "../constants/game-config";
 import { SAVE_KEY } from "../constants/save-key";
 

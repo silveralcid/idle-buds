@@ -1,5 +1,5 @@
-import { useActivityStore } from '../stores/activity.store';
-import { useBudStore } from '../stores/bud.store';
+import { useActivityStore } from '../stores/active-bud.store';
+import { useBudStore } from '../stores/box-bud.store';
 import { useHunterStore } from '../stores/hunter.store';
 import { useAssignmentStore } from '../stores/assignment.store';
 

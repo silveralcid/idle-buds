@@ -1,12 +1,12 @@
 import ResourceCard from '../../components/game/ResourceCard';
 import { useHunterStore } from '../../stores/hunter.store';
 import { useGameLoop } from '../../hooks/useGameLoop';
-import { useActivityStore } from '../../stores/activity.store';
+import { useActivityStore } from '../../stores/active-bud.store';
 import { lumberingNodes } from '../../data/nodes/lumbering.data';
 import { useHunterGathering } from '../../hooks/useHunterGathering';
 import { useBudGathering } from '../../hooks/useBudGathering';
-import { useBudStore } from '../../stores/bud.store';
-import { getParty } from '../../stores/bud.store';
+import { useBudStore } from '../../stores/box-bud.store';
+import { getParty } from '../../stores/box-bud.store';
 
 const LumberingView = () => {
   useGameLoop();

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ResourceNode } from '../../types/resourceNode.types';
 import { useHunterStore } from '../../stores/hunter.store';
-import { useActivityStore } from '../../stores/activity.store';
+import { useActivityStore } from '../../stores/active-bud.store';
 import { moveBudToNode, moveBudFromNodeToParty } from '../../utils/bud-management.utils';
-import { useBudStore } from '../../stores/bud.store';
-import { getParty } from '../../stores/bud.store';
+import { useBudStore } from '../../stores/box-bud.store';
+import { getParty } from '../../stores/box-bud.store';
 
 interface ResourceCardProps {
   resource: ResourceNode;
