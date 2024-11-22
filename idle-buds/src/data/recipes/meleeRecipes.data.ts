@@ -2,6 +2,23 @@ import { Recipe } from "../../types/recipe.types";
 
 
 export const meleeRecipes: Recipe[] = [
+{
+    id: "copper_dagger_recipe",
+    name: "Craft Copper Dagger",
+    workbenchType: "smithing",
+    itemType: "equipment",
+    inputs: [
+        { itemIds: ["copper_bar"], amount: 2 },
+        { itemIds: ["oak_logs"], amount: 1 },
+    ],
+    outputs: [
+        { itemId: "copper_dagger", amount: 1 },
+    ],
+    craftingTime: 100,
+    levelRequired: 1,
+    experienceGain: 10,
+    tier: 1,
+    },
   {
     id: "bronze_dagger_recipe",
     name: "Craft Bronze Dagger",

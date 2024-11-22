@@ -3,6 +3,17 @@ import { BaseItem } from "../../types/itemBase.types";
 
 export const melee: BaseItem[] = [
   {
+    id: "copper_dagger",
+    name: "Copper Dagger",
+    type: 'equipment',
+    tier: 1,
+    description: "A simple dagger forged from copper. Lightweight and easy to use.",
+    rarity: "common",
+    value: 10,
+    isStackable: false,
+    tags: ["weapon", "melee", "dagger"],
+  },
+  {
     id: "bronze_dagger",
     name: "Bronze Dagger",
     type: 'equipment',

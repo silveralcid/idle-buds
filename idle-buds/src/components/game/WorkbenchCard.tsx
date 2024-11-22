@@ -45,23 +45,25 @@ const WorkbenchCard: React.FC<WorkbenchCardProps> = ({
   }, [skill, workbench.levelRequired]);
 
   const handleBudCraft = () => {
-    if (!isUnlocked) return;
+    if (!isUnlocked || !selectedRecipeId) return;
     if (budActivity === workbench.id) {
       // Stop crafting
       onActivate('');
     } else {
-      // Start crafting
+      // Start crafting with selected recipe
+      useGameStore.getState().setCurrentRecipe(selectedRecipeId);
       onActivate(workbench.id);
     }
   };
 
   const handleHunterCraft = () => {
-    if (!isUnlocked) return;
+    if (!isUnlocked || !selectedRecipeId) return;
     if (currentActivity === workbench.id) {
       // Stop crafting
       onActivate('');
     } else {
-      // Start crafting
+      // Start crafting with selected recipe
+      useGameStore.getState().setCurrentRecipe(selectedRecipeId);
       onActivate(workbench.id);
     }
   };

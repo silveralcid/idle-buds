@@ -7,6 +7,7 @@ import { GameState } from "../types/state.types";
 import { useNodeAssignmentStore } from "./nodeAssignment.store"; 
 import { smeltedRecipes } from '../data/recipes/smeltedRecipes.data';
 import { meleeRecipes } from '../data/recipes/meleeRecipes.data';
+import { processCrafting } from '../utils/crafting.utils';
 
 // Use the functions inside the store
 export const useGameStore = create<GameState>((set, get) => ({
