@@ -29,8 +29,10 @@ export const updateHunterResources = (state: GameState, deltaTime: number) => {
       const { wholeXP, newXPFraction } = calculateExperienceGain(resource.experienceGain, ticks, state.fractionalXP[skillId] || 0);
       console.log('Experience gain calculated:', { wholeXP, newXPFraction });
 
-      useBankStore.getState().addItem(resource.id, wholeAmount);
-      console.log(`Added ${wholeAmount} of resource ${resource.id} to bank`);
+      resource.resourceNodeYields.forEach(itemId => {
+        useBankStore.getState().addItem(itemId, wholeAmount);
+        console.log(`Added ${wholeAmount} of item ${itemId} to bank`);
+      });
 
       useHunterStore.getState().increaseSkillExperience(skillId, wholeXP);
       console.log(`Increased skill experience for skill ${skillId} by ${wholeXP}`);
