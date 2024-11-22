@@ -1,75 +1,119 @@
-import { useActivityStore } from '../stores/active-bud.store';
-import { useBudStore } from '../stores/box-bud.store';
-import { useHunterStore } from '../stores/hunter.store';
-import { useAssignmentStore } from '../stores/assignment.store';
+import { useActiveBudStore } from '../stores/active-bud.store';
+import { useBoxBudStore } from '../stores/box-bud.store';
 
-export const moveBudToParty = (budId: string): boolean => {
-  const budStore = useBudStore.getState();
-  const activityStore = useActivityStore.getState();
-  const bud = budStore.getBud(budId);
+export const moveBudFromPartyToNode = (budId: string, nodeId: string): boolean => {
+  const activeBudStore = useActiveBudStore.getState();
+  const bud = activeBudStore.getBudFromParty(budId);
   
-  if (!bud) return false;
+  if (!bud) {
+    console.warn('❌ Bud not found in party:', { budId });
+    return false;
+  }
+
+  // Check if bud is already assigned to an activity
+  const currentActivity = activeBudStore.getBudActivity(budId);
+  if (currentActivity) {
+    console.warn('❌ Bud is already assigned to an activity:', { budId, activity: currentActivity });
+    return false;
+  }
+
+  console.log('✅ Moving bud from party to node:', { budId, nodeId });
+  return true;
+};
+
+export const moveBudFromNodeToParty = (budId: string, nodeId: string): boolean => {
+  const activeBudStore = useActiveBudStore.getState();
+  const bud = activeBudStore.getBudFromParty(budId);
   
-  const success = budStore.addBudToParty(budId);
+  if (!bud) {
+    console.warn('❌ Bud not found in party:', { budId });
+    return false;
+  }
+
+  // Check if bud is actually assigned to this node
+  const activity = activeBudStore.getBudActivity(budId);
+  if (!activity || activity.nodeId !== nodeId) {
+    console.warn('❌ Bud is not assigned to this node:', { budId, nodeId });
+    return false;
+  }
+
+  console.log('✅ Moving bud from node to party:', { budId, nodeId });
+  return true;
+};
+
+export const moveBudFromBoxToParty = (budId: string): boolean => {
+  const boxBudStore = useBoxBudStore.getState();
+  const activeBudStore = useActiveBudStore.getState();
+  
+  const bud = boxBudStore.getBudFromBox(budId);
+  if (!bud) {
+    console.warn('❌ Bud not found in box:', { budId });
+    return false;
+  }
+
+  const success = activeBudStore.addBudToParty(bud);
   if (success) {
-    activityStore.stopActivity('bud', budId);
+    boxBudStore.removeBudFromBox(budId);
+    console.log('✅ Moved bud from box to party:', { budId });
   }
   
   return success;
 };
 
-export const moveBudToBox = (budId: string): boolean => {
-  const budStore = useBudStore.getState();
-  const activityStore = useActivityStore.getState();
-  const bud = budStore.getBud(budId);
+export const moveBudFromPartyToBox = (budId: string): boolean => {
+  const boxBudStore = useBoxBudStore.getState();
+  const activeBudStore = useActiveBudStore.getState();
   
-  if (!bud) return false;
-  
-  activityStore.stopActivity('bud', budId);
-  budStore.moveBudToBox(budId);
-  return true;
-};
-
-export const moveBudToNode = (budId: string, nodeId: string): boolean => {
-  const assignmentStore = useAssignmentStore.getState();
-  const activityStore = useActivityStore.getState();
-  
-  // Check if bud exists and is available
-  const currentAssignment = assignmentStore.getBudAssignment(budId);
-  if (currentAssignment) {
-    console.warn('❌ Bud is already assigned:', currentAssignment);
+  const bud = activeBudStore.getBudFromParty(budId);
+  if (!bud) {
+    console.warn('❌ Bud not found in party:', { budId });
     return false;
   }
 
-  // Assign bud to node
-  assignmentStore.assignBud(budId, 'gathering', nodeId);
-  
-  // Start activity
-  activityStore.startActivity('bud', {
-    type: 'gathering',
-    nodeId,
-    budId
-  });
+  // Stop any active activities before moving
+  const activity = activeBudStore.getBudActivity(budId);
+  if (activity) {
+    activeBudStore.stopBudActivity(budId);
+  }
 
-  console.log('✅ Moved bud to node:', { budId, nodeId });
+  boxBudStore.addBudToBox(bud);
+  activeBudStore.removeBudFromParty(budId);
+  console.log('✅ Moved bud from party to box:', { budId });
+  
   return true;
 };
 
-export const moveBudFromNodeToParty = (budId: string, nodeId: string): boolean => {
-  const assignmentStore = useAssignmentStore.getState();
-  const activityStore = useActivityStore.getState();
+export const assignBudToGathering = (budId: string, nodeId: string): boolean => {
+  const activeBudStore = useActiveBudStore.getState();
   
-  // Stop activity first
-  activityStore.stopActivity('bud', budId);
+  // First move the bud to the node
+  const moveSuccess = moveBudFromPartyToNode(budId, nodeId);
+  if (!moveSuccess) return false;
   
-  // Remove assignment
-  assignmentStore.unassignBud(budId);
+  // Then start the gathering activity
+  const success = activeBudStore.startBudActivity(budId, 'gathering', nodeId);
+  if (success) {
+    console.log('✅ Assigned bud to gathering:', { budId, nodeId });
+  } else {
+    console.warn('❌ Failed to assign bud to gathering:', { budId, nodeId });
+  }
   
-  console.log('✅ Moved bud from node to party:', { budId, nodeId });
-  return true;
+  return success;
 };
 
-export const gainBudExperience = (budId: string, amount: number): void => {
-  const budStore = useBudStore.getState();
-  budStore.gainExperience(budId, amount);
+export const unassignBudFromGathering = (budId: string, nodeId: string): boolean => {
+  const activeBudStore = useActiveBudStore.getState();
+  
+  // Stop the gathering activity
+  activeBudStore.stopBudActivity(budId);
+  
+  // Move bud back to party
+  const success = moveBudFromNodeToParty(budId, nodeId);
+  if (success) {
+    console.log('✅ Unassigned bud from gathering:', { budId, nodeId });
+  } else {
+    console.warn('❌ Failed to unassign bud from gathering:', { budId, nodeId });
+  }
+  
+  return success;
 };

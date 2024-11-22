@@ -1,20 +1,19 @@
 import ResourceCard from '../../components/game/ResourceCard';
 import { useHunterStore } from '../../stores/hunter.store';
 import { useGameLoop } from '../../hooks/useGameLoop';
-import { useActivityStore } from '../../stores/active-bud.store';
+import { useActiveBudStore } from '../../stores/active-bud.store';
 import { lumberingNodes } from '../../data/nodes/lumbering.data';
-import { useHunterGathering } from '../../hooks/useHunterGathering';
-import { useBudGathering } from '../../hooks/useBudGathering';
-import { useBudStore } from '../../stores/box-bud.store';
-import { getParty } from '../../stores/box-bud.store';
+import { getBudParty } from '../../stores/active-bud.store';
 
 const LumberingView = () => {
   useGameLoop();
 
   const lumberingSkill = useHunterStore((state) => state.skills.lumbering);
-  const party = useBudStore(getParty);
-  const budActivities = useActivityStore((state) => state.budActivities);
-  const startActivity = useActivityStore((state) => state.startActivity);
+  const party = useActiveBudStore(getBudParty);
+  const budActivities = useActiveBudStore((state) => state.budActivities);
+  const startBudActivity = useActiveBudStore((state) => state.startBudActivity);
+  const stopBudActivity = useActiveBudStore((state) => state.stopBudActivity);
+  const startHunterActivity = useHunterStore((state) => state.startHunterActivity);
 
   return (
     <div className="h-full flex flex-col gap-4">
@@ -29,19 +28,11 @@ const LumberingView = () => {
 
       <div className="grid grid-cols-2 gap-4 flex-grow overflow-auto">
         {lumberingNodes.map((resource) => {
-          const assignedBudId = Object.entries(budActivities).find(
-            ([budId, activity]) => activity.nodeId === resource.id
-          )?.[0];
-
-          const assignedBud = assignedBudId ? party.find(bud => bud.id === assignedBudId) : null;
-          const assignedBudIds = assignedBud ? [assignedBud.id] : [];
-
-          const { startGathering: startHunterGathering } = useHunterGathering(
-            resource.id,
-            resource.isUnlocked
+          // Find any bud assigned to this node
+          const assignedBud = party.find(bud => 
+            budActivities[bud.id]?.nodeId === resource.id
           );
-          const { startGathering: startBudGathering, stopGathering: stopBudGathering } = 
-            useBudGathering(resource.id, resource.isUnlocked);
+          const assignedBudIds = assignedBud ? [assignedBud.id] : [];
 
           return (
             <ResourceCard
@@ -51,20 +42,13 @@ const LumberingView = () => {
               onAssignBud={(budId) => {
                 const bud = party.find((b) => b.id === budId);
                 if (bud) {
-                  const success = startBudGathering(budId);
-                  if (success) {
-                    startActivity('bud', {
-                      type: 'gathering',
-                      nodeId: resource.id,
-                      budId: bud.id
-                    });
-                  }
+                  startBudActivity(budId, 'gathering', resource.id);
                 }
               }}
               onRemoveBud={(budId) => {
-                stopBudGathering(budId);
+                stopBudActivity(budId);
               }}
-              onActivate={() => startHunterGathering()}
+              onActivate={() => startHunterActivity('gathering', resource.id)}
               skillId="lumbering"
             />
           );

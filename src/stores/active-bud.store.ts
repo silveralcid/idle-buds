@@ -1,8 +1,9 @@
 // stores/features/activity.store.ts
 import { create } from 'zustand';
-import { createSelectors } from '../utils/store.utils';
 import { budInstance } from '../types/budInstance.types';
 import { GameConfig } from '../constants/game-config';
+import { createBudInstance } from '../factories/budFactory';
+import { budBase } from '../types/budBase.types';
 
 interface ActiveBudState {
   party: budInstance[];
@@ -11,6 +12,7 @@ interface ActiveBudState {
     nodeId: string;
     budId: string;
     recipeId?: string;
+    experience?: number;
   }>;
   budProgress: Record<string, {
     items: Record<string, number>;
@@ -35,6 +37,8 @@ interface ActiveBudActions {
   resetBudState: () => void;
   saveBudState: () => object;
   loadBudState: (state: any) => void;
+  increaseBudSkillExperience: (budId: string, xp: number) => void;
+  createBud: (species: budBase) => budInstance;
 }
 
 const initialState: ActiveBudState = {
@@ -153,7 +157,28 @@ export const useActiveBudStore = create<ActiveBudState & ActiveBudActions>((set,
       budActivities: savedState.budActivities || {},
       budProgress: savedState.budProgress || {}
     });
+  },
+
+  increaseBudSkillExperience: (budId: string, xp: number) => 
+    set((state) => ({
+      budActivities: {
+        ...state.budActivities,
+        [budId]: {
+          ...state.budActivities[budId],
+          experience: (state.budActivities[budId]?.experience || 0) + xp
+        }
+      }
+    })),
+
+  createBud: (species) => {
+    const newBud = createBudInstance(species);
+    set((state) => ({
+      party: [...state.party, newBud]
+    }));
+    console.log('✅ Created new bud:', { budId: newBud.id, species: species.name });
+    return newBud;
   }
 }));
 
 export const getBudParty = (state: ActiveBudState) => state.party;
+

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ResourceNode } from '../../types/resourceNode.types';
 import { useHunterStore } from '../../stores/hunter.store';
-import { useActivityStore } from '../../stores/active-bud.store';
-import { moveBudToNode, moveBudFromNodeToParty } from '../../utils/bud-management.utils';
-import { useBudStore } from '../../stores/box-bud.store';
-import { getParty } from '../../stores/box-bud.store';
+import { useActiveBudStore } from '../../stores/active-bud.store';
+import { unassignBudFromGathering, assignBudToGathering } from '../../utils/bud-management.utils';
+import { getBudParty } from '../../stores/active-bud.store';
 
 interface ResourceCardProps {
   resource: ResourceNode;
@@ -15,22 +14,37 @@ interface ResourceCardProps {
   onActivate: () => void;
 }
 
-const ResourceCard: React.FC<ResourceCardProps> = ({ resource, skillId, assignedBuds, onAssignBud, onRemoveBud, onActivate }) => {
+const ResourceCard: React.FC<ResourceCardProps> = ({ 
+  resource, 
+  skillId,
+  onAssignBud,
+  onRemoveBud, 
+  onActivate 
+}) => {
   const [isUnlocked, setIsUnlocked] = useState(resource.isUnlocked);
   const skill = useHunterStore((state) => state.skills[skillId]);
-  const party = useBudStore(getParty);
+  const party = useActiveBudStore(getBudParty);
   
-  const hunterActivity = useActivityStore((state) => state.hunterActivity);
-  const getBudActivity = useActivityStore((state) => state.getBudActivity);
-  const startActivity = useActivityStore((state) => state.startActivity);
-  const stopActivity = useActivityStore((state) => state.stopActivity);
-  const progress = useActivityStore((state) => state.getProgress(resource.id));
+  // Hunter activity management
+  const hunterActivity = useHunterStore((state) => state.currentActivity);
+  const startHunterActivity = useHunterStore((state) => state.startHunterActivity);
+  const stopHunterActivity = useHunterStore((state) => state.stopHunterActivity);
+  const hunterProgress = useHunterStore((state) => 
+    state.getHunterActivityProgress(resource.id)
+  );
+
+  // Bud activity management
+  const budActivities = useActiveBudStore((state) => state.budActivities);
+  const startBudActivity = useActiveBudStore((state) => state.startBudActivity);
+  const stopBudActivity = useActiveBudStore((state) => state.stopBudActivity);
+  const budProgress = useActiveBudStore((state) => 
+    state.getBudProgress(resource.id)
+  );
 
   // Find assigned bud by checking activities
-  const assignedBud = party.find(bud => {
-    const activity = getBudActivity(bud.id);
-    return activity?.nodeId === resource.id;
-  });
+  const assignedBud = party.find(bud => 
+    budActivities[bud.id]?.nodeId === resource.id
+  );
 
   useEffect(() => {
     if (skill && skill.level >= resource.levelRequired) {
@@ -39,17 +53,17 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, skillId, assigned
   }, [skill, resource.levelRequired]);
 
   const isHunterActive = hunterActivity?.nodeId === resource.id;
-  const isBudActive = assignedBud && getBudActivity(assignedBud.id)?.nodeId === resource.id;
+  const isBudActive = assignedBud && budActivities[assignedBud.id]?.nodeId === resource.id;
 
   const handleAssignBud = (budId: string) => {
     if (!budId || !isUnlocked) return;
     
     console.log('🎯 Attempting to assign bud:', { budId, nodeId: resource.id });
-    const success = moveBudToNode(budId, resource.id);
+    const success = assignBudToGathering(budId, resource.id);
     
     if (success) {
-      console.log('✅ Successfully assigned bud to gathering');
       onAssignBud(budId);
+      console.log('✅ Successfully assigned bud to gathering');
     } else {
       console.warn('❌ Failed to assign bud to gathering');
     }
@@ -58,22 +72,25 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, skillId, assigned
   const handleUnassignBud = () => {
     if (!assignedBud) return;
     
-    stopActivity('bud', assignedBud.id);
-    moveBudFromNodeToParty(assignedBud.id, resource.id);
+    const success = unassignBudFromGathering(assignedBud.id, resource.id);
+    if (success) {
+      onRemoveBud(assignedBud.id);
+    }
   };
 
   const handleGather = () => {
     if (!isUnlocked) return;
 
     if (isHunterActive) {
-      stopActivity('hunter');
+      stopHunterActivity();
     } else {
-      startActivity('hunter', {
-        type: 'gathering',
-        nodeId: resource.id
-      });
+      startHunterActivity('gathering', resource.id);
+      onActivate();
     }
   };
+
+  // Calculate total progress as max of hunter and bud progress
+  const totalProgress = Math.max(hunterProgress, budProgress);
 
   return (
     <div className={`card shadow-lg ${isUnlocked ? 'opacity-100' : 'opacity-50'} ${(isBudActive || isHunterActive) ? 'bg-success' : 'bg-base-200'}`}>
@@ -84,7 +101,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, skillId, assigned
         <div className="space-y-2">
           <progress 
             className="progress progress-secondary w-full" 
-            value={progress} 
+            value={totalProgress} 
             max={100} 
           />
           <progress
@@ -150,7 +167,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, skillId, assigned
                 >
                   <option value="">Assign Bud</option>
                   {party
-                    .filter(bud => !getBudActivity(bud.id)) // Only show unassigned buds
+                    .filter(bud => !budActivities[bud.id]) // Only show unassigned buds
                     .map((bud) => (
                       <option key={bud.id} value={bud.id}>
                         {bud.name} (Lvl {bud.level})

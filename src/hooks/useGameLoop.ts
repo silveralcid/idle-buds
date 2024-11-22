@@ -1,14 +1,16 @@
 import { useEffect } from 'react';
 import { useGameStore } from '../stores/game.store';
-import { useActivityStore } from '../stores/active-bud.store';
+import { useHunterStore } from '../stores/hunter.store';
+import { useActiveBudStore } from '../stores/active-bud.store';
 import { GameConfig } from '../constants/game-config';
 import { processGathering } from '../utils/gathering.utils';
 
 export const useGameLoop = () => {
   const isPaused = useGameStore((state) => state.isPaused);
-  const updateProgress = useActivityStore((state) => state.updateProgress);
-  const hunterActivity = useActivityStore((state) => state.hunterActivity);
-  const budActivities = useActivityStore((state) => state.budActivities);
+  const updateHunterActivityProgress = useHunterStore((state) => state.updateHunterActivityProgress);
+  const updateBudProgress = useActiveBudStore((state) => state.updateBudProgress);
+  const hunterActivity = useHunterStore((state) => state.currentActivity);
+  const budActivities = useActiveBudStore((state) => state.budActivities);
 
   useEffect(() => {
     let lastTime = performance.now();
@@ -28,8 +30,14 @@ export const useGameLoop = () => {
       while (accumulatedTime >= tickDuration) {
         const tickDeltaTime = tickDuration / 1000; // Convert to seconds
 
-        // Update fractional progress for all active gatherers
-        updateProgress(tickDeltaTime);
+        // Update fractional progress for both hunter and buds
+        if (hunterActivity) {
+          updateHunterActivityProgress(tickDeltaTime);
+        }
+        
+        if (Object.keys(budActivities).length > 0) {
+          updateBudProgress(tickDeltaTime);
+        }
 
         // Process gathering for both hunter and buds if there are active gatherers
         if (hunterActivity || Object.keys(budActivities).length > 0) {
@@ -48,5 +56,11 @@ export const useGameLoop = () => {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [isPaused, updateProgress, hunterActivity, budActivities]);
+  }, [
+    isPaused, 
+    updateHunterActivityProgress, 
+    updateBudProgress, 
+    hunterActivity, 
+    budActivities
+  ]);
 };

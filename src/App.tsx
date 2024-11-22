@@ -12,11 +12,11 @@ function App() {
   const renderView = () => {
     switch (currentView) {
       case 'TestingView':
-        return <TestingView />;
+        // return <TestingView />;
       // case 'SmithingView':
       //   return <SmithingView />;
-      case 'MiningView':
-        return <MiningView />;
+      // case 'MiningView':
+      //   return <MiningView />;
       case 'LumberingView':
       default:
         return <LumberingView />;

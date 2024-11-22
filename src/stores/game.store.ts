@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { saveGameState, loadGameState, resetGameState } from "../utils/save-management.utils";
 import { useBankStore } from "./bank.store";
 import { useHunterStore } from "./hunter.store";
-import { useActivityStore } from "./active-bud.store";
-import { useBudStore } from "./box-bud.store";
+import { useActiveBudStore } from "./active-bud.store";
+import { useBoxBudStore } from "./box-bud.store";
 
 
 interface GameState {
@@ -54,10 +54,9 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
     const resetTime = Date.now();
     
     // Reset all stores in the correct order
-    useActivityStore.getState().resetActivities();
-    useBudStore.getState().resetBuds();
+    useActiveBudStore.getState().resetBudState();
     useBankStore.getState().resetBank();
-    useHunterStore.getState().resetHunter();
+    useHunterStore.getState().resetHunterState();
     
     set({
       lastSaveTime: resetTime,

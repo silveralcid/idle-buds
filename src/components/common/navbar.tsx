@@ -1,30 +1,44 @@
 import { useViewStore } from '../../stores/view.store';
-import { createBudInstance } from '../../factories/budFactory';
 import { budSpecies } from '../../data/buds/budSpecies.data';
 import SaveLoadControls from './SaveLoadControls';
 import { useGameStore } from '../../stores/game.store';
-import { useBudStore } from '../../stores/box-bud.store';
+import { useHunterStore } from '../../stores/hunter.store';
+import { useActiveBudStore } from '../../stores/active-bud.store';
+
 const Navbar = () => {
   const setView = useViewStore((state) => state.setView);
-  const addBudToParty = useBudStore((state) => state.addBudToParty); // Access addBudToParty
   const isPaused = useGameStore((state) => state.isPaused);
   const pauseGame = useGameStore((state) => state.pauseGame);
   const unpauseGame = useGameStore((state) => state.unpauseGame);
+  const hunterActivity = useHunterStore((state) => state.currentActivity);
+  const stopHunterActivity = useHunterStore((state) => state.stopHunterActivity);
+  const budActivities = useActiveBudStore((state) => state.budActivities);
 
   const addRandomBudToParty = () => {
-    const budStore = useBudStore.getState();
+    const activeBudStore = useActiveBudStore.getState();
     const randomSpecies = budSpecies[Math.floor(Math.random() * budSpecies.length)];
     
-    const newBud = budStore.createAndAddBud(randomSpecies);
-    budStore.addBudToParty(newBud.id);
+    const newBud = activeBudStore.createBud(randomSpecies);
+    activeBudStore.addBudToParty(newBud);
   };
 
   const togglePause = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    if (isPaused) {
-      unpauseGame();
-    } else {
+    
+    // Stop all activities when pausing
+    if (!isPaused) {
+      if (hunterActivity) {
+        stopHunterActivity();
+      }
+      
+      // Stop all bud activities
+      Object.keys(budActivities).forEach(budId => {
+        useActiveBudStore.getState().stopBudActivity(budId);
+      });
+      
       pauseGame();
+    } else {
+      unpauseGame();
     }
   };
 

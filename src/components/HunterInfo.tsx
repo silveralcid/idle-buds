@@ -1,16 +1,15 @@
 import React from 'react';
 import { useHunterStore } from '../stores/hunter.store';
-import { useActivityStore } from '../stores/active-bud.store';
+import { useActiveBudStore } from '../stores/active-bud.store';
 import { useBankStore } from '../stores/bank.store';
-import { getParty, useBudStore } from '../stores/box-bud.store';
 
 const HunterInfo = () => {
   const skills = useHunterStore((state) => state.skills);
   const stats = useHunterStore((state) => state.stats);
   const items = useBankStore((state) => state.items);
-  const party = useBudStore(getParty);
-  const hunterActivity = useActivityStore((state) => state.hunterActivity);
-  const budActivities = useActivityStore((state) => state.budActivities);
+  const party = useActiveBudStore((state) => state.party);
+  const hunterActivity = useHunterStore((state) => state.currentActivity);
+  const budActivities = useActiveBudStore((state) => state.budActivities);
 
   return (
     <div className="space-y-4">
@@ -34,6 +33,13 @@ const HunterInfo = () => {
           {party.map((bud) => (
             <div key={bud.id} className="text-center">
               <img src={bud.spriteRef} alt={bud.name} className="w-16 h-16 border" />
+              <div className="text-xs mt-1">
+                <div className="font-semibold">{bud.name}</div>
+                <div>Lvl {bud.level}</div>
+                {budActivities[bud.id] && (
+                  <div className="text-success">Active</div>
+                )}
+              </div>
             </div>
           ))}
         </div>

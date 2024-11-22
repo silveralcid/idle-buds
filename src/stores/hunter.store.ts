@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { Skill } from '../types/skill.types';
 import { calculateExperienceRequirement } from '../utils/experience.utils';
-import { useBudStore, getParty } from './box-bud.store';
 
 interface HunterActivity {
   type: 'gathering' | 'crafting';
@@ -230,5 +229,3 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
     });
   }
 }));
-
-export const useParty = () => useBudStore(getParty);

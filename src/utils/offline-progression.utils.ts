@@ -1,11 +1,9 @@
-import { useActivityStore } from '../stores/active-bud.store';
 import { useGameStore } from '../stores/game.store';
 import { useBankStore } from '../stores/bank.store';
 import { useHunterStore } from '../stores/hunter.store';
-import { useBudStore } from '../stores/box-bud.store';
 import { calculateGathering } from './gathering-core.utils';
 import { allResources } from '../data/allResources.data';
-import { GameConfig } from '../constants/game-config';
+import { useActiveBudStore } from '../stores/active-bud.store';
 
 interface OfflineProgressionResult {
   hunterResources: Record<string, number>;
@@ -15,15 +13,16 @@ interface OfflineProgressionResult {
 }
 
 export const calculateOfflineProgression = (deltaTime: number): OfflineProgressionResult => {
-  const activityStore = useActivityStore.getState();
+  const hunterStore = useHunterStore.getState();
+  const activityStore = useActiveBudStore.getState();
   const hunterResources: Record<string, number> = {};
   const budResources: Record<string, number> = {};
   const hunterExperience: Record<string, number> = {};
   const budExperience: Record<string, number> = {};
 
   // Process hunter activity
-  if (activityStore.hunterActivity) {
-    const resource = allResources.find(r => r.id === activityStore.hunterActivity?.nodeId);
+  if (hunterStore.currentActivity) {
+    const resource = allResources.find(r => r.id === hunterStore.currentActivity?.nodeId);
     if (resource) {
       const gatherResult = calculateGathering(
         resource,
@@ -88,13 +87,13 @@ export const handleOfflineProgression = (
   // Update Hunter XP
   const hunterStore = useHunterStore.getState();
   Object.entries(progressionData.hunterExperience).forEach(([skillId, xp]) => {
-    hunterStore.increaseSkillExperience(skillId, xp);
+    hunterStore.increaseHunterSkillExperience(skillId, xp);
   });
 
   // Update Bud XP
-  const budStore = useBudStore.getState();
+  const activeBudStore = useActiveBudStore.getState();
   Object.entries(progressionData.budExperience).forEach(([budId, xp]) => {
-    budStore.gainExperience(budId, xp);
+    activeBudStore.increaseBudSkillExperience(budId, xp);
   });
 
   setProgressionData(progressionData);
