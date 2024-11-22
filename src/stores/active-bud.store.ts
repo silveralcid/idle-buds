@@ -7,6 +7,7 @@ import { budBase } from '../types/budBase.types';
 
 interface ActiveBudState {
   party: budInstance[];
+  activeBuds: budInstance[];
   budActivities: Record<string, {
     type: 'gathering' | 'crafting';
     nodeId: string;
@@ -43,6 +44,7 @@ interface ActiveBudActions {
 
 const initialState: ActiveBudState = {
   party: [],
+  activeBuds: [],
   budActivities: {},
   budProgress: {}
 };
@@ -77,7 +79,10 @@ export const useActiveBudStore = create<ActiveBudState & ActiveBudActions>((set,
   },
 
   getBudFromParty: (budId) => {
-    return get().party.find(b => b.id === budId) || null;
+    const state = get();
+    return state.party.find(b => b.id === budId) || 
+           state.activeBuds.find(b => b.id === budId) || 
+           null;
   },
 
   // Activity Management
@@ -88,7 +93,15 @@ export const useActiveBudStore = create<ActiveBudState & ActiveBudActions>((set,
       return false;
     }
 
+    const bud = state.party.find(b => b.id === budId);
+    if (!bud) {
+      console.warn('❌ Bud not found in party', { budId });
+      return false;
+    }
+
     set((state) => ({
+      party: state.party.filter(b => b.id !== budId),
+      activeBuds: [...state.activeBuds, bud],
       budActivities: {
         ...state.budActivities,
         [budId]: { type, nodeId, budId }
@@ -99,11 +112,20 @@ export const useActiveBudStore = create<ActiveBudState & ActiveBudActions>((set,
   },
 
   stopBudActivity: (budId) => {
-    set((state) => {
-      const { [budId]: _, ...remainingActivities } = state.budActivities;
-      return { budActivities: remainingActivities };
-    });
-    console.log('✅ Stopped bud activity:', { budId });
+    const state = get();
+    const bud = state.activeBuds.find(b => b.id === budId);
+    
+    if (bud) {
+      set((state) => {
+        const { [budId]: _, ...remainingActivities } = state.budActivities;
+        return {
+          budActivities: remainingActivities,
+          activeBuds: state.activeBuds.filter(b => b.id !== budId),
+          party: [...state.party, bud]
+        };
+      });
+      console.log('✅ Stopped bud activity and returned to party:', { budId });
+    }
   },
 
   getBudActivity: (budId) => {

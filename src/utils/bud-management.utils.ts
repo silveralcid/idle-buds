@@ -17,7 +17,6 @@ export const moveBudFromPartyToNode = (budId: string, nodeId: string): boolean =
     return false;
   }
 
-  console.log('✅ Moving bud from party to node:', { budId, nodeId });
   return true;
 };
 
@@ -85,12 +84,21 @@ export const moveBudFromPartyToBox = (budId: string): boolean => {
 
 export const assignBudToGathering = (budId: string, nodeId: string): boolean => {
   const activeBudStore = useActiveBudStore.getState();
+  const bud = activeBudStore.getBudFromParty(budId);
   
-  // First move the bud to the node
-  const moveSuccess = moveBudFromPartyToNode(budId, nodeId);
-  if (!moveSuccess) return false;
+  if (!bud) {
+    console.warn('❌ Bud not found in party:', { budId });
+    return false;
+  }
+
+  // Check if bud is already assigned to an activity
+  const currentActivity = activeBudStore.getBudActivity(budId);
+  if (currentActivity) {
+    console.warn('❌ Bud is already assigned to an activity:', { budId, activity: currentActivity });
+    return false;
+  }
   
-  // Then start the gathering activity
+  // Start the gathering activity directly - this will handle moving the bud from party to active
   const success = activeBudStore.startBudActivity(budId, 'gathering', nodeId);
   if (success) {
     console.log('✅ Assigned bud to gathering:', { budId, nodeId });
