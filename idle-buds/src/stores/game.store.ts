@@ -28,6 +28,19 @@ export const useGameStore = create<GameState>((set, get) => ({
     isInitialLoad: false 
   })),
   startGathering: (activityId, isBud) => set((state) => {
+    // If activityId is empty, we're stopping
+    if (!activityId) {
+      return {
+        ...state,
+        currentActivity: null,
+        currentRecipeId: null,
+        fractionalItems: {
+          ...state.fractionalItems,
+          [state.currentActivity || '']: 0
+        }
+      };
+    }
+
     const recipe = state.currentRecipeId ? 
       [...smeltedRecipes, ...meleeRecipes].find(r => r.id === state.currentRecipeId) : 
       null;
@@ -69,6 +82,42 @@ export const useGameStore = create<GameState>((set, get) => ({
   })),
   updateResources: (deltaTime: number) => set((state) => {
     let newState = { ...state };
+    
+    // Handle crafting if there's a current recipe
+    if (state.currentRecipeId && state.currentActivity) {
+      const recipe = [...smeltedRecipes, ...meleeRecipes].find(r => r.id === state.currentRecipeId);
+      if (recipe) {
+        const result = processCrafting(
+          recipe, 
+          deltaTime, 
+          state.fractionalItems[state.currentActivity] || 0
+        );
+        
+        if (!result.success) {
+          // Stop crafting if we can't craft anymore
+          newState.currentActivity = null;
+          newState.currentRecipeId = null;
+          newState.fractionalItems = {
+            ...newState.fractionalItems,
+            [state.currentActivity]: 0
+          };
+        } else {
+          newState.fractionalItems = {
+            ...newState.fractionalItems,
+            [state.currentActivity]: result.fractionalProgress
+          };
+          
+          // If craft was completed, update the recipe state
+          if (result.completed) {
+            console.log('Craft completed!');
+          }
+        }
+        
+        // Return early since we handled the crafting
+        return newState;
+      }
+    }
+    
     // Update Hunter Resources
     newState = updateHunterResources(newState, deltaTime);
     // Update Bud Resources
