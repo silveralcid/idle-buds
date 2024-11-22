@@ -172,9 +172,6 @@ export const useActiveBudStore = create<ActiveBudState & ActiveBudActions>((set,
 
   createBud: (species) => {
     const newBud = createBudInstance(species);
-    set((state) => ({
-      party: [...state.party, newBud]
-    }));
     console.log('✅ Created new bud:', { budId: newBud.id, species: species.name });
     return newBud;
   }

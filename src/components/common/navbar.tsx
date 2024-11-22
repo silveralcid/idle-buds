@@ -18,8 +18,14 @@ const Navbar = () => {
     const activeBudStore = useActiveBudStore.getState();
     const randomSpecies = budSpecies[Math.floor(Math.random() * budSpecies.length)];
     
+    // Create the bud first
     const newBud = activeBudStore.createBud(randomSpecies);
-    activeBudStore.addBudToParty(newBud);
+    
+    // Check if adding to party was successful
+    const success = activeBudStore.addBudToParty(newBud);
+    if (!success) {
+      console.warn('❌ Failed to add bud to party - party might be full');
+    }
   };
 
   const togglePause = (event: React.MouseEvent<HTMLButtonElement>) => {
