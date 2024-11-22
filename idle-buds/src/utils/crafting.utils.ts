@@ -17,7 +17,7 @@ export const processCrafting = (recipe: Recipe, deltaTime: number, fractionalPro
   // Calculate progress based on time
   const ticks = deltaTime / GameConfig.tickDuration;
   const { wholeAmount: completedCrafts, newFraction } = calculateResourceGain(
-    1 / recipe.craftingTime,
+    (1 / recipe.craftingTime) * GameConfig.craftingRateModifier,
     ticks,
     fractionalProgress
   );
