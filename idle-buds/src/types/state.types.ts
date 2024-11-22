@@ -16,8 +16,8 @@ export interface HunterState {
   
 export interface GameState {
     // Resources
-      resources: Record<string, number>;
-      fractionalResources: Record<string, number>;
+      items: Record<string, number>;
+      fractionalItems: Record<string, number>;
       fractionalXP: Record<string, number>;
   
     // Activities

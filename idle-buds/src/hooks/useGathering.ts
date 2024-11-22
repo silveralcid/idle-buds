@@ -1,19 +1,19 @@
 import { useGameStore } from '../stores/game.store';
 
-export const useGathering = (resourceId: string, isUnlocked: boolean) => {
+export const useGathering = (nodeId: string, isUnlocked: boolean) => {
   const budActivity = useGameStore((state) => state.budActivity);
   const currentActivity = useGameStore((state) => state.currentActivity);
 
   const startGathering = (isBud: boolean) => {
     if (isUnlocked) {
-      useGameStore.getState().startGathering(resourceId, isBud);
+      useGameStore.getState().startGathering(nodeId, isBud);
     }
   };
 
   const stopGathering = (isBud: boolean) => {
-    if (isBud && budActivity === resourceId) {
+    if (isBud && budActivity === nodeId) {
       useGameStore.getState().stopBudGathering();
-    } else if (!isBud && currentActivity === resourceId) {
+    } else if (!isBud && currentActivity === nodeId) {
       useGameStore.getState().stopHunterGathering();
     }
   };

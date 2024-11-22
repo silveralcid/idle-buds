@@ -1,6 +1,6 @@
 import { useBudBoxStore } from '../stores/budBox.store';
 import { useHunterStore } from '../stores/hunter.store';
-import { useResourceAssignmentStore } from '../stores/nodeAssignment.store';
+import { useNodeAssignmentStore } from '../stores/nodeAssignment.store';
 
 export const moveBudToParty = (budId: string) => {
   const { buds, removeBud } = useBudBoxStore.getState();
@@ -24,25 +24,25 @@ export const moveBudToBudBox = (budId: string) => {
   }
 };
 
-export const moveBudToResource = (budId: string, resourceId: string) => {
+export const moveBudToNode = (budId: string, nodeId: string) => {
   const { party, removeBudFromParty } = useHunterStore.getState();
-  const { assignBudToResource } = useResourceAssignmentStore.getState();
+  const { assignBudToNode } = useNodeAssignmentStore.getState();
 
   const bud = party.find((b: any) => b.id === budId);
   if (bud) {
     removeBudFromParty(budId);
-    assignBudToResource(resourceId, bud);
+    assignBudToNode(nodeId, bud);
   }
 };
 
-export const moveBudFromResourceToParty = (budId: string, resourceId: string) => {
-  const { assignments, removeBudFromResource } = useResourceAssignmentStore.getState();
+export const moveBudFromNodeToParty = (budId: string, nodeId: string) => {
+  const { assignments, removeBudFromNode } = useNodeAssignmentStore.getState();
   const { addBudToParty } = useHunterStore.getState();
 
-  const bud = assignments[resourceId];
+  const bud = assignments[nodeId];
   if (bud && bud.id === budId) {
-    console.log(`Moving Bud from resource to party: ${bud.id}`);
-    removeBudFromResource(resourceId);
+    console.log(`Moving Bud from node to party: ${bud.id}`);
+    removeBudFromNode(nodeId);
     addBudToParty(bud);
   } else {
     console.warn(`Bud not found in resource: ${budId}`);
@@ -50,13 +50,13 @@ export const moveBudFromResourceToParty = (budId: string, resourceId: string) =>
 };
 
 export const increaseBudExperience = (budId: string, amount: number) => {
-  const { assignments } = useResourceAssignmentStore.getState();
+  const { assignments } = useNodeAssignmentStore.getState();
   const bud = assignments[Object.keys(assignments).find(key => assignments[key]?.id === budId) as string];
   if (!bud) return;
 
   const newExperience = bud.experience + amount;
   if (newExperience >= bud.experienceToNextLevel) {
-    useResourceAssignmentStore.setState((state) => ({
+    useNodeAssignmentStore.setState((state) => ({
       assignments: {
         ...state.assignments,
         [Object.keys(assignments).find(key => assignments[key]?.id === budId) as string]: {
@@ -68,7 +68,7 @@ export const increaseBudExperience = (budId: string, amount: number) => {
       },
     }));
   } else {
-    useResourceAssignmentStore.setState((state) => ({
+    useNodeAssignmentStore.setState((state) => ({
       assignments: {
         ...state.assignments,
         [Object.keys(assignments).find(key => assignments[key]?.id === budId) as string]: {

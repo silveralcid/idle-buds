@@ -12,7 +12,7 @@ export const updateHunterResources = (state: GameState, deltaTime: number) => {
     const resource = allResources.find(r => r.id === state.currentActivity);
     if (resource) {
       const ticks = deltaTime / GameConfig.tickDuration;
-      const { wholeAmount, newFraction } = calculateResourceGain(resource.gatherRate, ticks, state.fractionalResources[resource.id] || 0);
+      const { wholeAmount, newFraction } = calculateResourceGain(resource.gatherRate, ticks, state.fractionalItems[resource.id] || 0);
       const skillId = defaultSkillMapping[resource.type];
       const { wholeXP, newXPFraction } = calculateExperienceGain(resource.experienceGain, ticks, state.fractionalXP[skillId] || 0);
 
@@ -21,8 +21,8 @@ export const updateHunterResources = (state: GameState, deltaTime: number) => {
 
       return {
         ...state,
-        fractionalResources: {
-          ...state.fractionalResources,
+        fractionalItems: {
+          ...state.fractionalItems,
           [resource.id]: newFraction,
         },
         fractionalXP: {
@@ -44,16 +44,19 @@ export const updateBudResources = (state: GameState, deltaTime: number) => {
 
       if (assignedBud) {
         const ticks = deltaTime / GameConfig.tickDuration;
-        const { wholeAmount, newFraction } = calculateResourceGain(resource.gatherRate, ticks, state.fractionalResources[resource.id] || 0);
+        const { wholeAmount, newFraction } = calculateResourceGain(resource.gatherRate, ticks, state.fractionalItems[resource.id] || 0);
         const { wholeXP, newXPFraction } = calculateExperienceGain(resource.experienceGain, ticks, state.fractionalXP[assignedBud.id] || 0);
 
-        useBankStore.getState().addItem(resource.id, wholeAmount);
+        resource.resourceNodeYields.forEach(itemId => {
+          useBankStore.getState().addItem(itemId, wholeAmount);
+        });
+
         useHunterStore.getState().increaseBudExperience(assignedBud.id, wholeXP);
 
         return {
           ...state,
-          fractionalResources: {
-            ...state.fractionalResources,
+          fractionalItems: {
+            ...state.fractionalItems,
             [resource.id]: newFraction,
           },
           fractionalXP: {

@@ -1,15 +1,18 @@
 import React from 'react';
 import ResourceCard from '../../components/game/ResourceCard';
-import { woodResources } from '../../data/nodes/lumbering.data';
 import { useGameStore } from '../../stores/game.store';
 import { useHunterStore } from '../../stores/hunter.store';
-import { useGameLoop } from '../../hooks/useGameLoop'; // Import the hook
+import { useGameLoop } from '../../hooks/useGameLoop';
+import { useNodeAssignmentStore } from '../../stores/nodeAssignment.store';
+import { allResources } from '../../data/allResources.data';
 
 const LumberingView = () => {
-  useGameLoop(); // Call the hook to start the game loop
+  useGameLoop();
 
   const startGathering = useGameStore((state) => state.startGathering);
   const lumberingSkill = useHunterStore((state) => state.skills.lumbering);
+  const { assignments = {}, assignBudToNode, removeBudFromNode } = useNodeAssignmentStore() || {};
+  const party = useHunterStore((state) => state.party);
 
   const handleActivate = (resourceId: string) => {
     const currentActivity = useGameStore.getState().currentActivity;
@@ -31,14 +34,26 @@ const LumberingView = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-4 flex-grow overflow-auto">
-        {woodResources.map((resource) => (
-          <ResourceCard
-            key={resource.id}
-            resource={resource}
-            onActivate={handleActivate}
-            skillId="lumbering"
-          />
-        ))}
+        {allResources.map((resource) => {
+          const assignedBud = assignments[resource.id];
+          const assignedBudIds = assignedBud ? [assignedBud.id] : [];
+          return (
+            <ResourceCard
+              key={resource.id}
+              resource={resource}
+              assignedBuds={assignedBudIds}
+              onAssignBud={(budId) => {
+                const bud = party.find((b) => b.id === budId);
+                if (bud) {
+                  assignBudToNode(resource.id, bud);
+                }
+              }}
+              onRemoveBud={(budId) => removeBudFromNode(budId)}
+              onActivate={handleActivate}
+              skillId="lumbering"
+            />
+          );
+        })}
       </div>
     </div>
   );

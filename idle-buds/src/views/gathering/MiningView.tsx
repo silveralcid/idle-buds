@@ -12,6 +12,7 @@ const MiningView = () => {
   const startGathering = useGameStore((state) => state.startGathering);
   const miningSkill = useHunterStore((state) => state.skills.mining);
   const { assignments, assignBudToNode, removeBudFromNode } = useNodeAssignmentStore();
+  const party = useHunterStore((state) => state.party);
 
   const handleActivate = (resourceId: string) => {
     const currentActivity = useGameStore.getState().currentActivity;
@@ -33,17 +34,26 @@ const MiningView = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-4 flex-grow overflow-auto">
-        {allResources.map((resource) => (
-          <ResourceCard
-            key={resource.id}
-            resource={resource}
-            assignedBuds={assignments[resource.id] || []}
-            onAssignBud={(bud) => assignBudToNode(resource.id, bud)}
-            onRemoveBud={(budId) => removeBudFromNode(resource.id, budId)}
-            onActivate={handleActivate}
-            skillId="mining"
-          />
-        ))}
+        {allResources.map((resource) => {
+          const assignedBud = assignments[resource.id];
+          const assignedBudIds = assignedBud ? [assignedBud.id] : [];
+          return (
+            <ResourceCard
+              key={resource.id}
+              resource={resource}
+              assignedBuds={assignedBudIds}
+              onAssignBud={(budId) => {
+                const bud = party.find((b) => b.id === budId);
+                if (bud) {
+                  assignBudToNode(resource.id, bud);
+                }
+              }}
+              onRemoveBud={(budId) => removeBudFromNode(budId)}
+              onActivate={handleActivate}
+              skillId="mining"
+            />
+          );
+        })}
       </div>
     </div>
   );

@@ -7,11 +7,14 @@ import { useGameStore } from '../../stores/game.store';
 
 interface ResourceCardProps {
   resource: ResourceNode;
+  assignedBuds: string[] ;
+  onAssignBud: (budId: string) => void;
+  onRemoveBud: (budId: string) => void;
   onActivate: (resourceId: string) => void;
   skillId: string;
 }
 
-const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skillId }) => {
+const ResourceCard: React.FC<ResourceCardProps> = ({ resource, assignedBuds, onAssignBud, onRemoveBud, onActivate, skillId }) => {
   const [isUnlocked, setIsUnlocked] = useState(resource.isUnlocked);
   const skill = useHunterStore((state) => state.skills[skillId]);
   const { assignedBud, removeBud, handleAssignBud } = useBudAssignment(resource.id);
@@ -95,7 +98,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, onActivate, skill
                     <div>XP: {assignedBud.experience}/{assignedBud.experienceToNextLevel}</div>
                   </div>
                   <button
-                    onClick={removeBud}
+                    onClick={() => onRemoveBud(assignedBud.id)}
                     className="text-red-500 hover:text-red-700"
                   >
                     &times;

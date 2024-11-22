@@ -41,7 +41,7 @@ const OfflineProgressionModal: React.FC<OfflineProgressionModalProps> = ({ isVis
         <div className="py-2">
           <h4 className="font-bold">Hunter Resources Gained:</h4>
           <ul>
-            {Object.entries(progressionData.hunterResources).map(([resource, amount]) => (
+            {Object.entries(progressionData.hunterResources || {}).map(([resource, amount]) => (
               <li key={resource}>{resource}: {amount}</li>
             ))}
           </ul>

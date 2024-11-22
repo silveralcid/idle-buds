@@ -1,20 +1,20 @@
-import { useResourceAssignmentStore } from '../stores/nodeAssignment.store';
-import { moveBudToResource, moveBudFromResourceToParty } from '../utils/budManagement.utils';
+import { useNodeAssignmentStore } from '../stores/nodeAssignment.store';
+import { moveBudToNode, moveBudFromNodeToParty } from '../utils/budManagement.utils';
 
-export const useBudAssignment = (resourceId: string) => {
-  const { assignments } = useResourceAssignmentStore();
-  const assignedBud = assignments[resourceId] || null;
+export const useBudAssignment = (nodeId: string) => {
+  const { assignments = {} } = useNodeAssignmentStore() || {};
+  const assignedBud = assignments[nodeId] || null;
 
   const assignBud = (budId: string) => {
     if (budId) {
-      moveBudToResource(budId, resourceId);
+      moveBudToNode(budId, nodeId);
     }
   };
 
   const removeBud = () => {
     if (assignedBud) {
       console.log(`Removing Bud from resource: ${assignedBud.id}`);
-      moveBudFromResourceToParty(assignedBud.id, resourceId);
+      moveBudFromNodeToParty(assignedBud.id, nodeId);
     }
   };
 

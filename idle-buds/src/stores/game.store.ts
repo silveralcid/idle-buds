@@ -8,8 +8,8 @@ import { useNodeAssignmentStore } from "./nodeAssignment.store";
 
 // Use the functions inside the store
 export const useGameStore = create<GameState>((set, get) => ({
-  resources: {},
-  fractionalResources: {},
+  items: {},
+  fractionalItems: {},
   fractionalXP: {},
   isGathering: false,
   currentActivity: null,
@@ -70,8 +70,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     resetGameState();
     const resetTime = Date.now();
     set({
-      resources: {},
-      fractionalResources: {},
+      items: {},
+      fractionalItems: {},
       fractionalXP: {},
       isGathering: false,
       currentActivity: null,
