@@ -6,6 +6,7 @@ export interface BaseItem {
     variantId?: string; // Optional identifier for item variants (e.g., "iron_sword+1")
     name: string; // Display name of the item
     type: ItemType; // Core category of the item (see below)
+    tier?: number; // Tier of the item
   
     // General Properties
     description?: string; // Optional description for lore or context

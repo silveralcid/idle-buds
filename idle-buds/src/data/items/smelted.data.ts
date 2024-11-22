@@ -1,6 +1,6 @@
 import { BaseItem } from "../../types/itemBase.types";
 
-export const refinedBars: BaseItem[] = [
+export const smeltedItems: BaseItem[] = [
   {
     id: 'copper_bar',
     name: 'Copper Bar',
