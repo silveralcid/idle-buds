@@ -4,7 +4,7 @@ import { useGameStore } from '../../stores/game.store';
 import { useHunterStore } from '../../stores/hunter.store';
 import { useGameLoop } from '../../hooks/useGameLoop';
 import { useNodeAssignmentStore } from '../../stores/nodeAssignment.store';
-import { allResources } from '../../data/allResources.data';
+import { lumberingNodes } from '../../data/nodes/lumbering.data';
 
 const LumberingView = () => {
   useGameLoop();
@@ -34,7 +34,7 @@ const LumberingView = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-4 flex-grow overflow-auto">
-        {allResources.map((resource) => {
+        {lumberingNodes.map((resource) => {
           const assignedBud = assignments[resource.id];
           const assignedBudIds = assignedBud ? [assignedBud.id] : [];
           return (
