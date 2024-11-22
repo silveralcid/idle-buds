@@ -1,7 +1,7 @@
 import Navbar from './components/common/navbar';
 import GameContainer from './views/GameContainer';
 import LumberingView from './views/gathering/LumberingView';
-import TestingView from './views/TestingView';
+// import TestingView from './views/TestingView';
 import { useViewStore } from './stores/view.store';
 import MiningView from './views/gathering/MiningView';
 
@@ -10,8 +10,8 @@ function App() {
 
   const renderView = () => {
     switch (currentView) {
-      case 'TestingView':
-        return <TestingView />;
+      // case 'TestingView':
+      //   return <TestingView />;
       case 'MiningView':
         return <MiningView />;
       case 'LumberingView':
