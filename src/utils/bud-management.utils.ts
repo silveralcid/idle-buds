@@ -33,18 +33,31 @@ export const moveBudToNode = (budId: string, nodeId: string): boolean => {
   const budStore = useBudStore.getState();
   const activityStore = useActivityStore.getState();
   
-  // First try to assign the bud
+  // Check if bud exists in party
+  const bud = budStore.buds.party.find(b => b.id === budId);
+  if (!bud) {
+    console.warn('❌ Bud not found in party:', { budId });
+    return false;
+  }
+
+  // Check for existing activity
+  const currentActivity = activityStore.getBudActivity(budId);
+  if (currentActivity) {
+    console.warn('❌ Bud is already in an activity:', { budId, activity: currentActivity });
+    return false;
+  }
+
+  // Assign bud to node
   const success = budStore.assignBudToNode(budId, nodeId);
   if (!success) return false;
 
-  // Then start the activity
+  // Start activity
   activityStore.startActivity('bud', {
     type: 'gathering',
     nodeId,
     budId
   });
   
-  console.log('✅ Bud moved to node successfully');
   return true;
 };
 

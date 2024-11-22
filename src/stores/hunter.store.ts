@@ -1,13 +1,11 @@
 import { create } from 'zustand';
 import { Skill } from '../types/skill.types';
 import { calculateExperienceRequirement } from '../utils/experience.utils';
-import { budInstance } from '../types/budInstance.types';
-import { GameConfig } from '../constants/game-config';
+import { useBudStore, getParty } from './bud.store';
 
 
 interface HunterState {
   skills: Record<string, Skill>;
-  party: budInstance[];
   stats: {
     health: number;
     wisdom: number;
@@ -23,11 +21,6 @@ interface HunterActions {
   increaseSkillExperience: (skillId: string, amount: number) => void;
   setSkillLevel: (skillId: string, level: number) => void;
   setSkillExperience: (skillId: string, experience: number) => void;
-  
-  // Party Management
-  addBudToParty: (bud: budInstance) => boolean;
-  removeBudFromParty: (budId: string) => void;
-  getPartyBuds: () => budInstance[];
   
   // Stats Management
   increaseStats: (stat: keyof HunterState['stats'], amount: number) => void;
@@ -75,7 +68,6 @@ const initialStats = {
 
 export const useHunterStore = create<HunterState & HunterActions>((set, get) => ({
   skills: { ...initialSkills },
-  party: [],
   stats: { ...initialStats },
   
   increaseSkillExperience: (skillId, amount) => set((state) => {
@@ -129,36 +121,6 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
     },
   })),
   
-  // Party Management
-  addBudToParty: (bud) => {
-    const state = get();
-    if (state.party.length >= GameConfig.BUD.STORAGE.PARTY_CAPACITY) {
-      console.warn('❌ Party is full');
-      return false;
-    }
-
-    if (state.party.some(b => b.id === bud.id)) {
-      console.warn('❌ Bud already in party', { budId: bud.id });
-      return false;
-    }
-
-    set((state) => ({
-      party: [...state.party, bud]
-    }));
-    
-    console.log('✅ Added bud to party', { budId: bud.id });
-    return true;
-  },
-  
-  removeBudFromParty: (budId) => {
-    set((state) => ({
-      party: state.party.filter(b => b.id !== budId)
-    }));
-    console.log('✅ Removed bud from party', { budId });
-  },
-  
-  getPartyBuds: () => get().party,
-  
   // Stats Management
   increaseStats: (stat, amount) => set((state) => ({
     stats: {
@@ -189,7 +151,6 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
   
   resetHunter: () => set({
     skills: { ...initialSkills },
-    party: [],
     stats: { ...initialStats },
   }),
   
@@ -197,7 +158,6 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
     const state = get();
     return {
       skills: state.skills,
-      party: state.party,
       stats: state.stats,
     };
   },
@@ -206,8 +166,9 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
     if (!savedState) return;
     set({
       skills: savedState.skills || initialSkills,
-      party: savedState.party || [],
       stats: savedState.stats || initialStats,
     });
   },
 }));
+
+export const useParty = () => useBudStore(getParty);

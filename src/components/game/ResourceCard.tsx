@@ -3,6 +3,8 @@ import { ResourceNode } from '../../types/resourceNode.types';
 import { useHunterStore } from '../../stores/hunter.store';
 import { useActivityStore } from '../../stores/activity.store';
 import { moveBudToNode, moveBudFromNodeToParty } from '../../utils/bud-management.utils';
+import { useBudStore } from '../../stores/bud.store';
+import { getParty } from '../../stores/bud.store';
 
 interface ResourceCardProps {
   resource: ResourceNode;
@@ -16,7 +18,7 @@ interface ResourceCardProps {
 const ResourceCard: React.FC<ResourceCardProps> = ({ resource, skillId, assignedBuds, onAssignBud, onRemoveBud, onActivate }) => {
   const [isUnlocked, setIsUnlocked] = useState(resource.isUnlocked);
   const skill = useHunterStore((state) => state.skills[skillId]);
-  const party = useHunterStore((state) => state.party);
+  const party = useBudStore(getParty);
   
   const hunterActivity = useActivityStore((state) => state.hunterActivity);
   const getBudActivity = useActivityStore((state) => state.getBudActivity);
@@ -40,15 +42,16 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, skillId, assigned
   const isBudActive = assignedBud && getBudActivity(assignedBud.id)?.nodeId === resource.id;
 
   const handleAssignBud = (budId: string) => {
-    if (!budId) return;
+    if (!budId || !isUnlocked) return;
     
+    console.log('🎯 Attempting to assign bud:', { budId, nodeId: resource.id });
     const success = moveBudToNode(budId, resource.id);
+    
     if (success) {
-      startActivity('bud', {
-        type: 'gathering',
-        nodeId: resource.id,
-        budId
-      });
+      console.log('✅ Successfully assigned bud to gathering');
+      onAssignBud(budId);
+    } else {
+      console.warn('❌ Failed to assign bud to gathering');
     }
   };
 

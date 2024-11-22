@@ -2,12 +2,13 @@ import React from 'react';
 import { useHunterStore } from '../stores/hunter.store';
 import { useActivityStore } from '../stores/activity.store';
 import { useBankStore } from '../stores/bank.store';
+import { getParty, useBudStore } from '../stores/bud.store';
 
 const HunterInfo = () => {
   const skills = useHunterStore((state) => state.skills);
   const stats = useHunterStore((state) => state.stats);
   const items = useBankStore((state) => state.items);
-  const party = useHunterStore((state) => state.party);
+  const party = useBudStore(getParty);
   const hunterActivity = useActivityStore((state) => state.hunterActivity);
   const budActivities = useActivityStore((state) => state.budActivities);
 

@@ -1,21 +1,22 @@
 import { useViewStore } from '../../stores/view.store';
 import { createBudInstance } from '../../factories/budFactory';
 import { budSpecies } from '../../data/buds/budSpecies.data';
-import { useHunterStore } from '../../stores/hunter.store'; // Import the hunter store
 import SaveLoadControls from './SaveLoadControls';
 import { useGameStore } from '../../stores/game.store';
-
+import { useBudStore } from '../../stores/bud.store';
 const Navbar = () => {
   const setView = useViewStore((state) => state.setView);
-  const addBudToParty = useHunterStore((state) => state.addBudToParty); // Access addBudToParty
+  const addBudToParty = useBudStore((state) => state.addBudToParty); // Access addBudToParty
   const isPaused = useGameStore((state) => state.isPaused);
   const pauseGame = useGameStore((state) => state.pauseGame);
   const unpauseGame = useGameStore((state) => state.unpauseGame);
 
   const addRandomBudToParty = () => {
+    const budStore = useBudStore.getState();
     const randomSpecies = budSpecies[Math.floor(Math.random() * budSpecies.length)];
-    const newBud = createBudInstance(randomSpecies);
-    addBudToParty(newBud);
+    
+    const newBud = budStore.createAndAddBud(randomSpecies);
+    budStore.addBudToParty(newBud.id);
   };
 
   const togglePause = (event: React.MouseEvent<HTMLButtonElement>) => {

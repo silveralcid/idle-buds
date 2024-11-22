@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { budInstance } from '../types/budInstance.types';
 import { GameConfig } from '../constants/game-config';
 import { calculateExperienceRequirement } from '../utils/experience.utils';
-import { useHunterStore } from './hunter.store';
+import { budBase } from '../types/budBase.types';
+import { createBudInstance } from '../factories/budFactory';
 
 interface BudState {
   buds: {
@@ -34,6 +35,9 @@ interface BudActions {
   // Activity Management
   assignBudToNode: (budId: string, nodeId: string) => boolean;
   unassignBud: (budId: string) => boolean;
+  
+  // Add this new action
+  createAndAddBud: (base: budBase) => budInstance;
 }
 
 export const useBudStore = create<BudState & BudActions>((set, get) => ({
@@ -68,12 +72,6 @@ export const useBudStore = create<BudState & BudActions>((set, get) => ({
       return false;
     }
 
-    const success = useHunterStore.getState().addBudToParty(bud);
-    if (!success) {
-      console.warn('❌ Failed to add bud to hunter party');
-      return false;
-    }
-
     set((state) => ({
       buds: {
         ...state.buds,
@@ -94,9 +92,6 @@ export const useBudStore = create<BudState & BudActions>((set, get) => ({
       console.warn('❌ Bud not found in party:', { budId });
       return;
     }
-
-    // First remove from hunter's party
-    useHunterStore.getState().removeBudFromParty(budId);
 
     set((state) => ({
       buds: {
@@ -194,6 +189,12 @@ export const useBudStore = create<BudState & BudActions>((set, get) => ({
       return false;
     }
 
+    // Check if bud is already assigned
+    if (state.buds.activities[budId]) {
+      console.warn('❌ Bud is already assigned to an activity', { budId });
+      return false;
+    }
+
     set((state) => ({
       buds: {
         ...state.buds,
@@ -229,5 +230,22 @@ export const useBudStore = create<BudState & BudActions>((set, get) => ({
     
     console.log('✅ Unassigned bud from node:', { budId });
     return true;
+  },
+
+  // Add this new action
+  createAndAddBud: (base) => {
+    const bud = createBudInstance(base);
+    
+    set((state) => ({
+      buds: {
+        ...state.buds,
+        box: [...state.buds.box, bud]
+      }
+    }));
+    
+    console.log('✅ Created and added bud to box:', { budId: bud.id });
+    return bud;
   }
 }));
+
+export const getParty = (state: BudState) => state.buds.party;

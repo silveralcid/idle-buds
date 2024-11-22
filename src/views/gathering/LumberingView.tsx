@@ -5,12 +5,14 @@ import { useActivityStore } from '../../stores/activity.store';
 import { lumberingNodes } from '../../data/nodes/lumbering.data';
 import { useHunterGathering } from '../../hooks/useHunterGathering';
 import { useBudGathering } from '../../hooks/useBudGathering';
+import { useBudStore } from '../../stores/bud.store';
+import { getParty } from '../../stores/bud.store';
 
 const LumberingView = () => {
   useGameLoop();
 
   const lumberingSkill = useHunterStore((state) => state.skills.lumbering);
-  const party = useHunterStore((state) => state.party);
+  const party = useBudStore(getParty);
   const budActivities = useActivityStore((state) => state.budActivities);
 
   return (
