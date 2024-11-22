@@ -1,10 +1,13 @@
 import { create } from 'zustand';
 import { Skill } from '../types/skill.types';
 import { calculateExperienceRequirement } from '../utils/experience.utils';
+import { budInstance } from '../types/budInstance.types';
+import { GameConfig } from '../constants/game-config';
+
 
 interface HunterState {
   skills: Record<string, Skill>;
-  party: any[]; // TODO: Replace with proper BudInstance type
+  party: budInstance[];
   stats: {
     health: number;
     wisdom: number;
@@ -22,8 +25,9 @@ interface HunterActions {
   setSkillExperience: (skillId: string, experience: number) => void;
   
   // Party Management
-  addBudToParty: (bud: any) => void; // TODO: Type properly
+  addBudToParty: (bud: budInstance) => boolean;
   removeBudFromParty: (budId: string) => void;
+  getPartyBuds: () => budInstance[];
   
   // Stats Management
   increaseStats: (stat: keyof HunterState['stats'], amount: number) => void;
@@ -126,13 +130,34 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
   })),
   
   // Party Management
-  addBudToParty: (bud) => set((state) => ({
-    party: [...state.party, bud],
-  })),
+  addBudToParty: (bud) => {
+    const state = get();
+    if (state.party.length >= GameConfig.BUD.STORAGE.PARTY_CAPACITY) {
+      console.warn('❌ Party is full');
+      return false;
+    }
+
+    if (state.party.some(b => b.id === bud.id)) {
+      console.warn('❌ Bud already in party', { budId: bud.id });
+      return false;
+    }
+
+    set((state) => ({
+      party: [...state.party, bud]
+    }));
+    
+    console.log('✅ Added bud to party', { budId: bud.id });
+    return true;
+  },
   
-  removeBudFromParty: (budId) => set((state) => ({
-    party: state.party.filter((b) => b.id !== budId),
-  })),
+  removeBudFromParty: (budId) => {
+    set((state) => ({
+      party: state.party.filter(b => b.id !== budId)
+    }));
+    console.log('✅ Removed bud from party', { budId });
+  },
+  
+  getPartyBuds: () => get().party,
   
   // Stats Management
   increaseStats: (stat, amount) => set((state) => ({

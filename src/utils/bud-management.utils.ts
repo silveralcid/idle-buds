@@ -1,5 +1,6 @@
 import { useActivityStore } from '../stores/activity.store';
 import { useBudStore } from '../stores/bud.store';
+import { useHunterStore } from '../stores/hunter.store';
 
 export const moveBudToParty = (budId: string): boolean => {
   const budStore = useBudStore.getState();
@@ -32,36 +33,30 @@ export const moveBudToNode = (budId: string, nodeId: string): boolean => {
   const budStore = useBudStore.getState();
   const activityStore = useActivityStore.getState();
   
-  const bud = budStore.getBud(budId);
-  if (!bud) return false;
+  // First try to assign the bud
+  const success = budStore.assignBudToNode(budId, nodeId);
+  if (!success) return false;
 
-  // Ensure bud is in party first
-  if (!budStore.buds.party.some(b => b.id === budId)) {
-    const success = budStore.addBudToParty(budId);
-    if (!success) return false;
-  }
-
-  // Start the gathering activity for this bud
+  // Then start the activity
   activityStore.startActivity('bud', {
     type: 'gathering',
     nodeId,
     budId
   });
   
+  console.log('✅ Bud moved to node successfully');
   return true;
 };
 
 export const moveBudFromNodeToParty = (budId: string, nodeId: string): boolean => {
+  const budStore = useBudStore.getState();
   const activityStore = useActivityStore.getState();
-  const activity = activityStore.budActivities[budId];
   
-  if (!activity || activity.nodeId !== nodeId) {
-    console.warn(`No matching activity found for bud ${budId} at node ${nodeId}`);
-    return false;
-  }
-  
+  // Stop the activity first
   activityStore.stopActivity('bud', budId);
-  return true;
+  
+  // Then update bud store
+  return budStore.unassignBud(budId);
 };
 
 export const gainBudExperience = (budId: string, amount: number): void => {

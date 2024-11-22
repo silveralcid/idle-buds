@@ -40,25 +40,34 @@ const useActivityStoreBase = create<ActivityState & ActivityActions>((set, get) 
   },
 
   startActivity: (type, activityData) => set((state) => {
+    console.log('🎯 Starting activity:', { type, activityData });
+    
     if (type === 'hunter') {
       return { hunterActivity: activityData as Activity };
     }
     const budActivity = activityData as Activity & { budId: string };
-    return {
+    console.log('📊 Current activities:', state.budActivities);
+    
+    const newState = {
       budActivities: {
         ...state.budActivities,
         [budActivity.budId]: budActivity
       }
     };
+    console.log('📊 New activities state:', newState.budActivities);
+    return newState;
   }),
 
   stopActivity: (type, id) => set((state) => {
+    console.log('⏹️ Stopping activity:', { type, id });
+    
     if (type === 'hunter') {
       return { hunterActivity: null };
     }
     if (id) {
       const newActivities = { ...state.budActivities };
       delete newActivities[id];
+      console.log('📊 Updated activities:', newActivities);
       return { budActivities: newActivities };
     }
     return state;
