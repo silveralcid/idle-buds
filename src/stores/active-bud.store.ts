@@ -128,6 +128,16 @@ export const useActiveBudStore = create<ActiveBudState & ActiveBudActions>((set,
     }
   },
 
+  // In active-bud.store.ts
+  getBudFromActivity: (budId: string): budInstance | null => {
+  const state = get();
+  const activity = state.budActivities[budId];
+  if (!activity) return null;
+  
+  return state.activeBuds.find(bud => bud.id === budId) || null;
+},
+
+
   getBudActivity: (budId) => {
     return get().budActivities[budId] || null;
   },

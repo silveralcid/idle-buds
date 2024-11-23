@@ -42,9 +42,16 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
   );
 
   // Find assigned bud by checking activities
-  const assignedBud = party.find(bud => 
-    budActivities[bud.id]?.nodeId === resource.id
-  );
+  // const assignedBud = party.find(bud => 
+  //   budActivities[bud.id]?.nodeId === resource.id
+  // );
+  
+    // Find assigned bud using existing store methods
+  const assignedBudId = Object.entries(budActivities)
+    .find(([_, activity]) => activity.nodeId === resource.id)?.[0];
+  
+  const assignedBud = assignedBudId ? 
+    useActiveBudStore.getState().getBudFromParty(assignedBudId) : null;
 
   useEffect(() => {
     if (skill && skill.level >= resource.levelRequired) {
