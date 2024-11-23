@@ -1,14 +1,3 @@
-Redesign:
-
-- theme to dark-ish fantasy instead of cute cute
-- EXPLORING AND BEATING COMBAT UNLOCKS RESOURCE NODES THAT, so theyre locked until you manage to get pass the area requirements
-- each "activity" once unlocked allows for one bud to work, upgrades to assign more, prob up to 3-5
-- Droppable TMs
-
-# Under Development
-
-Passion system
-
 # Exploration
 
 ## Regions
@@ -39,9 +28,9 @@ At least three POI per Area
 | 3rd Phase     | Level 54-75                     | 1.50                  |
 | Ascended Form | Level 100, Unique Condition Per | -                     |
 
-- To evolve, bud must spend X hours at an Evolution Shrine
-- Current phase affects how much stat a bud can gain per level
-- Each phase unlocks new move availability
+- To evolve, bud must spend a certain amount of hours at an Evolution Shrine based on Bud Rarity and Shrine conditions
+- Evolution phase affects how much stat a bud can gain per level
+- Evolution unlocks new move availability
 
 ### Hunters
 
@@ -56,8 +45,8 @@ In order to evolve, buds need to be placed in an evolution shrine for X hours. T
 
 ### Eggs
 
-- Buds cannot be caught, eggs drop as loot and they must be hatched\*
-- Kindling buds can boost efficiency
+- Buds cannot be caught, eggs drop as loot and they must be hatched
+- Buds can be assigned to hatchery to increase hatch speed, depending on affinity
 - Eggs must be placed in the hatchery for X hours to hatch. There will be ways to shorten the length of time, minimum and maximum needs to be set.
 
 ## Items
@@ -78,7 +67,7 @@ In order to evolve, buds need to be placed in an evolution shrine for X hours. T
 
 ### Bud Crafting/Gathering Skills
 
-Buds do not have individual skill levels for tasks like tamers do, instead their work efficiency is determined by their stats, which is determined by level, IVs, and etc. Passions provide a boost to this.
+Buds do not have individual skill levels for tasks like Hunters do, instead their work efficiency is determined by their stats, which is determined by level, IVs, and etc. Passions provide a boost to this.
 
 Buds task ability depends on species, effectiveness depends on affinity and passion
 
@@ -170,10 +159,6 @@ Combat
 Hatching
 Offering
 
-Next Phase:
-Bowcrafting
-Magikcrafting
-
 # Combat
 
 ## General
@@ -199,235 +184,6 @@ Bud Box - PokePC for buds
 Bud Ball - capture buds NOT FOR PROTOTYPE SCOPE
 Bud Bark - basic material needed to create bud balls NOT FOR PROTOTYPE SCOPE
 
-# Executive Summary
-
-## Game Concept and Vision
-
-Idle Buds reimagines the monster-taming genre through an innovative idle progression system, creating a unique blend of passive gameplay and active strategy. As a Bud Tamer, players discover and nurture a diverse collection of Buds - mystical creatures that evolve and grow even while offline. The game transforms traditional taming mechanics into an engaging idle experience where your Buds autonomously battle, gather resources, and develop new abilities.
-
-At its core, Idle Buds offers deep strategic elements through team composition and Bud development, while maintaining accessibility through automated progression systems. Players can customize their Buds' traits, abilities, and equipment, creating unique combinations for different challenges.
-
-The game features an expansive ecosystem where Buds work together in various activities - from resource gathering and crafting to battling wild Buds and challenging boss encounters. Your collection of Buds continues to grow and evolve while you're away, with each Bud having distinct roles in your growing sanctuary.
-
-Idle Buds maintains the core appeal of monster-taming games while eliminating the traditional grind. The automated systems handle the repetitive aspects, allowing players to focus on strategic decisions and collection goals. Whether actively playing or letting your Buds progress independently, the game provides meaningful advancement through its multi-layered progression system, special events, and achievement-based unlocks that enhance your idle efficiency.
-
-## Core Game Loops
-
-### Primary Loop
-
-1. Assign Tamer and/or Buds to gather resources
-2. Resources accumulate through idle progression
-3. Spend resources to craft and upgrade equipment/tools
-4. Use enhanced equipment to battle and unlock unlock new areas/resources
-5. Collect new Buds to access different skills
-6. Return to step 1 with improved efficiency
-
-### Resource Generation Loop
-
-1. Assign Buds to gathering tasks
-2. Choose to assist Buds for efficiency boost
-3. Collect accumulated resources
-4. Process resources into materials
-5. Craft equipment upgrades
-
-### Progression Loop
-
-1. Level up Bud skills through activities
-2. Upgrade Tamer equipment to access new areas
-3. Unlock new resource types
-4. Discover new Buds with unique abilities
-5. Access higher-tier content
-
-### Daily Engagement Loop
-
-1. Check accumulated resources
-2. Collect daily rewards
-3. Reassign Buds to optimal tasks
-4. Complete daily challenges
-5. Optimize Bud-Tamer combinations
-
-### Engagement Drivers
-
-**Short-term Goals**
-
-- Resource accumulation
-- Daily task completion
-- Equipment crafting
-
-**Medium-term Goals**
-
-- Equipment tier progression
-- Bud collection expansion
-- Area unlocks
-
-**Long-term Goals**
-
-- Skill mastery (Level 100)
-- Rare Bud discovery
-- End-game content access
-
-## Genre Classification
-
-Idler, Incremental, Creature Collector, Clicker, Breeding, RPG
-
-## Target Audience
-
-Pokemon and Palworld fans.
-
-## Unique Selling Points
-
-### Dual Role Gameplay
-
-Players take an active role in the world alongside their Buds, creating a unique hybrid of idle and active gameplay.
-
-### Tamer Combat System
-
-- Equip various tools and weapons for personal combat
-- Strategic positioning in battles alongside Buds
-- Personal skill progression and combat abilities
-
-### Advanced Idle Systems
-
-- Continuous Bud evolution during offline periods
-- Automated resource gathering and crafting
-- Smart AI behavior for independent Bud activities
-
-### Strategic Elements
-
-### Tamer Progression
-
-- Unique skill tree separate from Bud collection
-- Craftable tools and combat equipment
-- Synergy systems between Tamer and Buds
-
-### Team Building
-
-- Complex party composition with Tamer-Bud combinations
-- Strategic resource allocation
-
-## Platform(s)
-
-Browser based.
-
-## Project Scope
-
-### Must Have Features (MVP)
-
-#### Core Systems
-
-**Progression Mechanics**
-
-- Basic idle progression system
-- Equipment-based Tamer progression
-
-**Bud Collection**
-
-- 8 regular Buds with unique abilities
-- 2 epic Buds (catchable boss-type)
-
-**Bud Characteristics**
-
-- Base stats (HP, Attack, Defense, Speed)
-- Individual Values (IVs)
-- Gender system
-- Elemental affinity
-- Passive abilities
-- Combat moves
-
-**Skills**
-**Gathering Skills**
-
-- Woodcutting
-- Mining
-- Fishing
-- Farming
-
-**Crafting Skills**
-
-- Crafting
-- Cooking
-- Smelting
-
-**Progression Elements**
-
-- Skill leveling system (100)
-- 3 tiers of resources per gathering skill
-- Basic equipment progression (Tier 1-5)
-- Offline progression system
-
-**Gameplay Mechanics**
-
-- Tamer-Bud cooperation system
-- Skill-based Bud assignment
-- Battle system
-- Food and health management
-- Elemental affinity interactions
-
-**Progression Tiers**
-
-NEEDS ADJUSTMENT
-
-- 3 tiers of crafts and gear
-- Tier 2 required to:
-  - Access Area 1 boss
-  - Obtain boss materials
-  - Create specialized cube for boss capture
-- Tier 3 required to:
-  - Access Area 2 boss
-  - Craft endgame equipment
-
-**World Design**
-
-- 2 distinct areas
-- 2 boss encounters
-
-**Saves**
-Auto Save
-Local Save
-Cloud Save
-Export Save
-Import Save
-
-### Should Have Features
-
-#### Extended Content
-
-- 10 additional collectable Buds
-- Basic breeding system
-- Simple base building
-- Achievement system
-- Daily tasks
-- Narrative
-
-#### Quality of Life
-
-- Auto-assignment of Buds
-- Resource storage system
-- bud storage system
-- Basic tutorial system
-
-### Could Have Features
-
-#### Additional Systems
-
-- Mastery
-- Theme change with Daisy, see docs
-
-### Won't Have (v1.0)
-
-#### Future Considerations
-
-- PvP systems
-- Breeding
-- Multiplayer features
-- Seasonal events
-- Social features
-- Breeding mechanics
-- trading system
-- trading
-- Base building
-- Guild system
-
 # Gameplay Elements
 
 ## Core Mechanics and Systems
@@ -447,16 +203,16 @@ Each Bud possesses unique abilities aligned with traditional gathering and produ
 #### Parallel Progression Paths
 
 - Buds level individual skills (1-99) through experience
-- Tamers progress through equipment tiers and tools
-- Equipment quality determines Tamer's resource access
+- Hunters progress through equipment tiers and tools
+- Equipment quality determines Hunter's resource access
 - Skill-specific tools (axes, pickaxes, fishing rods) unlock new gathering options
 
 ### Synergy Mechanics
 
-#### Tamer-Bud Cooperation
+#### Hunter-Bud Cooperation
 
-- Tamers can assist one Bud to boost productivity
-- Combined Tamer-Bud efforts yield bonus resources
+- Hunters can assist one Bud to boost productivity
+- Combined Hunter-Bud efforts yield bonus resources
 - Unique interactions based on tool and Bud combinations
 - Special gathering events requiring cooperation
 
@@ -464,17 +220,17 @@ Each Bud possesses unique abilities aligned with traditional gathering and produ
 
 - Each Bud specializes in one activity at a time
 - Strategic assignment of Buds to different resources
-- Tamer assistance provides significant efficiency boost
+- Hunter assistance provides significant efficiency boost
 - Resource nodes scale with combined skill levels
 
 ### Resource System
 
 #### Progressive Resource Tiers
 
-- Basic resources available to new Tamers and Buds
+- Basic resources available to new Hunters and Buds
 - Mid-tier resources require skilled Buds or quality tools
 - Elite resources demand both high-level Buds and advanced equipment
-- Rare resources only accessible through Tamer-Bud cooperation
+- Rare resources only accessible through Hunter-Bud cooperation
 
 ### Catching
 
@@ -489,13 +245,21 @@ manual, player check marks ball types
 Passive Catching - game attempts to throw ball once before a bud dies
 Active Catching - player clicks button similar to eating
 
+## Game Modes
+
+### Adventure
+
+### Hardcore
+
+### Nuzlocke
+
 ## Controls and Player Interactions
 
 Screen touch and mouse click
 
 ## Game Progression
 
-Level up to 100 for both tamer and bud, progress through areas by beating bosses and unlocking special materials to craft?
+Level up to 100 for both Hunter and bud, progress through areas by beating bosses and unlocking special materials to craft?
 
 ## Objectives and Goals
 
@@ -505,10 +269,24 @@ Collect them all, train and level buds, craft powerful gear
 
 ## Level Design Principles
 
-?
-Here's the comprehensive technical specification incorporating React, Tailwind, TypeScript, and AWS services:
+# Creative Elements
 
-## Software Architecture
+## Story and Narrative
+
+## Character Descriptions
+
+## World-Building Details
+
+## Art Style and Direction
+
+Pixel Art
+https://civitai.com/models/161280/pokemon-sprite-pixelart-768
+
+## Sound Design and Music
+
+## UI/UX Design
+
+# Software Architecture
 
 ### Frontend Layer
 
@@ -614,23 +392,6 @@ Here's the comprehensive technical specification incorporating React, Tailwind, 
   - Reduced CSS bundle size through purging
   - Responsive design utilities for cross-device support
 
-# Creative Elements
-
-## Story and Narrative
-
-## Character Descriptions
-
-## World-Building Details
-
-## Art Style and Direction
-
-Pixel Art
-https://civitai.com/models/161280/pokemon-sprite-pixelart-768
-
-## Sound Design and Music
-
-## UI/UX Design
-
 # Production Details
 
 ## Asset Requirements
@@ -639,20 +400,6 @@ https://civitai.com/models/161280/pokemon-sprite-pixelart-768
 
 ## Development Timeline
 
-2 Months for MVP for Hackathon submission
-
-- Pre-production: 1 month
-- Core development: 4 months
-- Testing and polish: 1 month
-- Total: 6 months
-- Due Jan 14, 2025
+MVP Prototype Due Jan 14, 2025
 
 ## Milestone Planning
-
-# Game Modes
-
-## Adventure
-
-## Hardcore
-
-## Nuzlocke
