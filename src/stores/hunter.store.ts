@@ -85,40 +85,72 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
   const handleCraftingProgress = (ticks: number) => {
     const { currentTask } = get();
     if (!currentTask) return;
-
+  
     const recipe = recipeRegistry.find((r) => r.id === currentTask.taskId);
     if (!recipe) return;
-
+  
+    const bankStore = useBankStore.getState();
+  
+    // Check for sufficient materials
+    const hasMaterials = recipe.inputs.every((input) =>
+      input.itemIds.some((id) => (bankStore.items[id] || 0) >= input.amount)
+    );
+  
+    if (!hasMaterials) {
+      // Stop task due to insufficient materials
+      set({ isWorking: false, currentTask: null, progress: 0 });
+  
+      gameEvents.emit("hunterTaskCompleted", {
+        hunterId: get().hunterId,
+        task: currentTask.taskId,
+        results: { success: false, reason: "Insufficient materials" },
+      });
+  
+      gameEvents.emit("hunterStateChanged", {
+        hunterId: get().hunterId,
+        newState: "idle",
+      });
+  
+      return;
+    }
+  
+    // Calculate progress increment
     const progressIncrement = (ticks / recipe.craftingTime) * 100;
     const newProgress = Math.min(get().progress + progressIncrement, 100);
-
+  
     if (newProgress === 100) {
+      // Add outputs to the bank
       recipe.outputs.forEach((output) => {
-        useBankStore.getState().addItem(output.itemId, output.amount);
+        bankStore.addItem(output.itemId, output.amount);
       });
-
+  
+      // Remove inputs from the bank
       recipe.inputs.forEach((input) => {
         input.itemIds.forEach((id) => {
-          useBankStore.getState().removeItem(id, input.amount);
+          bankStore.removeItem(id, input.amount);
         });
       });
-
+  
+      // Gain XP
       const xpGained = recipe.experienceGain || 0;
       if (currentTask.skillId) {
         get().gainSkillXp(currentTask.skillId, xpGained);
+  
         gameEvents.emit("hunterSkillXpGained", {
           hunterId: get().hunterId,
           skillName: currentTask.skillId,
           xpGained,
         });
       }
-
+  
       resetOrStopTask();
       return;
     }
-
+  
+    // Update progress if task is not yet complete
     set({ progress: newProgress });
   };
+  
 
   return {
     hunterId,
