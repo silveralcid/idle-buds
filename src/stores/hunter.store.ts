@@ -2,16 +2,10 @@ import { create } from 'zustand';
 import { Skill } from '../types/skill.types';
 import { calculateExperienceRequirement } from '../utils/experience.utils';
 
-interface HunterActivity {
-  type: 'gathering' | 'crafting';
-  nodeId: string;
-  fractionalProgress: {
-    items: Record<string, number>;
-    xp: Record<string, number>;
-  };
-}
+
 
 interface HunterState {
+  id: string;
   skills: Record<string, Skill>;
   stats: {
     health: number;
@@ -21,27 +15,46 @@ interface HunterState {
     dexterity: number;
     skillPoints: number;
   };
-  currentActivity: HunterActivity | null;
+  currentHunterActivity: HunterGathering | HunterCrafting | null;
+}
+
+interface HunterGathering {
+  type: 'gathering';
+  nodeId: string;
+  gatheringProgress: {
+    resourcesGained: Record<string, number>;
+    xpGained: Record<string, number>;
+  };
+}
+
+interface HunterCrafting {
+  type: 'crafting';
+  workbenchId: string;
+  recipeId: string | null;
+  craftingProgress: {
+    materialsUsed: Record<string, number>;
+    itemsCrafted: Record<string, number>;
+    xpGained: Record<string, number>;
+  };
 }
 
 interface HunterActions {
   // Activity Management
-  startHunterActivity: (type: 'gathering' | 'crafting', nodeId: string) => void;
+  startHunterGathering: (nodeId: string) => void;
+  startHunterCrafting: (workbenchId: string, recipeId: string) => void;
   stopHunterActivity: () => void;
-  updateHunterActivityProgress: (deltaTime: number) => void;
-  getHunterActivityProgress: (nodeId: string) => number;
-  
+  getHunterGatheringProgress: (nodeId: string) => number;
+  getHunterCraftingProgress: (workbenchId: string, recipeId: string) => number;
+  processHunterTick: () => void;
+
   // Skill Management
   increaseHunterSkillExperience: (skillId: string, amount: number) => void;
   setHunterSkillLevel: (skillId: string, level: number) => void;
   setHunterSkillExperience: (skillId: string, experience: number) => void;
   
   // Stats Management
-  increaseHunterStats: (stat: keyof HunterState['stats'], amount: number) => void;
-  spendHunterSkillPoint: (stat: keyof HunterState['stats']) => boolean;
-  
+
   // State Management
-  refreshHunterSkills: () => void;
   resetHunterState: () => void;
   saveHunterState: () => object;
   loadHunterState: (state: any) => void;
@@ -81,51 +94,82 @@ const initialStats = {
 };
 
 export const useHunterStore = create<HunterState & HunterActions>((set, get) => ({
+  id: crypto.randomUUID(),
   skills: { ...initialSkills },
   stats: { ...initialStats },
-  currentActivity: null,
-  
-  startHunterActivity: (type, nodeId) => set({
-    currentActivity: {
-      type,
+  currentHunterActivity: null,
+
+  // Activity Management
+  startHunterGathering: (nodeId: string) => set({
+    currentHunterActivity: {
+      type: 'gathering',
       nodeId,
-      fractionalProgress: {
-        items: {},
-        xp: {}
+      gatheringProgress: {
+        resourcesGained: {},
+        xpGained: {}
       }
     }
   }),
-  
-  stopHunterActivity: () => set({ currentActivity: null }),
-  
-  updateHunterActivityProgress: (deltaTime) => set((state) => {
-    if (!state.currentActivity) return state;
 
-    const { nodeId } = state.currentActivity;
-    const currentProgress = state.currentActivity.fractionalProgress;
+  startHunterCrafting: (workbenchId: string, recipeId: string) => set({
+    currentHunterActivity: {
+      type: 'crafting',
+      workbenchId,
+      recipeId,
+      craftingProgress: {
+        materialsUsed: {},
+        itemsCrafted: {},
+        xpGained: {}
+      }
+    }
+  }),
 
-    return {
-      currentActivity: {
-        ...state.currentActivity,
-        fractionalProgress: {
-          items: {
-            ...currentProgress.items,
-            [nodeId]: (currentProgress.items[nodeId] || 0) + deltaTime
-          },
-          xp: {
-            ...currentProgress.xp,
-            [nodeId]: (currentProgress.xp[nodeId] || 0) + deltaTime
+  stopHunterActivity: () => set({ currentHunterActivity: null }),
+
+  getHunterGatheringProgress: (nodeId: string) => {
+    const state = get();
+    if (!state.currentHunterActivity || state.currentHunterActivity.type !== 'gathering') return 0;
+    return state.currentHunterActivity.gatheringProgress.resourcesGained[nodeId] || 0;
+  },
+
+  getHunterCraftingProgress: (workbenchId: string, recipeId: string) => {
+    const state = get();
+    if (!state.currentHunterActivity || state.currentHunterActivity.type !== 'crafting') return 0;
+    return state.currentHunterActivity.craftingProgress.itemsCrafted[recipeId] || 0;
+  },
+
+  processHunterTick: () => set((state) => {
+    if (!state.currentHunterActivity) return state;
+
+    if (state.currentHunterActivity.type === 'gathering') {
+      // Process gathering tick
+      return {
+        currentHunterActivity: {
+          ...state.currentHunterActivity,
+          gatheringProgress: {
+            resourcesGained: { /* Update resources */ },
+            xpGained: { /* Update XP */ }
           }
         }
-      }
-    };
+      };
+    }
+
+    if (state.currentHunterActivity.type === 'crafting') {
+      // Process crafting tick
+      return {
+        currentHunterActivity: {
+          ...state.currentHunterActivity,
+          craftingProgress: {
+            materialsUsed: { /* Update materials */ },
+            itemsCrafted: { /* Update crafted items */ },
+            xpGained: { /* Update XP */ }
+          }
+        }
+      };
+    }
+
+    return state;
   }),
-  
-  getHunterActivityProgress: (nodeId) => {
-    const state = get();
-    if (!state.currentActivity) return 0;
-    return (state.currentActivity.fractionalProgress.items[nodeId] || 0) * 100;
-  },
   
   increaseHunterSkillExperience: (skillId, amount) => set((state) => {
     const skill = state.skills[skillId];
@@ -178,37 +222,12 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
     },
   })),
   
-  increaseHunterStats: (stat, amount) => set((state) => ({
-    stats: {
-      ...state.stats,
-      [stat]: state.stats[stat] + amount,
-    },
-  })),
-  
-  spendHunterSkillPoint: (stat) => {
-    const { stats } = get();
-    if (stats.skillPoints <= 0) return false;
-    
-    set((state) => ({
-      stats: {
-        ...state.stats,
-        skillPoints: state.stats.skillPoints - 1,
-        [stat]: state.stats[stat] + 1,
-      },
-    }));
-    return true;
-  },
-  
-  refreshHunterSkills: () => set(() => ({
-    skills: { ...initialSkills },
-    stats: { ...initialStats },
-    currentActivity: null
-  })),
+
   
   resetHunterState: () => set({
     skills: { ...initialSkills },
     stats: { ...initialStats },
-    currentActivity: null
+    currentHunterActivity: null
   }),
   
   saveHunterState: () => {
@@ -216,7 +235,7 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
     return {
       skills: state.skills,
       stats: state.stats,
-      currentActivity: state.currentActivity
+      currentHunterActivity: state.currentHunterActivity
     };
   },
   
@@ -225,7 +244,7 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
     set({
       skills: savedState.skills || initialSkills,
       stats: savedState.stats || initialStats,
-      currentActivity: savedState.currentActivity || null
+      currentHunterActivity: savedState.currentHunterActivity || null
     });
   }
 }));

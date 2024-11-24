@@ -1,29 +1,59 @@
 import { useHunterStore } from '../stores/hunter.store';
 
 export const useHunterGathering = (nodeId: string, isUnlocked: boolean) => {
-  const hunterActivity = useHunterStore((state) => state.currentActivity);
+  const hunterActivity = useHunterStore((state) => state.currentHunterActivity);
 
   const startGathering = () => {
     if (!isUnlocked) {
-      console.log('❌ Cannot start gathering - node is locked');
+      console.warn('❌ Cannot start gathering - node is locked');
       return false;
     }
-    
-    useHunterStore.getState().startHunterActivity('gathering', nodeId);
-    console.log('✅ Started hunter gathering:', { nodeId });
+
+    // Check if already gathering at a different node
+    if (hunterActivity?.type === 'gathering' && hunterActivity.nodeId !== nodeId) {
+      console.warn('❌ Already gathering at a different node');
+      return false;
+    }
+
+    // Check if currently crafting
+    if (hunterActivity?.type === 'crafting') {
+      console.warn('❌ Cannot gather while crafting');
+      return false;
+    }
+
+    useHunterStore.getState().startHunterGathering(nodeId);
+    console.log('✅ Started gathering at node:', nodeId);
     return true;
   };
 
   const stopGathering = () => {
-    if (hunterActivity?.nodeId === nodeId) {
-      useHunterStore.getState().stopHunterActivity();
-      console.log('✅ Stopped hunter gathering:', { nodeId });
-      return true;
+    if (!isGathering) {
+      console.warn('❌ Not currently gathering at this node');
+      return false;
     }
-    return false;
+
+    useHunterStore.getState().stopHunterActivity();
+    console.log('✅ Stopped gathering at node:', nodeId);
+    return true;
   };
 
-  const isGathering = hunterActivity?.type === 'gathering' && hunterActivity?.nodeId === nodeId;
+  const getGatheringProgress = () => {
+    return useHunterStore.getState().getHunterGatheringProgress(nodeId);
+  };
 
-  return { startGathering, stopGathering, isGathering };
+  const isGathering = 
+    hunterActivity?.type === 'gathering' && 
+    hunterActivity.nodeId === nodeId;
+
+  const gatheringProgress = isGathering 
+    ? hunterActivity.gatheringProgress 
+    : null;
+
+  return {
+    startGathering,
+    stopGathering,
+    isGathering,
+    gatheringProgress,
+    getGatheringProgress,
+  };
 };

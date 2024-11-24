@@ -2,12 +2,11 @@ import { useEffect } from 'react';
 import { useGameStore } from '../stores/game.store';
 import { useHunterStore } from '../stores/hunter.store';
 import { GameConfig } from '../constants/game-config';
-import { processGathering } from '../utils/gathering.utils';
 
 export const useGameLoop = () => {
   const isPaused = useGameStore((state) => state.isPaused);
-  const updateHunterActivityProgress = useHunterStore((state) => state.updateHunterActivityProgress);
-  const hunterActivity = useHunterStore((state) => state.currentActivity);
+  const processHunterTick = useHunterStore((state) => state.processHunterTick);
+  const currentHunterActivity = useHunterStore((state) => state.currentHunterActivity);
 
   useEffect(() => {
     let lastTime = performance.now();
@@ -25,16 +24,9 @@ export const useGameLoop = () => {
       accumulatedTime += deltaTime * 1000; // Convert to milliseconds
 
       while (accumulatedTime >= tickDuration) {
-        const tickDeltaTime = tickDuration / 1000; // Convert to seconds
-
-        // Update fractional progress for both hunter and buds
-        if (hunterActivity) {
-          updateHunterActivityProgress(tickDeltaTime);
-        }
-
-        // Process gathering for both hunter and buds if there are active gatherers
-        if (hunterActivity) {
-          processGathering(tickDeltaTime);
+        // Process activity ticks if there's an active activity
+        if (currentHunterActivity) {
+          processHunterTick();
         }
 
         accumulatedTime -= tickDuration;
@@ -49,9 +41,5 @@ export const useGameLoop = () => {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [
-    isPaused, 
-    updateHunterActivityProgress, 
-    hunterActivity, 
-  ]);
+  }, [isPaused, processHunterTick, currentHunterActivity]);
 };
