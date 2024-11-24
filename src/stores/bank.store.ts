@@ -51,9 +51,25 @@ export const useBankStore = create<BankState>((set) => {
         };
       }),
 
-    loadState: (state) =>
+    loadState: (loadedState) => {
+      if (typeof loadedState !== "object" || loadedState === null) {
+        console.error("Invalid bank state: Expected an object.", loadedState);
+        set({ items: {} }); // Reset to default empty state
+        return;
+      }
+
+      if (Object.keys(loadedState).some((key) => typeof key !== "string" || typeof loadedState[key] !== "number")) {
+        console.error("Invalid item structure in bank state.", loadedState);
+        set({ items: {} }); // Reset to default empty state
+        return;
+      }
+
+      // Valid state, apply it
       set({
-        items: state,
-      }),
+        items: loadedState,
+      });
+
+      console.log("Bank state loaded successfully:", loadedState);
+    },
   };
 });

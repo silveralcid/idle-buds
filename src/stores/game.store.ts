@@ -74,9 +74,12 @@ export const useGameStore = create<GameState & GameActions>((set, get) => {
   const loadGameState = () => {
     const savedState = loadFromLocalStorage();
     if (savedState) {
+      console.log("Saved state loaded:", savedState); // Debugging
+  
       const currentTime = Date.now();
       const elapsedTime = currentTime - savedState.lastSaveTime;
-
+  
+      // Restore core game state
       set({
         lastSaveTime: currentTime,
         isPaused: savedState.isPaused,
@@ -84,17 +87,31 @@ export const useGameStore = create<GameState & GameActions>((set, get) => {
         tickRate: savedState.tickRate,
         isInitialLoad: false,
       });
-
-      // Restore other store states
-      useBankStore.getState().loadState(savedState.bankState);
-      useHunterStore.getState().loadState(savedState.hunterState);
-
+  
+      console.log("Restoring hunter and bank states...");
+      // Restore hunter and bank states
+      if (savedState.bankState) {
+        useBankStore.getState().loadState(savedState.bankState);
+      } else {
+        console.warn("Bank state is missing in saved data.");
+      }
+  
+      if (savedState.hunterState) {
+        useHunterStore.getState().loadState(savedState.hunterState);
+      } else {
+        console.warn("Hunter state is missing in saved data.");
+      }
+  
+      console.log("Processing offline progression...");
       // Process offline progression
       if (!savedState.isPaused) {
         handleOfflineProgression(elapsedTime);
       }
+    } else {
+      console.error("No saved state found in local storage.");
     }
   };
+  
 
   // Autosave Logic
   const startAutosave = () => {
@@ -112,10 +129,27 @@ export const useGameStore = create<GameState & GameActions>((set, get) => {
 
     saveGame: () => {
       const currentTime = Date.now();
+      const state = get(); // Fetch the current state
       set({ lastSaveTime: currentTime });
-      saveGameState();
-      console.log("Game saved!");
+    
+      console.log("Attempting to save game...");
+      console.log("Current Game State Snapshot:", {
+        lastSaveTime: currentTime,
+        isPaused: state.isPaused,
+        lastTickTime: state.lastTickTime,
+        tickRate: state.tickRate,
+      });
+    
+      try {
+        saveGameState(); // Call the function to save the state
+        console.log("Game saved successfully at:", new Date(currentTime).toLocaleString());
+        console.log("Saved Bank State:", useBankStore.getState().items);
+        console.log("Saved Hunter State:", useHunterStore.getState());
+      } catch (error) {
+        console.error("Error saving game state:", error);
+      }
     },
+    
 
     loadGame: (loadedState?: Partial<GameState>) => {
       if (loadedState) {
@@ -223,7 +257,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => {
 
         console.log("Save imported!");
       } catch (error) {
-        console.error("Failed to import save data:", error);
+        console.error("Failed to import save data:", error)
       }
     },
   };

@@ -256,11 +256,12 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
         };
       });
     },
-    loadState: (state: Partial<HunterState>) => {
-      set((currentState) => ({
-        ...currentState,
-        ...state,
-      }));
+    loadState: (loadedState) => {
+      set({
+        hunterSkills: loadedState.hunterSkills || {}, // Load hunter skills
+        currentTask: loadedState.currentTask || null, // Load current task
+        progress: loadedState.progress || 0, // Reset task progress
+      });
     },
     resetHunterState: () => {
       set({
