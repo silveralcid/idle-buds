@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useHunterStore } from "../../stores/hunter.store";
 import { useBankStore } from "../../stores/bank.store";
 import { useViewStore } from "../../stores/view.store";
 import { useGameStore } from "../../stores/game.store";
+import { GameEvents } from "../../core/game-events/game-events";
 
 const Sidebar: React.FC = () => {
   const [isSaveDropdownOpen, setSaveDropdownOpen] = useState(false);
@@ -11,6 +12,18 @@ const Sidebar: React.FC = () => {
   const bankItems = useBankStore((state) => state.items);
   const setView = useViewStore((state) => state.setView);
   const { saveGame, loadGame, resetGame, togglePause, isPaused, exportSave, importSave } = useGameStore();
+  const gameEvents = GameEvents.getInstance();
+
+  useEffect(() => {
+    // Debugging: Log pause/unpause events
+    gameEvents.on("gamePaused", () => console.log("Game has been paused."));
+    gameEvents.on("gameResumed", () => console.log("Game has been resumed."));
+
+    return () => {
+      gameEvents.off("gamePaused", () => console.log("Game has been paused."));
+      gameEvents.off("gameResumed", () => console.log("Game has been resumed."));
+    };
+  }, [gameEvents]);
 
   const handleSkillClick = (skillId: string) => {
     setView(skillId.toLowerCase());
@@ -34,12 +47,21 @@ const Sidebar: React.FC = () => {
     }
   };
 
+  const handleTogglePause = () => {
+    togglePause();
+    if (isPaused) {
+      gameEvents.emit("gameResumed");
+    } else {
+      gameEvents.emit("gamePaused");
+    }
+  };
+
   return (
     <aside className="w-64 bg-gray-800 text-white p-4">
       <h2 className="text-lg font-bold mb-4">Idle Buds</h2>
 
-            {/* Save Management */}
-            <div className="mb-6">
+      {/* Save Management */}
+      <div className="mb-6">
         <h3
           className="text-md font-semibold mb-2 cursor-pointer hover:text-gray-300"
           onClick={() => setSaveDropdownOpen(!isSaveDropdownOpen)}
@@ -79,7 +101,7 @@ const Sidebar: React.FC = () => {
             >
               Reset Game
             </li>
-            <li className="cursor-pointer hover:bg-gray-600 p-2 rounded" onClick={togglePause}>
+            <li className="cursor-pointer hover:bg-gray-600 p-2 rounded" onClick={handleTogglePause}>
               {isPaused ? "Unpause Game" : "Pause Game"}
             </li>
           </ul>
@@ -115,8 +137,8 @@ const Sidebar: React.FC = () => {
         </ul>
       </div>
 
-            {/* Current Task */}
-            <div className="mb-6">
+      {/* Current Task */}
+      <div className="mb-6">
         <h3 className="text-md font-semibold mb-2">Current Task</h3>
         {currentTask ? (
           <div>
@@ -143,8 +165,6 @@ const Sidebar: React.FC = () => {
           ))}
         </ul>
       </div>
-
-
     </aside>
   );
 };
