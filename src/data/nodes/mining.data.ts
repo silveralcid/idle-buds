@@ -1,4 +1,4 @@
-import { ResourceNode } from "../../types/resourceNode.types";
+import { ResourceNode } from "../../types/resource-node.types";
 
 
 export const miningNodes: ResourceNode[] = [

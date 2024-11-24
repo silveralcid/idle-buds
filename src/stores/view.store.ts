@@ -6,6 +6,6 @@ interface ViewState {
 }
 
 export const useViewStore = create<ViewState>((set) => ({
-  currentView: 'LumberingView', // Default view
+  currentView: 'mining', // Default to empty or "mining"
   setView: (view) => set({ currentView: view }),
 }));

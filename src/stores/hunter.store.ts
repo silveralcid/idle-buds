@@ -1,231 +1,182 @@
-import { create } from 'zustand';
-import { Skill } from '../types/skill.types';
-import { calculateExperienceRequirement } from '../utils/experience.utils';
-
-interface HunterActivity {
-  type: 'gathering' | 'crafting';
-  nodeId: string;
-  fractionalProgress: {
-    items: Record<string, number>;
-    xp: Record<string, number>;
-  };
-}
+import { v4 as uuidv4 } from "uuid";
+import { create } from "zustand";
+import { BaseTask } from "../types/task.types";
+import { Skill } from "../types/skill.types";
+import { calculateExperienceRequirement } from "../utils/experience.utils";
+import { GameEvents } from "../core/game-events/game-events";
+import { GameConfig } from "../core/constants/game-config";
+import { resourceRegistry } from "../data/resource-registry";
 
 interface HunterState {
-  skills: Record<string, Skill>;
-  stats: {
-    health: number;
-    wisdom: number;
-    attack: number;
-    defense: number;
-    dexterity: number;
-    skillPoints: number;
-  };
-  currentActivity: HunterActivity | null;
+  hunterId: string; // Unique ID for the hunter
+  currentTask: BaseTask | null; // Current task being performed
+  progress: number; // Task progress as a percentage (0–100)
+  hunterSkills: Record<string, Skill>; // Hunter's skill levels and experience
 }
 
 interface HunterActions {
-  // Activity Management
-  startHunterActivity: (type: 'gathering' | 'crafting', nodeId: string) => void;
-  stopHunterActivity: () => void;
-  updateHunterActivityProgress: (deltaTime: number) => void;
-  getHunterActivityProgress: (nodeId: string) => number;
-  
-  // Skill Management
-  increaseHunterSkillExperience: (skillId: string, amount: number) => void;
-  setHunterSkillLevel: (skillId: string, level: number) => void;
-  setHunterSkillExperience: (skillId: string, experience: number) => void;
-  
-  // Stats Management
-  increaseHunterStats: (stat: keyof HunterState['stats'], amount: number) => void;
-  spendHunterSkillPoint: (stat: keyof HunterState['stats']) => boolean;
-  
-  // State Management
-  refreshHunterSkills: () => void;
-  resetHunterState: () => void;
-  saveHunterState: () => object;
-  loadHunterState: (state: any) => void;
+  startTask: (task: Omit<BaseTask, "ownerType" | "ownerId">) => void; // Assign a new task
+  isWorking: boolean; // Tracks whether a task (gathering or crafting) is active
+  stopTask: () => void; // Stop the current task
+  updateTaskProgress: (ticks: number) => void; // Update task progress based on game ticks
+  gainSkillXp: (skillId: string, xp: number) => void; // Gain XP for a skill
 }
 
-const initialSkills: Record<string, Skill> = {
-  lumbering: {
-    id: 'lumbering',
-    name: 'Lumbering',
-    level: 2,
-    experience: 10,
-    experienceToNextLevel: calculateExperienceRequirement(2),
-  },
-  mining: {
-    id: 'mining',
-    name: 'Mining',
-    level: 2,
-    experience: 10,
-    experienceToNextLevel: calculateExperienceRequirement(2),
-  },
-  smithing: {
-    id: 'smithing',
-    name: 'Smithing',
-    level: 5,
-    experience: 10,
-    experienceToNextLevel: calculateExperienceRequirement(5),
-  },
-};
+const gameEvents = GameEvents.getInstance();
 
-const initialStats = {
-  health: 100,
-  wisdom: 50,
-  attack: 75,
-  defense: 60,
-  dexterity: 80,
-  skillPoints: 10,
-};
+export const useHunterStore = create<HunterState & HunterActions>((set, get) => {
+  const hunterId = uuidv4();
+  const gameEvents = GameEvents.getInstance();
 
-export const useHunterStore = create<HunterState & HunterActions>((set, get) => ({
-  skills: { ...initialSkills },
-  stats: { ...initialStats },
-  currentActivity: null,
-  
-  startHunterActivity: (type, nodeId) => set({
-    currentActivity: {
-      type,
-      nodeId,
-      fractionalProgress: {
-        items: {},
-        xp: {}
-      }
+  // Subscribe to gameTick event for task progress updates
+  gameEvents.on("gameTick", () => {
+    const { currentTask, isWorking } = get();
+    if (currentTask && isWorking) {
+      get().updateTaskProgress(1); // Increment progress every tick
     }
-  }),
-  
-  stopHunterActivity: () => set({ currentActivity: null }),
-  
-  updateHunterActivityProgress: (deltaTime) => set((state) => {
-    if (!state.currentActivity) return state;
+  });
 
-    const { nodeId } = state.currentActivity;
-    const currentProgress = state.currentActivity.fractionalProgress;
+  return {
+    hunterId,
+    currentTask: null,
+    progress: 0,
+    isWorking: false, // Tracks whether a task (gathering or crafting) is active
+    hunterSkills: {
+      mining: {
+        id: "mining",
+        name: "Mining",
+        level: 1,
+        experience: 0,
+        experienceToNextLevel: calculateExperienceRequirement("mining", 1),
+      },
+    },
 
-    return {
-      currentActivity: {
-        ...state.currentActivity,
-        fractionalProgress: {
-          items: {
-            ...currentProgress.items,
-            [nodeId]: (currentProgress.items[nodeId] || 0) + deltaTime
-          },
-          xp: {
-            ...currentProgress.xp,
-            [nodeId]: (currentProgress.xp[nodeId] || 0) + deltaTime
-          }
-        }
+    startTask: (task) => {
+      const { isWorking, currentTask } = get();
+
+      // If already working on the same task, toggle off
+      if (isWorking && currentTask?.taskId === task.taskId) {
+        set({ isWorking: false, currentTask: null, progress: 0 });
+
+        gameEvents.emit("hunterStateChanged", {
+          hunterId,
+          newState: "idle",
+        });
+
+        return;
       }
-    };
-  }),
-  
-  getHunterActivityProgress: (nodeId) => {
-    const state = get();
-    if (!state.currentActivity) return 0;
-    return (state.currentActivity.fractionalProgress.items[nodeId] || 0) * 100;
-  },
-  
-  increaseHunterSkillExperience: (skillId, amount) => set((state) => {
-    const skill = state.skills[skillId];
-    if (!skill) return state;
 
-    const newExperience = skill.experience + amount;
-    if (newExperience >= skill.experienceToNextLevel) {
-      return {
-        skills: {
-          ...state.skills,
-          [skillId]: {
-            ...skill,
-            level: skill.level + 1,
-            experience: newExperience - skill.experienceToNextLevel,
-            experienceToNextLevel: calculateExperienceRequirement(skill.level + 1),
-          },
-        },
+      // Otherwise, start a new task
+      const fullTask: BaseTask = {
+        ...task,
+        ownerType: "hunter",
+        ownerId: hunterId,
       };
-    }
-    
-    return {
-      skills: {
-        ...state.skills,
-        [skillId]: {
-          ...skill,
-          experience: newExperience,
-        },
-      },
-    };
-  }),
-  
-  setHunterSkillLevel: (skillId, level) => set((state) => ({
-    skills: {
-      ...state.skills,
-      [skillId]: {
-        ...state.skills[skillId],
-        level,
-        experienceToNextLevel: calculateExperienceRequirement(level),
-      },
+
+      set({ currentTask: fullTask, isWorking: true, progress: 0 });
+
+      gameEvents.emit("hunterTaskAssigned", {
+        hunterId,
+        task: task.taskId,
+        duration: resourceRegistry[task.taskId]?.gatherRate || 0,
+      });
+
+      gameEvents.emit("hunterStateChanged", {
+        hunterId,
+        newState: "active",
+      });
     },
-  })),
-  
-  setHunterSkillExperience: (skillId, experience) => set((state) => ({
-    skills: {
-      ...state.skills,
-      [skillId]: {
-        ...state.skills[skillId],
-        experience,
-      },
+
+    stopTask: () => {
+      set({ isWorking: false, currentTask: null, progress: 0 });
+
+      gameEvents.emit("hunterStateChanged", {
+        hunterId,
+        newState: "idle",
+      });
     },
-  })),
-  
-  increaseHunterStats: (stat, amount) => set((state) => ({
-    stats: {
-      ...state.stats,
-      [stat]: state.stats[stat] + amount,
+
+    updateTaskProgress: (ticks) => {
+      const { currentTask, isWorking } = get();
+      if (!currentTask || !isWorking) return;
+
+      const taskDefinition = resourceRegistry[currentTask.taskId];
+      if (!taskDefinition) return;
+
+      const progressIncrement = (ticks / (taskDefinition.gatherRate / GameConfig.TICK.DURATION)) * 100;
+      const newProgress = Math.min(get().progress + progressIncrement, 100);
+
+      if (newProgress === 100) {
+        if (taskDefinition.resourceNodeYields.length > 0) {
+          const itemId = taskDefinition.resourceNodeYields[0];
+          const quantity = 1;
+
+          // Emit resourceGathered event
+          gameEvents.emit("resourceGathered", { name: itemId, quantity });
+        }
+
+        // Gain skill XP
+        const xpGained = taskDefinition.experienceGain || 0;
+        if (currentTask.skillId) {
+          get().gainSkillXp(currentTask.skillId, xpGained);
+
+          gameEvents.emit("hunterSkillXpGained", {
+            hunterId,
+            skillName: currentTask.skillId,
+            xpGained,
+          });
+        }
+
+        // Reset progress to allow continuous work
+        if (isWorking) {
+          set({ progress: 0 });
+        } else {
+          // Stop work if toggle is off
+          set({ currentTask: null, progress: 0 });
+          gameEvents.emit("hunterStateChanged", { hunterId, newState: "idle" });
+        }
+
+        return;
+      }
+
+      // Update progress if task is not yet complete
+      set({ progress: newProgress });
     },
-  })),
-  
-  spendHunterSkillPoint: (stat) => {
-    const { stats } = get();
-    if (stats.skillPoints <= 0) return false;
-    
-    set((state) => ({
-      stats: {
-        ...state.stats,
-        skillPoints: state.stats.skillPoints - 1,
-        [stat]: state.stats[stat] + 1,
-      },
-    }));
-    return true;
-  },
-  
-  refreshHunterSkills: () => set(() => ({
-    skills: { ...initialSkills },
-    stats: { ...initialStats },
-    currentActivity: null
-  })),
-  
-  resetHunterState: () => set({
-    skills: { ...initialSkills },
-    stats: { ...initialStats },
-    currentActivity: null
-  }),
-  
-  saveHunterState: () => {
-    const state = get();
-    return {
-      skills: state.skills,
-      stats: state.stats,
-      currentActivity: state.currentActivity
-    };
-  },
-  
-  loadHunterState: (savedState) => {
-    if (!savedState) return;
-    set({
-      skills: savedState.skills || initialSkills,
-      stats: savedState.stats || initialStats,
-      currentActivity: savedState.currentActivity || null
-    });
-  }
-}));
+
+    gainSkillXp: (skillId, xp) => {
+      set((state) => {
+        const skill = state.hunterSkills[skillId];
+        if (!skill) return state;
+
+        const newExperience = skill.experience + xp;
+
+        // Check for level-up
+        if (newExperience >= skill.experienceToNextLevel) {
+          return {
+            hunterSkills: {
+              ...state.hunterSkills,
+              [skillId]: {
+                ...skill,
+                level: skill.level + 1,
+                experience: newExperience - skill.experienceToNextLevel,
+                experienceToNextLevel: calculateExperienceRequirement(skillId, skill.level + 1),
+              },
+            },
+          };
+        }
+
+        // Update XP
+        return {
+          hunterSkills: {
+            ...state.hunterSkills,
+            [skillId]: {
+              ...skill,
+              experience: newExperience,
+            },
+          },
+        };
+      });
+    },
+  };
+});
+
