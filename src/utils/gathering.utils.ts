@@ -1,58 +1,108 @@
 import { useHunterStore } from '../stores/hunter.store';
-import { defaultSkillMapping } from '../data/defaultSkillMapping';
-import { calculateGathering } from './gathering-core.utils';
 import { useBankStore } from '../stores/bank.store';
+import { defaultSkillMapping } from '../data/defaultSkillMapping';
+import { GatheringCalculator } from './gathering-core.utils';
 import { allResources } from '../data/allResources.data';
 
-export const processGathering = (deltaTime: number): void => {
-  console.groupCollapsed(`⚙️ Gathering Process (deltaTime: ${deltaTime})`);
+interface GatheringResult {
+  resources: Record<string, number>;
+  experience: Record<string, number>;
+}
 
+export const processGathering = (deltaTime: number): GatheringResult | null => {
+  const hunterStore = useHunterStore.getState();
+  const bankStore = useBankStore.getState();
+  const activity = hunterStore.currentHunterActivity;
+
+  if (!activity || activity.type !== 'gathering') {
+    return null;
+  }
+
+  console.group('🎯 Processing Gathering');
+  
+  try {
+    const resource = allResources.find(r => r.id === activity.nodeId);
+    if (!resource) {
+      console.warn('❌ Resource not found:', activity.nodeId);
+      return null;
+    }
+
+    // Calculate gathering using the calculator
+    const gatherResult = GatheringCalculator.calculate(
+      resource,
+      deltaTime,
+      {
+        resourceFraction: 0,
+        experienceFraction: 0
+      }
+    );
+
+    const result: GatheringResult = {
+      resources: {},
+      experience: {}
+    };
+
+    // Process resources
+    resource.resourceNodeYields.forEach(itemId => {
+      const amount = gatherResult.resources.amount;
+      result.resources[itemId] = amount;
+      bankStore.addItem(itemId, amount);
+    });
+
+    // Process experience
+    const skillType = resource.type;
+    const skillId = defaultSkillMapping[skillType];
+    if (skillId) {
+      result.experience[skillType] = gatherResult.experience.amount;
+      hunterStore.increaseHunterSkillExperience(skillId, gatherResult.experience.amount);
+    }
+
+    console.debug('Gathering Results:', {
+      nodeId: resource.id,
+      resourcesGained: result.resources,
+      experienceGained: result.experience,
+      ticksProcessed: gatherResult.ticksProcessed
+    });
+
+    return result;
+
+  } catch (error) {
+    console.error('❌ Error processing gathering:', error);
+    return null;
+  } finally {
+    console.groupEnd();
+  }
+};
+
+export const canGather = (
+  nodeId: string, 
+  requiredLevel: number,
+  requiredItems: string[]
+): boolean => {
   const hunterStore = useHunterStore.getState();
   const bankStore = useBankStore.getState();
 
-  // Log initial state
-  console.group('📊 Activities State');
-  console.table({
-    hunter: hunterStore.currentActivity,
-  });
-  console.groupEnd();
-
-  // Process hunter activity
-  if (hunterStore.currentActivity?.type === 'gathering') {
-    console.group('🎯 Hunter Gathering');
-    const resource = allResources.find(r => r.id === hunterStore.currentActivity?.nodeId);
-    if (resource) {
-      const fractionalProgress = hunterStore.currentActivity.fractionalProgress.items[resource.id] || 0;
-      const fractionalXP = hunterStore.currentActivity.fractionalProgress.xp[resource.id] || 0;
-
-      const gatherResult = calculateGathering(
-        resource,
-        deltaTime,
-        fractionalProgress,
-        fractionalXP
-      );
-
-      console.debug('Hunter Results:', {
-        resource: resource.id,
-        gathered: gatherResult.wholeAmount,
-        xp: gatherResult.wholeXP
-      });
-
-      // Add gathered resources to bank
-      resource.resourceNodeYields.forEach(itemId => {
-        bankStore.addItem(itemId, gatherResult.wholeAmount);
-      });
-
-      // Update hunter skill experience
-      const skillId = defaultSkillMapping[resource.type];
-      hunterStore.increaseHunterSkillExperience(skillId, gatherResult.wholeXP);
-
-      // Update progress
-      hunterStore.updateHunterActivityProgress(deltaTime);
-    }
-    console.groupEnd();
+  // Check if already gathering
+  if (hunterStore.currentHunterActivity?.type === 'gathering') {
+    return false;
   }
 
+  // Check skill requirements
+  const resource = allResources.find(r => r.id === nodeId);
+  if (resource) {
+    const skillId = defaultSkillMapping[resource.type];
+    const skillLevel = hunterStore.skills[skillId]?.level ?? 0;
+    if (skillLevel < requiredLevel) {
+      return false;
+    }
+  }
 
-  console.groupEnd();
+  // Check required items
+  if (requiredItems.length > 0) {
+    return requiredItems.every(itemId => 
+      bankStore.getItemAmount(itemId) > 0
+    );
+  }
+
+  return true;
 };

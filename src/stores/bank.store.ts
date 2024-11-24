@@ -5,6 +5,7 @@ interface BankState {
   resetBank: () => void;
   addItem: (itemId: string, amount: number) => void;
   removeItem: (itemId: string, amount: number) => void;
+  getItemAmount: (itemId: string) => number;
 }
 
 export const useBankStore = create<BankState>((set) => ({
@@ -27,4 +28,8 @@ export const useBankStore = create<BankState>((set) => ({
       }
     };
   }),
+  getItemAmount: (itemId: string): number => {
+    const state = useBankStore.getState();
+    return state.items[itemId] || 0;
+  },
 }));
