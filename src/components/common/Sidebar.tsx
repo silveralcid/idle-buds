@@ -38,6 +38,54 @@ const Sidebar: React.FC = () => {
     <aside className="w-64 bg-gray-800 text-white p-4">
       <h2 className="text-lg font-bold mb-4">Idle Buds</h2>
 
+            {/* Save Management */}
+            <div className="mb-6">
+        <h3
+          className="text-md font-semibold mb-2 cursor-pointer hover:text-gray-300"
+          onClick={() => setSaveDropdownOpen(!isSaveDropdownOpen)}
+        >
+          Save Management
+        </h3>
+        {isSaveDropdownOpen && (
+          <ul className="bg-gray-700 rounded p-2">
+            <li className="cursor-pointer hover:bg-gray-600 p-2 rounded" onClick={saveGame}>
+              Save Game
+            </li>
+            <li className="cursor-pointer hover:bg-gray-600 p-2 rounded" onClick={() => loadGame()}>
+              Load Game
+            </li>
+            <li className="cursor-pointer hover:bg-gray-600 p-2 rounded" onClick={exportSave}>
+              Export Save
+            </li>
+            <li className="cursor-pointer hover:bg-gray-600 p-2 rounded">
+              <label>
+                Import Save
+                <input
+                  type="file"
+                  accept="application/json"
+                  onChange={handleImportSave}
+                  className="hidden"
+                />
+              </label>
+            </li>
+            <li
+              className="cursor-pointer hover:bg-gray-600 p-2 rounded"
+              onClick={() => {
+                if (window.confirm("Are you sure you want to reset the game?")) {
+                  resetGame();
+                  alert("Game reset successfully!");
+                }
+              }}
+            >
+              Reset Game
+            </li>
+            <li className="cursor-pointer hover:bg-gray-600 p-2 rounded" onClick={togglePause}>
+              {isPaused ? "Unpause Game" : "Pause Game"}
+            </li>
+          </ul>
+        )}
+      </div>
+
       {/* Skill Progress */}
       <div className="mb-6">
         <h3 className="text-md font-semibold mb-2">Skills</h3>
@@ -96,53 +144,7 @@ const Sidebar: React.FC = () => {
         </ul>
       </div>
 
-      {/* Save Management */}
-      <div className="mb-6">
-        <h3
-          className="text-md font-semibold mb-2 cursor-pointer hover:text-gray-300"
-          onClick={() => setSaveDropdownOpen(!isSaveDropdownOpen)}
-        >
-          Save Management
-        </h3>
-        {isSaveDropdownOpen && (
-          <ul className="bg-gray-700 rounded p-2">
-            <li className="cursor-pointer hover:bg-gray-600 p-2 rounded" onClick={saveGame}>
-              Save Game
-            </li>
-            <li className="cursor-pointer hover:bg-gray-600 p-2 rounded" onClick={() => loadGame()}>
-              Load Game
-            </li>
-            <li className="cursor-pointer hover:bg-gray-600 p-2 rounded" onClick={exportSave}>
-              Export Save
-            </li>
-            <li className="cursor-pointer hover:bg-gray-600 p-2 rounded">
-              <label>
-                Import Save
-                <input
-                  type="file"
-                  accept="application/json"
-                  onChange={handleImportSave}
-                  className="hidden"
-                />
-              </label>
-            </li>
-            <li
-              className="cursor-pointer hover:bg-gray-600 p-2 rounded"
-              onClick={() => {
-                if (window.confirm("Are you sure you want to reset the game?")) {
-                  resetGame();
-                  alert("Game reset successfully!");
-                }
-              }}
-            >
-              Reset Game
-            </li>
-            <li className="cursor-pointer hover:bg-gray-600 p-2 rounded" onClick={togglePause}>
-              {isPaused ? "Unpause Game" : "Pause Game"}
-            </li>
-          </ul>
-        )}
-      </div>
+
     </aside>
   );
 };
