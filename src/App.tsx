@@ -2,18 +2,25 @@ import React, { useEffect } from "react";
 import { useViewStore } from "./stores/view.store";
 import GameContainer from "./views/GameContainer";
 import MiningView from "./views/gathering/MiningView";
-import SmithingView from "./views/crafting/SmithingView"; // Import SmithingView
+import SmithingView from "./views/crafting/SmithingView";
 import Sidebar from "./components/common/Sidebar";
 import { GameLoop } from "./core/game-loop/game-loop";
 import LumberingView from "./views/gathering/LumberingView";
+import { useGameStore } from "./stores/game.store";
+
 function App() {
   const currentView = useViewStore((state) => state.currentView);
 
   useEffect(() => {
     const gameLoop = GameLoop.getInstance();
+    const gameStore = useGameStore.getState();
+
+    console.log("Starting game loop and autosave...");
     gameLoop.start();
+    gameStore.startAutosave();
 
     return () => {
+      console.log("Stopping game loop...");
       gameLoop.stop();
     };
   }, []);
@@ -22,9 +29,9 @@ function App() {
     switch (currentView) {
       case "mining":
         return <MiningView />;
-      case "smithing": // Add SmithingView case
+      case "smithing":
         return <SmithingView />;
-      case "lumbering": // Add LumberingView case
+      case "lumbering":
         return <LumberingView />;
       default:
         return <div>Select a view to display.</div>;
