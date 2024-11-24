@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
-import { smeltedItems } from "../../data/items/smelted.data";
+import { getRecipesByWorkbench } from "../../data/recipe-registry";
 import { Workbench } from "../../types/workbench.types";
-import WorkbenchComponent from "../../components/game/Workbench";
+import WorkbenchComponent from "../../components/game/WorkbenchComponent";
 
 const smithingWorkbench: Workbench = {
   id: "smithing_workbench",
@@ -13,10 +13,8 @@ const smithingWorkbench: Workbench = {
 };
 
 const SmithingView: React.FC = () => {
-  const recipes = useMemo(() => [
-    { input: "copper_ore", output: smeltedItems.find((item) => item.id === "copper_bar")!, inputAmount: 2 },
-    { input: "iron_ore", output: smeltedItems.find((item) => item.id === "iron_bar")!, inputAmount: 3 },
-  ], []);
+  // Fetch recipes for the smithing workbench
+  const recipes = useMemo(() => getRecipesByWorkbench("smithing"), []);
 
   return (
     <div className="p-6 bg-gray-900 text-white rounded shadow-lg">
