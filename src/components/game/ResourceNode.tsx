@@ -9,6 +9,7 @@ interface ResourceNodeProps {
 
 const ResourceNodeComponent: React.FC<ResourceNodeProps> = ({ node, skillId }) => {
   const startTask = useHunterStore((state) => state.startTask);
+  const stopTask = useHunterStore((state) => state.stopTask);
   const currentTask = useHunterStore((state) => state.currentTask);
   const hunterSkills = useHunterStore((state) => state.hunterSkills);
 
@@ -20,19 +21,18 @@ const ResourceNodeComponent: React.FC<ResourceNodeProps> = ({ node, skillId }) =
       alert(`You need at least level ${node.levelRequired} in ${skill?.name || "this skill"} to gather.`);
       return;
     }
-  
+
     if (currentTask?.taskId === node.id) {
-      alert("Already gathering from this node!");
+      stopTask(); // Toggle off gathering if already gathering from this node
       return;
     }
-  
+
     startTask({
       taskId: node.id,
       type: "gathering",
       skillId,
     });
   };
-  
 
   return (
     <div className="p-4 bg-gray-800 text-white rounded shadow-md">
@@ -46,9 +46,9 @@ const ResourceNodeComponent: React.FC<ResourceNodeProps> = ({ node, skillId }) =
         className={`mt-2 px-4 py-2 rounded ${
           canGather ? "bg-green-500 hover:bg-green-600" : "bg-gray-500 cursor-not-allowed"
         }`}
-        disabled={!canGather || currentTask?.taskId === node.id}
+        disabled={!canGather}
       >
-        {currentTask?.taskId === node.id ? "Gathering..." : canGather ? "Gather" : "Can't Gather"}
+        {currentTask?.taskId === node.id ? "Stop Gathering" : "Gather"}
       </button>
     </div>
   );
