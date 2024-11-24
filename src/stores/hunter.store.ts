@@ -85,12 +85,12 @@ const initialSkills: Record<string, Skill> = {
 };
 
 const initialStats = {
-  health: 100,
-  wisdom: 50,
-  attack: 75,
-  defense: 60,
-  dexterity: 80,
-  skillPoints: 10,
+  health: 1,
+  wisdom: 1,
+  attack: 1,
+  defense: 1,
+  dexterity: 1,
+  skillPoints: 1,
 };
 
 export const useHunterStore = create<HunterState & HunterActions>((set, get) => ({
