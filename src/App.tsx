@@ -5,7 +5,7 @@ import MiningView from "./views/gathering/MiningView";
 import SmithingView from "./views/crafting/SmithingView"; // Import SmithingView
 import Sidebar from "./components/common/Sidebar";
 import { GameLoop } from "./core/game-loop/game-loop";
-
+import LumberingView from "./views/gathering/LumberingView";
 function App() {
   const currentView = useViewStore((state) => state.currentView);
 
@@ -24,6 +24,8 @@ function App() {
         return <MiningView />;
       case "smithing": // Add SmithingView case
         return <SmithingView />;
+      case "lumbering": // Add LumberingView case
+        return <LumberingView />;
       default:
         return <div>Select a view to display.</div>;
     }

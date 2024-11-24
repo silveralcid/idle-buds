@@ -14,6 +14,7 @@ const WorkbenchComponent: React.FC<WorkbenchProps> = ({ workbench, skillId, reci
   const startTask = useHunterStore((state) => state.startTask);
   const stopTask = useHunterStore((state) => state.stopTask);
   const currentTask = useHunterStore((state) => state.currentTask);
+  const progress = useHunterStore((state) => state.progress);
   const hunterSkills = useHunterStore((state) => state.hunterSkills);
   const bankItems = useBankStore((state) => state.items);
 
@@ -68,6 +69,16 @@ const WorkbenchComponent: React.FC<WorkbenchProps> = ({ workbench, skillId, reci
                   {output.amount}x {output.itemId}{" "}
                 </span>
               ))}
+            </div>
+            <div className="mt-2">
+              {currentTask?.taskId === recipe.id && (
+                <div className="w-full bg-gray-600 rounded h-4">
+                  <div
+                    className="bg-blue-500 h-4 rounded"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              )}
             </div>
             <button
               onClick={() => handleCraftClick(recipe)}

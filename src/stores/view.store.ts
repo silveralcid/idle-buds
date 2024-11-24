@@ -8,7 +8,7 @@ interface ViewState {
 
 export const useViewStore = create<ViewState>((set, get) => ({
   currentView: 'mining', // Default to "mining"
-  availableViews: ['mining', 'smithing'], // Add all views here
+  availableViews: ['mining', 'smithing', 'lumbering'], // Add all views here
   setView: (view) => {
     const { availableViews } = get();
     if (availableViews.includes(view)) {

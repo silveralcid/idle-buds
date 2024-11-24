@@ -33,18 +33,17 @@ const SmithingView: React.FC = () => {
       <p className="mb-4">Welcome to the smithing area! Use workbenches to craft items and smelt ores.</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Smithing Workbench */}
-        <WorkbenchComponent
-          workbench={smithingWorkbench}
-          skillId="smithing"
-          recipes={smithingRecipes}
-        />
-
         {/* Smelter Furnace */}
         <WorkbenchComponent
           workbench={smelterWorkbench}
           skillId="smithing"
           recipes={smeltingRecipes}
+        />
+        {/* Smithing Workbench */}
+        <WorkbenchComponent
+          workbench={smithingWorkbench}
+          skillId="smithing"
+          recipes={smithingRecipes}
         />
       </div>
     </div>

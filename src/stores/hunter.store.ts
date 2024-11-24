@@ -140,6 +140,13 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
         experience: 0,
         experienceToNextLevel: calculateExperienceRequirement("smithing", 1),
       },
+      lumbering: {
+        id: "lumbering",
+        name: "Lumbering",
+        level: 1,
+        experience: 0,
+        experienceToNextLevel: calculateExperienceRequirement("lumbering", 1),
+      },
     },
 
     startTask: (task) => {

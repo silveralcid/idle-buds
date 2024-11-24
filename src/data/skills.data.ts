@@ -18,5 +18,11 @@ interface SkillConfig {
       baseExperience: 100,
       xpMultiplier: 1,
     },
+    lumbering: {
+      id: "lumbering",
+      name: "Lumbering",
+      baseExperience: 100,
+      xpMultiplier: 1,
+    },
   };
   
