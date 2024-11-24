@@ -6,11 +6,9 @@ import { useHunterStore } from "./hunter.store";
 
 
 interface GameState {
-  lastSaveTime: number;
-  isPaused: boolean;
   isInitialLoad: boolean;
-  lastTickTime: number;
-  tickRate: number;
+  isPaused: boolean;
+  lastSaveTime: number;
 }
 
 interface GameActions {
@@ -19,16 +17,12 @@ interface GameActions {
   resetGame: () => void;
   pauseGame: () => void;
   unpauseGame: () => void;
-  togglePause: () => void;
-  updateLastTickTime: (time: number) => void;
 }
 
 export const useGameStore = create<GameState & GameActions>((set, get) => ({
-  lastSaveTime: Date.now(),
-  isPaused: false,
   isInitialLoad: true,
-  lastTickTime: Date.now(),
-  tickRate: 50, // 20 ticks per second
+  isPaused: false,
+  lastSaveTime: Date.now(),
   
   saveGame: () => {
     const currentTime = Date.now();
@@ -43,7 +37,6 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
         lastSaveTime: savedState.timestamp,
         isPaused: false,
         isInitialLoad: false,
-        lastTickTime: Date.now()
       });
     }
   },
@@ -60,7 +53,6 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
       lastSaveTime: resetTime,
       isPaused: false,
       isInitialLoad: true,
-      lastTickTime: resetTime
     });
     
     saveGameState();
@@ -69,30 +61,13 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
   pauseGame: () => {
     if (!get().isPaused) {
       set({ isPaused: true });
-      // Save state when pausing
-      get().saveGame();
     }
   },
   
   unpauseGame: () => {
     if (get().isPaused) {
       set({ 
-        isPaused: false,
-        lastTickTime: Date.now()
-      });
+        isPaused: false,});
     }
   },
-  
-  togglePause: () => {
-    const isPaused = get().isPaused;
-    if (isPaused) {
-      get().unpauseGame();
-    } else {
-      get().pauseGame();
-    }
-  },
-  
-  updateLastTickTime: (time: number) => {
-    set({ lastTickTime: time });
-  }
 }));
