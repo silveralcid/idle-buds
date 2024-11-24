@@ -155,6 +155,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => {
     pauseGame: () => {
       if (!get().isPaused) {
         set({ isPaused: true });
+        GameEvents.getInstance().emit("gamePaused");
         console.log("Game paused!");
       }
     },
@@ -162,6 +163,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => {
     resumeGame: () => {
       if (get().isPaused) {
         set({ isPaused: false, lastTickTime: Date.now() });
+        GameEvents.getInstance().emit("gameResumed");
         console.log("Game unpaused!");
       }
     },
