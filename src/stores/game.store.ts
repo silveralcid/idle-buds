@@ -27,7 +27,7 @@ interface GameActions {
   loadGame: (loadedState?: Partial<GameState>) => void;
   resetGame: () => void;
   pauseGame: () => void;
-  unpauseGame: () => void;
+  resumeGame: () => void;
   togglePause: () => void;
   updateLastTickTime: (time: number) => void;
   tick: () => void;
@@ -159,7 +159,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => {
       }
     },
 
-    unpauseGame: () => {
+    resumeGame: () => {
       if (get().isPaused) {
         set({ isPaused: false, lastTickTime: Date.now() });
         console.log("Game unpaused!");
@@ -168,7 +168,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => {
 
     togglePause: () => {
       if (get().isPaused) {
-        get().unpauseGame();
+        get().resumeGame();
       } else {
         get().pauseGame();
       }

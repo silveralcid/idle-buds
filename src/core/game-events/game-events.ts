@@ -7,6 +7,8 @@ export type GameEventPayloads = {
     gameInitialized: void;
     gameTick: void;
     resourceGathered: { name: string; quantity: number };
+    gamePaused: void;
+    gameResumed: void;
 
     // Hunter Events
     hunterStateChanged: { hunterId: string; newState: "idle" | "active" | "combat" };
