@@ -5,17 +5,12 @@ import { useHunterStore } from '../../stores/hunter.store';
 interface ResourceCardProps {
   resource: ResourceNode;
   skillId: string;
-  assignedBuds: string[];
-  onAssignBud: (budId: string) => void;
-  onRemoveBud: (budId: string) => void;
   onActivate: () => void;
 }
 
 const ResourceCard: React.FC<ResourceCardProps> = ({ 
   resource, 
   skillId,
-  onAssignBud,
-  onRemoveBud, 
   onActivate 
 }) => {
   const [isUnlocked, setIsUnlocked] = useState(resource.isUnlocked);

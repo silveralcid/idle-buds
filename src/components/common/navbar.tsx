@@ -1,9 +1,7 @@
 import { useViewStore } from '../../stores/view.store';
-import { budSpecies } from '../../data/buds/budSpecies.data';
 import SaveLoadControls from './SaveLoadControls';
 import { useGameStore } from '../../stores/game.store';
 import { useHunterStore } from '../../stores/hunter.store';
-import { useActiveBudStore } from '../../stores/active-bud.store';
 
 const Navbar = () => {
   const setView = useViewStore((state) => state.setView);
@@ -12,21 +10,6 @@ const Navbar = () => {
   const unpauseGame = useGameStore((state) => state.unpauseGame);
   const hunterActivity = useHunterStore((state) => state.currentActivity);
   const stopHunterActivity = useHunterStore((state) => state.stopHunterActivity);
-  const budActivities = useActiveBudStore((state) => state.budActivities);
-
-  const addRandomBudToParty = () => {
-    const activeBudStore = useActiveBudStore.getState();
-    const randomSpecies = budSpecies[Math.floor(Math.random() * budSpecies.length)];
-    
-    // Create the bud first
-    const newBud = activeBudStore.createBud(randomSpecies);
-    
-    // Check if adding to party was successful
-    const success = activeBudStore.addBudToParty(newBud);
-    if (!success) {
-      console.warn('❌ Failed to add bud to party - party might be full');
-    }
-  };
 
   const togglePause = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -36,11 +19,6 @@ const Navbar = () => {
       if (hunterActivity) {
         stopHunterActivity();
       }
-      
-      // Stop all bud activities
-      Object.keys(budActivities).forEach(budId => {
-        useActiveBudStore.getState().stopBudActivity(budId);
-      });
       
       pauseGame();
     } else {
@@ -81,9 +59,7 @@ const Navbar = () => {
             <SaveLoadControls />
             {/* Action Buttons */}
             <div className="space-x-2">
-              <button onClick={addRandomBudToParty} className="btn btn-primary">
-                Add Random Bud to Party
-              </button>
+
               <button onClick={togglePause} className="btn btn-secondary">
                 {isPaused ? 'Resume' : 'Pause'}
               </button>
