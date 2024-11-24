@@ -1,10 +1,18 @@
 import { create } from "zustand";
-import { saveGameState, loadGameState, resetGameState } from "../utils/save-management.utils";
-import { useBankStore } from "./bank.store";
+import { GameConfig } from "../core/constants/game-config";
+import { GameEvents } from "../core/game-events/game-events";
 import { useHunterStore } from "./hunter.store";
-import { useActiveBudStore } from "./active-bud.store";
-import { useBoxBudStore } from "./box-bud.store";
+import { useBankStore } from "./bank.store";
 
+interface SavedGameState {
+  lastSaveTime: number;
+  isPaused: boolean;
+  lastTickTime: number;
+  tickRate: number;
+  bankState: any;
+  hunterState: any;
+  [key: string]: any; // Allow additional properties for extensibility
+}
 
 interface GameState {
   lastSaveTime: number;
@@ -16,85 +24,210 @@ interface GameState {
 
 interface GameActions {
   saveGame: () => void;
-  loadGame: () => void;
+  loadGame: (loadedState?: Partial<GameState>) => void;
   resetGame: () => void;
   pauseGame: () => void;
   unpauseGame: () => void;
   togglePause: () => void;
   updateLastTickTime: (time: number) => void;
+  tick: () => void;
+  exportSave: () => void;
+  importSave: (data: string) => void;
 }
 
-export const useGameStore = create<GameState & GameActions>((set, get) => ({
-  lastSaveTime: Date.now(),
-  isPaused: false,
-  isInitialLoad: true,
-  lastTickTime: Date.now(),
-  tickRate: 50, // 20 ticks per second
-  
-  saveGame: () => {
-    const currentTime = Date.now();
-    set({ lastSaveTime: currentTime });
-    saveGameState();
-  },
-  
-  loadGame: () => {
-    const savedState = loadGameState();
+export const useGameStore = create<GameState & GameActions>((set, get) => {
+  const saveKey = "idle_buds_save";
+
+  const saveToLocalStorage = (state: SavedGameState) => {
+    localStorage.setItem(saveKey, JSON.stringify(state));
+  };
+
+  const loadFromLocalStorage = (): SavedGameState | null => {
+    const savedData = localStorage.getItem(saveKey);
+    return savedData ? JSON.parse(savedData) : null;
+  };
+
+  const handleOfflineProgression = (elapsedTime: number) => {
+    const tickDuration = GameConfig.TICK.DURATION;
+    const ticks = Math.floor(elapsedTime / tickDuration);
+
+    if (ticks > 0) {
+      for (let i = 0; i < ticks; i++) {
+        GameEvents.getInstance().emit("gameTick");
+      }
+    }
+  };
+
+  const saveGameState = () => {
+    const { lastSaveTime, isPaused, lastTickTime, tickRate } = get();
+    const saveData: SavedGameState = {
+      lastSaveTime,
+      isPaused,
+      lastTickTime,
+      tickRate,
+      bankState: useBankStore.getState(),
+      hunterState: useHunterStore.getState(),
+    };
+    saveToLocalStorage(saveData);
+  };
+
+  const loadGameState = () => {
+    const savedState = loadFromLocalStorage();
     if (savedState) {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - savedState.lastSaveTime;
+
       set({
-        lastSaveTime: savedState.timestamp,
-        isPaused: false,
+        lastSaveTime: currentTime,
+        isPaused: savedState.isPaused,
+        lastTickTime: currentTime,
+        tickRate: savedState.tickRate,
         isInitialLoad: false,
-        lastTickTime: Date.now()
       });
+
+      // Restore other store states
+      useBankStore.getState().loadState(savedState.bankState);
+      useHunterStore.getState().loadState(savedState.hunterState);
+
+      // Process offline progression
+      if (!savedState.isPaused) {
+        handleOfflineProgression(elapsedTime);
+      }
     }
-  },
-  
-  resetGame: () => {
-    resetGameState();
-    const resetTime = Date.now();
-    
-    // Reset all stores in the correct order
-    useActiveBudStore.getState().resetBudState();
-    useBankStore.getState().resetBank();
-    useHunterStore.getState().resetHunterState();
-    
-    set({
-      lastSaveTime: resetTime,
-      isPaused: false,
-      isInitialLoad: true,
-      lastTickTime: resetTime
-    });
-    
-    saveGameState();
-  },
-  
-  pauseGame: () => {
-    if (!get().isPaused) {
-      set({ isPaused: true });
-      // Save state when pausing
+  };
+
+  // Autosave Logic
+  const startAutosave = () => {
+    setInterval(() => {
       get().saveGame();
-    }
-  },
-  
-  unpauseGame: () => {
-    if (get().isPaused) {
-      set({ 
+    }, GameConfig.SAVE.AUTO_INTERVAL);
+  };
+
+  return {
+    lastSaveTime: Date.now(),
+    isPaused: false,
+    isInitialLoad: true,
+    lastTickTime: Date.now(),
+    tickRate: GameConfig.TICK.RATE.DEFAULT,
+
+    saveGame: () => {
+      const currentTime = Date.now();
+      set({ lastSaveTime: currentTime });
+      saveGameState();
+      console.log("Game saved!");
+    },
+
+    loadGame: (loadedState?: Partial<GameState>) => {
+      if (loadedState) {
+        set({
+          ...loadedState,
+          isInitialLoad: false,
+          lastTickTime: Date.now(),
+        });
+        console.log("Game loaded from provided state!");
+      } else {
+        loadGameState();
+      }
+    },
+
+    resetGame: () => {
+      set({
+        lastSaveTime: Date.now(),
         isPaused: false,
-        lastTickTime: Date.now()
+        isInitialLoad: true,
+        lastTickTime: Date.now(),
       });
-    }
-  },
-  
-  togglePause: () => {
-    const isPaused = get().isPaused;
-    if (isPaused) {
-      get().unpauseGame();
-    } else {
-      get().pauseGame();
-    }
-  },
-  
-  updateLastTickTime: (time: number) => {
-    set({ lastTickTime: time });
-  }
-}));
+
+      useBankStore.getState().resetBank();
+      useHunterStore.getState().resetHunterState();
+
+      saveGameState();
+      console.log("Game reset!");
+    },
+
+    pauseGame: () => {
+      if (!get().isPaused) {
+        set({ isPaused: true });
+        get().saveGame();
+        console.log("Game paused!");
+      }
+    },
+
+    unpauseGame: () => {
+      if (get().isPaused) {
+        set({
+          isPaused: false,
+          lastTickTime: Date.now(),
+        });
+        console.log("Game unpaused!");
+      }
+    },
+
+    togglePause: () => {
+      if (get().isPaused) {
+        get().unpauseGame();
+      } else {
+        get().pauseGame();
+      }
+    },
+
+    updateLastTickTime: (time: number) => {
+      set({ lastTickTime: time });
+    },
+
+    tick: () => {
+      if (get().isPaused) return;
+
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - get().lastTickTime;
+      const tickDuration = GameConfig.TICK.DURATION;
+
+      if (elapsedTime >= tickDuration) {
+        GameEvents.getInstance().emit("gameTick");
+        set({ lastTickTime: currentTime });
+      }
+    },
+
+    exportSave: () => {
+      const { lastSaveTime, isPaused, lastTickTime, tickRate } = get();
+      const saveData: SavedGameState = {
+        lastSaveTime,
+        isPaused,
+        lastTickTime,
+        tickRate,
+        bankState: useBankStore.getState(),
+        hunterState: useHunterStore.getState(),
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(saveData));
+      const downloadAnchor = document.createElement("a");
+      downloadAnchor.href = dataStr;
+      downloadAnchor.download = `IdleBuds_Save_${new Date().toISOString()}.json`;
+      downloadAnchor.click();
+      console.log("Save exported!");
+    },
+
+    importSave: (data: string) => {
+      try {
+        const importedState: SavedGameState = JSON.parse(data);
+        set({
+          lastSaveTime: importedState.lastSaveTime,
+          isPaused: importedState.isPaused,
+          lastTickTime: Date.now(),
+          tickRate: importedState.tickRate,
+          isInitialLoad: false,
+        });
+
+        useBankStore.getState().loadState(importedState.bankState);
+        useHunterStore.getState().loadState(importedState.hunterState);
+
+        console.log("Save imported!");
+      } catch (error) {
+        console.error("Failed to import save data:", error);
+      }
+    },
+  };
+});
+
+// Start autosave
+// startAutosave();

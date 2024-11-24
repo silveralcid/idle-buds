@@ -14,6 +14,8 @@ interface HunterState {
   currentTask: BaseTask | null; // Current task being performed
   progress: number; // Task progress as a percentage (0–100)
   hunterSkills: Record<string, Skill>; // Hunter's skill levels and experience
+  loadState: (state: Partial<HunterState>) => void; // Load state from saved game
+  resetHunterState: () => void; // Reset hunter state
 }
 
 interface HunterActions {
@@ -253,6 +255,46 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
           },
         };
       });
+    },
+    loadState: (state: Partial<HunterState>) => {
+      set((currentState) => ({
+        ...currentState,
+        ...state,
+      }));
+    },
+    resetHunterState: () => {
+      set({
+        hunterId: uuidv4(), // Generate a new unique ID for the hunter
+        currentTask: null, // Clear the current task
+        progress: 0, // Reset task progress to 0
+        isWorking: false, // Set working status to false
+        hunterSkills: {
+          mining: {
+            id: "mining",
+            name: "Mining",
+            level: 1,
+            experience: 0,
+            experienceToNextLevel: calculateExperienceRequirement("mining", 1),
+          },
+          smithing: {
+            id: "smithing",
+            name: "Smithing",
+            level: 1,
+            experience: 0,
+            experienceToNextLevel: calculateExperienceRequirement("smithing", 1),
+          },
+          lumbering: {
+            id: "lumbering",
+            name: "Lumbering",
+            level: 1,
+            experience: 0,
+            experienceToNextLevel: calculateExperienceRequirement("lumbering", 1),
+          },
+        },
+      });
+
+      // Emit an event to signal the reset
+      gameEvents.emit("hunterStateChanged", { hunterId: get().hunterId, newState: "idle" });
     },
   };
 });

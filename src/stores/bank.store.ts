@@ -6,6 +6,7 @@ interface BankState {
   addItem: (itemId: string, amount: number) => void; // Add items to the bank
   resetBank: () => void; // Reset all items in the bank
   removeItem: (itemId: string, amount: number) => void; // Remove items from the bank
+  loadState: (state: Record<string, number>) => void; // Load items into the bank
 }
 
 const gameEvents = GameEvents.getInstance();
@@ -23,6 +24,7 @@ export const useBankStore = create<BankState>((set) => {
 
   return {
     items: {},
+
     addItem: (itemId, amount) =>
       set((state) => ({
         items: {
@@ -30,7 +32,9 @@ export const useBankStore = create<BankState>((set) => {
           [itemId]: (state.items[itemId] || 0) + amount,
         },
       })),
+
     resetBank: () => set({ items: {} }),
+
     removeItem: (itemId, amount) =>
       set((state) => {
         const currentAmount = state.items[itemId] || 0;
@@ -45,6 +49,11 @@ export const useBankStore = create<BankState>((set) => {
             [itemId]: currentAmount - amount,
           },
         };
+      }),
+
+    loadState: (state) =>
+      set({
+        items: state,
       }),
   };
 });
