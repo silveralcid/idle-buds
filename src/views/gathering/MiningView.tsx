@@ -6,16 +6,16 @@ import { miningNodes } from '../../data/nodes/mining.data';
 const MiningView = () => {
   useGameLoop();
 
-  const MiningSkill = useHunterStore((state) => state.skills.Mining);
-  const startHunterActivity = useHunterStore((state) => state.startHunterActivity);
+  const miningSkill = useHunterStore((state) => state.skills.mining);
+  const startHunterGathering = useHunterStore((state) => state.startHunterGathering);
 
   return (
     <div className="h-full flex flex-col gap-4">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">Mining</h2>
+          <h2 className="text-2xl font-bold">mining</h2>
           <p className="text-sm opacity-70">
-            Level: {MiningSkill.level} | XP: {MiningSkill.experience}/{MiningSkill.experienceToNextLevel}
+            Level: {miningSkill.level} | XP: {miningSkill.experience}/{miningSkill.experienceToNextLevel}
           </p>
         </div>
       </div>
@@ -26,8 +26,8 @@ const MiningView = () => {
             <ResourceCard
               key={resource.id}
               resource={resource}
-              onActivate={() => startHunterActivity('gathering', resource.id)}
-              skillId="Mining"
+              onActivate={() => startHunterGathering(resource.id)}
+              skillId="mining"
             />
           );
         })}

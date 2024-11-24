@@ -7,7 +7,7 @@ const LumberingView = () => {
   useGameLoop();
 
   const lumberingSkill = useHunterStore((state) => state.skills.lumbering);
-  const startHunterActivity = useHunterStore((state) => state.startHunterActivity);
+  const startHunterGathering = useHunterStore((state) => state.startHunterGathering);
 
   return (
     <div className="h-full flex flex-col gap-4">
@@ -26,7 +26,7 @@ const LumberingView = () => {
             <ResourceCard
               key={resource.id}
               resource={resource}
-              onActivate={() => startHunterActivity('gathering', resource.id)}
+              onActivate={() => startHunterGathering(resource.id)}
               skillId="lumbering"
             />
           );

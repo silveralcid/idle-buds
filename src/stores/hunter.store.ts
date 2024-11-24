@@ -4,7 +4,7 @@ import { calculateExperienceRequirement } from '../utils/experience.utils';
 
 
 
-interface HunterState {
+export interface HunterState {
   id: string;
   skills: Record<string, Skill>;
   stats: {
@@ -18,7 +18,7 @@ interface HunterState {
   currentHunterActivity: HunterGathering | HunterCrafting | null;
 }
 
-interface HunterGathering {
+export interface HunterGathering {
   type: 'gathering';
   nodeId: string;
   gatheringProgress: {
@@ -27,7 +27,7 @@ interface HunterGathering {
   };
 }
 
-interface HunterCrafting {
+export interface HunterCrafting {
   type: 'crafting';
   workbenchId: string;
   recipeId: string | null;
@@ -38,7 +38,7 @@ interface HunterCrafting {
   };
 }
 
-interface HunterActions {
+export interface HunterActions {
   // Activity Management
   startHunterGathering: (nodeId: string) => void;
   startHunterCrafting: (workbenchId: string, recipeId: string) => void;

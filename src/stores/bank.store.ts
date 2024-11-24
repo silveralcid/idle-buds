@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-interface BankState {
+export interface BankState {
   items: Record<string, number>;
   resetBank: () => void;
   addItem: (itemId: string, amount: number) => void;

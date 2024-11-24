@@ -8,7 +8,7 @@ const Navbar = () => {
   const isPaused = useGameStore((state) => state.isPaused);
   const pauseGame = useGameStore((state) => state.pauseGame);
   const unpauseGame = useGameStore((state) => state.unpauseGame);
-  const hunterActivity = useHunterStore((state) => state.currentActivity);
+  const hunterActivity = useHunterStore((state) => state.currentHunterActivity);
   const stopHunterActivity = useHunterStore((state) => state.stopHunterActivity);
 
   const togglePause = (event: React.MouseEvent<HTMLButtonElement>) => {
