@@ -175,7 +175,6 @@ export const useGameStore = create<GameState & GameActions>((set, get) => {
       useBankStore.getState().resetBank();
       useHunterStore.getState().resetHunterState();
 
-      saveGameState();
       console.log("Game reset!");
     },
 
