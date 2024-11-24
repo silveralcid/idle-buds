@@ -5,9 +5,9 @@ import { Workbench } from "../../types/workbench.types";
 import { BaseItem } from "../../types/itemBase.types";
 
 interface WorkbenchProps {
-  workbench: Workbench; // Workbench data
-  skillId: string; // Skill required to use the workbench
-  recipes: { input: string; output: BaseItem; inputAmount: number }[]; // Crafting recipes
+  workbench: Workbench;
+  skillId: string;
+  recipes: { input: string; output: BaseItem; inputAmount: number }[];
 }
 
 const WorkbenchComponent: React.FC<WorkbenchProps> = ({ workbench, skillId, recipes }) => {
@@ -15,11 +15,7 @@ const WorkbenchComponent: React.FC<WorkbenchProps> = ({ workbench, skillId, reci
   const stopTask = useHunterStore((state) => state.stopTask);
   const currentTask = useHunterStore((state) => state.currentTask);
   const hunterSkills = useHunterStore((state) => state.hunterSkills);
-  const bankStore = useBankStore((state) => ({
-    addItem: state.addItem,
-    removeItem: state.removeItem,
-    items: state.items,
-  }));
+  const bankItems = useBankStore((state) => state.items);
 
   const skill = hunterSkills[skillId];
   const canCraft = skill && skill.level >= workbench.levelRequired;
@@ -30,20 +26,17 @@ const WorkbenchComponent: React.FC<WorkbenchProps> = ({ workbench, skillId, reci
       return;
     }
 
-    // Check if sufficient resources are available
-    const availableAmount = bankStore.items[recipe.input] || 0;
+    const availableAmount = bankItems[recipe.input] || 0;
     if (availableAmount < recipe.inputAmount) {
       alert(`You need at least ${recipe.inputAmount} ${recipe.input} to craft ${recipe.output.name}.`);
       return;
     }
 
     if (currentTask?.taskId === workbench.id) {
-      stopTask(); // Toggle off crafting if already crafting at this workbench
+      stopTask(); // Toggle off crafting
       return;
     }
 
-    // Remove required resources and start crafting task
-    bankStore.removeItem(recipe.input, recipe.inputAmount);
     startTask({
       taskId: workbench.id,
       type: "crafting",

@@ -1,35 +1,28 @@
-import React from "react";
-import { useHunterStore } from "../../stores/hunter.store";
+import React, { useMemo } from "react";
+import { smeltedItems } from "../../data/items/smelted.data";
+import { Workbench } from "../../types/workbench.types";
+import WorkbenchComponent from "../../components/game/Workbench";
+
+const smithingWorkbench: Workbench = {
+  id: "smithing_workbench",
+  name: "Smithing Workbench",
+  description: "A sturdy workbench for refining ores into bars.",
+  workbenchType: "smithing",
+  levelRequired: 1,
+  isUnlocked: true,
+};
 
 const SmithingView: React.FC = () => {
-  const currentTask = useHunterStore((state) => state.currentTask);
+  const recipes = useMemo(() => [
+    { input: "copper_ore", output: smeltedItems.find((item) => item.id === "copper_bar")!, inputAmount: 2 },
+    { input: "iron_ore", output: smeltedItems.find((item) => item.id === "iron_bar")!, inputAmount: 3 },
+  ], []);
 
   return (
     <div className="p-6 bg-gray-900 text-white rounded shadow-lg">
       <h1 className="text-2xl font-bold mb-4">Smithing</h1>
       <p className="mb-4">Welcome to the smithing area! Use a workbench to craft items and refine materials.</p>
-
-      {/* Display Current Task */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Current Task</h2>
-        {currentTask && currentTask.type === "crafting" ? (
-          <div>
-            <p>
-              <strong>Task:</strong> {currentTask.taskId}
-            </p>
-            <p>
-              <strong>Status:</strong> In Progress
-            </p>
-          </div>
-        ) : (
-          <p>No active smithing task.</p>
-        )}
-      </div>
-
-      {/* Placeholder for Workbench Component */}
-      <div className="bg-gray-800 p-4 rounded">
-        <p className="text-center">Workbench will be implemented here.</p>
-      </div>
+      <WorkbenchComponent workbench={smithingWorkbench} skillId="smithing" recipes={recipes} />
     </div>
   );
 };
