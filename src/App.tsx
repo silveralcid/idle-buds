@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { useViewStore } from "./stores/view.store";
 import GameContainer from "./views/GameContainer";
 import MiningView from "./views/gathering/MiningView";
-import Sidebar from "./components/common/Sidebar"; // Import Sidebar
+import SmithingView from "./views/crafting/SmithingView"; // Import SmithingView
+import Sidebar from "./components/common/Sidebar";
 import { GameLoop } from "./core/game-loop/game-loop";
 
 function App() {
@@ -21,6 +22,8 @@ function App() {
     switch (currentView) {
       case "mining":
         return <MiningView />;
+      case "smithing": // Add SmithingView case
+        return <SmithingView />;
       default:
         return <div>Select a view to display.</div>;
     }
@@ -28,7 +31,7 @@ function App() {
 
   return (
     <div className="flex min-h-screen bg-base-300">
-      <Sidebar /> {/* Add Sidebar */}
+      <Sidebar />
       <div className="flex-1">
         <GameContainer>{renderView()}</GameContainer>
       </div>

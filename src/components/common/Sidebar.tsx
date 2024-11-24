@@ -1,12 +1,17 @@
 import React from "react";
 import { useHunterStore } from "../../stores/hunter.store";
 import { useBankStore } from "../../stores/bank.store";
+import { useViewStore } from "../../stores/view.store";
 
 const Sidebar: React.FC = () => {
-  // Select only the state you need to minimize re-renders
   const hunterSkills = useHunterStore((state) => state.hunterSkills);
   const currentTask = useHunterStore((state) => state.currentTask);
   const bankItems = useBankStore((state) => state.items);
+  const setView = useViewStore((state) => state.setView);
+
+  const handleSkillClick = (skillId: string) => {
+    setView(skillId.toLowerCase()); // Dynamically set the view based on the skill ID
+  };
 
   return (
     <aside className="w-64 bg-gray-800 text-white p-4">
@@ -17,7 +22,11 @@ const Sidebar: React.FC = () => {
         <h3 className="text-md font-semibold mb-2">Skills</h3>
         <ul>
           {Object.values(hunterSkills).map((skill) => (
-            <li key={skill.id} className="mb-2">
+            <li
+              key={skill.id}
+              className="mb-2 cursor-pointer hover:bg-gray-700 p-2 rounded"
+              onClick={() => handleSkillClick(skill.id)} // Click handler to change view
+            >
               <div className="flex justify-between items-center">
                 <span>{skill.name}</span>
                 <span>
