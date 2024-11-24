@@ -1,7 +1,6 @@
 import { useBankStore } from "../stores/bank.store";
 import { useGameStore } from "../stores/game.store";
 import { useHunterStore } from "../stores/hunter.store";
-import { useActiveBudStore } from "../stores/active-bud.store";
 import { GameConfig } from "../constants/game-config";
 import { SAVE_KEY } from "../constants/save-key";
 
@@ -9,7 +8,6 @@ export function saveGameState() {
     const gameState = useGameStore.getState();
     const bankState = useBankStore.getState();
     const hunterState = useHunterStore.getState().saveHunterState();
-    const activeBudState = useActiveBudStore.getState().saveBudState();
     
     const currentTime = Date.now();
     useGameStore.setState({ lastSaveTime: currentTime });
@@ -21,7 +19,6 @@ export function saveGameState() {
             game: { ...gameState, lastSaveTime: currentTime },
             bank: bankState,
             hunter: hunterState,
-            buds: activeBudState,
         }
     };
   
@@ -54,14 +51,8 @@ export const loadGameState = () => {
         
         useBankStore.setState(bank);
         useHunterStore.getState().loadHunterState(hunter);
-        useActiveBudStore.getState().loadBudState(buds);
         
-        // Load activity state last since it depends on other states
-        useActiveBudStore.setState({
-            budActivities: activities.budActivities || {},
-            budProgress: activities.budProgress || {}
-        });
-        
+
         return saveData;
     } catch (error) {
         console.error('Failed to load game:', error);
@@ -73,7 +64,6 @@ export const resetGameState = () => {
     const resetTime = Date.now();
     
     // Reset all stores in the correct order to maintain dependencies
-    useActiveBudStore.getState().resetBudState();
     useHunterStore.getState().resetHunterState();
     useBankStore.getState().resetBank();
     
