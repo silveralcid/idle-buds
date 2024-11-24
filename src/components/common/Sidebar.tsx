@@ -102,7 +102,7 @@ const Sidebar: React.FC = () => {
               Reset Game
             </li>
             <li className="cursor-pointer hover:bg-gray-600 p-2 rounded" onClick={handleTogglePause}>
-              {isPaused ? "Unpause Game" : "Pause Game"}
+              {isPaused ? "Resume Game" : "Pause Game"}
             </li>
           </ul>
         )}
