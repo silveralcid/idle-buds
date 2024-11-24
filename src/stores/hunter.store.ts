@@ -6,6 +6,8 @@ import { calculateExperienceRequirement } from "../utils/experience.utils";
 import { GameEvents } from "../core/game-events/game-events";
 import { GameConfig } from "../core/constants/game-config";
 import { resourceRegistry } from "../data/resource-registry";
+import { recipeRegistry } from "../data/recipe-registry";
+import { useBankStore } from "./bank.store";
 
 interface HunterState {
   hunterId: string; // Unique ID for the hunter
@@ -26,7 +28,6 @@ const gameEvents = GameEvents.getInstance();
 
 export const useHunterStore = create<HunterState & HunterActions>((set, get) => {
   const hunterId = uuidv4();
-  const gameEvents = GameEvents.getInstance();
 
   // Subscribe to gameTick event for task progress updates
   gameEvents.on("gameTick", () => {
@@ -36,11 +37,94 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
     }
   });
 
+  const resetOrStopTask = () => {
+    if (get().isWorking) {
+      set({ progress: 0 });
+    } else {
+      set({ currentTask: null, progress: 0 });
+      gameEvents.emit("hunterStateChanged", { hunterId: get().hunterId, newState: "idle" });
+    }
+  };
+
+  const handleGatheringProgress = (ticks: number) => {
+    const { currentTask } = get();
+    if (!currentTask) return;
+
+    const taskDefinition = resourceRegistry[currentTask.taskId];
+    if (!taskDefinition) return;
+
+    const progressIncrement = (ticks / (taskDefinition.gatherRate / GameConfig.TICK.DURATION)) * 100;
+    const newProgress = Math.min(get().progress + progressIncrement, 100);
+
+    if (newProgress === 100) {
+      if (taskDefinition.resourceNodeYields.length > 0) {
+        const itemId = taskDefinition.resourceNodeYields[0];
+        const quantity = 1;
+
+        useBankStore.getState().addItem(itemId, quantity);
+        gameEvents.emit("resourceGathered", { name: itemId, quantity });
+      }
+
+      const xpGained = taskDefinition.experienceGain || 0;
+      if (currentTask.skillId) {
+        get().gainSkillXp(currentTask.skillId, xpGained);
+        gameEvents.emit("hunterSkillXpGained", {
+          hunterId: get().hunterId,
+          skillName: currentTask.skillId,
+          xpGained,
+        });
+      }
+
+      resetOrStopTask();
+      return;
+    }
+
+    set({ progress: newProgress });
+  };
+
+  const handleCraftingProgress = (ticks: number) => {
+    const { currentTask } = get();
+    if (!currentTask) return;
+
+    const recipe = recipeRegistry.find((r) => r.id === currentTask.taskId);
+    if (!recipe) return;
+
+    const progressIncrement = (ticks / recipe.craftingTime) * 100;
+    const newProgress = Math.min(get().progress + progressIncrement, 100);
+
+    if (newProgress === 100) {
+      recipe.outputs.forEach((output) => {
+        useBankStore.getState().addItem(output.itemId, output.amount);
+      });
+
+      recipe.inputs.forEach((input) => {
+        input.itemIds.forEach((id) => {
+          useBankStore.getState().removeItem(id, input.amount);
+        });
+      });
+
+      const xpGained = recipe.experienceGain || 0;
+      if (currentTask.skillId) {
+        get().gainSkillXp(currentTask.skillId, xpGained);
+        gameEvents.emit("hunterSkillXpGained", {
+          hunterId: get().hunterId,
+          skillName: currentTask.skillId,
+          xpGained,
+        });
+      }
+
+      resetOrStopTask();
+      return;
+    }
+
+    set({ progress: newProgress });
+  };
+
   return {
     hunterId,
     currentTask: null,
     progress: 0,
-    isWorking: false, // Tracks whether a task (gathering or crafting) is active
+    isWorking: false,
     hunterSkills: {
       mining: {
         id: "mining",
@@ -61,19 +145,12 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
     startTask: (task) => {
       const { isWorking, currentTask } = get();
 
-      // If already working on the same task, toggle off
       if (isWorking && currentTask?.taskId === task.taskId) {
         set({ isWorking: false, currentTask: null, progress: 0 });
-
-        gameEvents.emit("hunterStateChanged", {
-          hunterId,
-          newState: "idle",
-        });
-
+        gameEvents.emit("hunterStateChanged", { hunterId, newState: "idle" });
         return;
       }
 
-      // Otherwise, start a new task
       const fullTask: BaseTask = {
         ...task,
         ownerType: "hunter",
@@ -81,73 +158,29 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
       };
 
       set({ currentTask: fullTask, isWorking: true, progress: 0 });
-
-      gameEvents.emit("hunterTaskAssigned", {
-        hunterId,
-        task: task.taskId,
-        duration: resourceRegistry[task.taskId]?.gatherRate || 0,
-      });
-
-      gameEvents.emit("hunterStateChanged", {
-        hunterId,
-        newState: "active",
-      });
+      gameEvents.emit("hunterTaskAssigned", { hunterId, task: task.taskId });
+      gameEvents.emit("hunterStateChanged", { hunterId, newState: "active" });
     },
 
     stopTask: () => {
       set({ isWorking: false, currentTask: null, progress: 0 });
-
-      gameEvents.emit("hunterStateChanged", {
-        hunterId,
-        newState: "idle",
-      });
+      gameEvents.emit("hunterStateChanged", { hunterId, newState: "idle" });
     },
 
     updateTaskProgress: (ticks) => {
-      const { currentTask, isWorking } = get();
-      if (!currentTask || !isWorking) return;
+      const { currentTask } = get();
+      if (!currentTask) return;
 
-      const taskDefinition = resourceRegistry[currentTask.taskId];
-      if (!taskDefinition) return;
-
-      const progressIncrement = (ticks / (taskDefinition.gatherRate / GameConfig.TICK.DURATION)) * 100;
-      const newProgress = Math.min(get().progress + progressIncrement, 100);
-
-      if (newProgress === 100) {
-        if (taskDefinition.resourceNodeYields.length > 0) {
-          const itemId = taskDefinition.resourceNodeYields[0];
-          const quantity = 1;
-
-          // Emit resourceGathered event
-          gameEvents.emit("resourceGathered", { name: itemId, quantity });
-        }
-
-        // Gain skill XP
-        const xpGained = taskDefinition.experienceGain || 0;
-        if (currentTask.skillId) {
-          get().gainSkillXp(currentTask.skillId, xpGained);
-
-          gameEvents.emit("hunterSkillXpGained", {
-            hunterId,
-            skillName: currentTask.skillId,
-            xpGained,
-          });
-        }
-
-        // Reset progress to allow continuous work
-        if (isWorking) {
-          set({ progress: 0 });
-        } else {
-          // Stop work if toggle is off
-          set({ currentTask: null, progress: 0 });
-          gameEvents.emit("hunterStateChanged", { hunterId, newState: "idle" });
-        }
-
-        return;
+      switch (currentTask.type) {
+        case "gathering":
+          handleGatheringProgress(ticks);
+          break;
+        case "crafting":
+          handleCraftingProgress(ticks);
+          break;
+        default:
+          console.warn("Unknown task type:", currentTask.type);
       }
-
-      // Update progress if task is not yet complete
-      set({ progress: newProgress });
     },
 
     gainSkillXp: (skillId, xp) => {
@@ -157,7 +190,6 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
 
         const newExperience = skill.experience + xp;
 
-        // Check for level-up
         if (newExperience >= skill.experienceToNextLevel) {
           return {
             hunterSkills: {
@@ -172,7 +204,6 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
           };
         }
 
-        // Update XP
         return {
           hunterSkills: {
             ...state.hunterSkills,
@@ -186,4 +217,3 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
     },
   };
 });
-

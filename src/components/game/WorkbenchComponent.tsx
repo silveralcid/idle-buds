@@ -58,32 +58,33 @@ const WorkbenchComponent: React.FC<WorkbenchProps> = ({ workbench, skillId }) =>
       <p>{workbench.description}</p>
       <p>Required Level: {workbench.levelRequired}</p>
       <ul>
-        {recipes.map((recipe) => (
-          <li key={recipe.id} className="mb-4">
-            <div>
-              {recipe.inputs.map((input) => (
-                <span key={input.itemIds[0]}>
-                  {input.amount}x {input.itemIds.join(" / ")}{" "}
-                </span>
-              ))}
-              → {recipe.outputs.map((output) => (
-                <span key={output.itemId}>
-                  {output.amount}x {output.itemId}{" "}
-                </span>
-              ))}
-            </div>
-            <button
-              onClick={() => handleCraftClick(recipe)}
-              className={`mt-1 px-4 py-2 rounded ${
-                canCraft ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-500 cursor-not-allowed"
-              }`}
-              disabled={!canCraft}
-            >
-              {currentTask?.taskId === recipe.id ? "Stop Crafting" : "Craft"}
-            </button>
-          </li>
+  {recipes.map((recipe) => (
+    <li key={recipe.id} className="mb-4">
+      <div>
+        {recipe.inputs.map((input) => (
+          <span key={input.itemIds[0]}>
+            {input.amount}x {input.itemIds.join(" / ")}{" "}
+          </span>
         ))}
-      </ul>
+        → {recipe.outputs.map((output) => (
+          <span key={output.itemId}>
+            {output.amount}x {output.itemId}{" "}
+          </span>
+        ))}
+      </div>
+      <button
+        onClick={() => handleCraftClick(recipe)}
+        className={`mt-1 px-4 py-2 rounded ${
+          canCraft ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-500 cursor-not-allowed"
+        }`}
+        disabled={!canCraft}
+      >
+        {currentTask?.taskId === recipe.id ? "Stop Crafting" : "Craft"}
+      </button>
+    </li>
+  ))}
+</ul>
+
     </div>
   );
 };

@@ -11,7 +11,7 @@ export type GameEventPayloads = {
     // Hunter Events
     hunterStateChanged: { hunterId: string; newState: "idle" | "active" | "combat" };
     hunterSkillXpGained: { hunterId: string; skillName: string; xpGained: number };
-    hunterTaskAssigned: { hunterId: string; task: string; duration: number };
+    hunterTaskAssigned: { hunterId: string; task: string};
     hunterTaskCompleted: { hunterId: string; task: string; results: any };
 };
 
