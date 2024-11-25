@@ -9,6 +9,7 @@ export type GameEventPayloads = {
     resourceGathered: { name: string; quantity: number };
     gamePaused: void;
     gameResumed: void;
+    offlineProgressCalculated: { xpGained: number; itemsGained: Record<string, number>; itemsLost: Record<string, number> };
 
     // Hunter Events
     hunterStateChanged: { hunterId: string; newState: "idle" | "active" | "combat" };

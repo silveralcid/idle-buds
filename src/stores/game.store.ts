@@ -164,7 +164,6 @@ const initializeAutosave = (() => {
       if (!get().isPaused) {
         set({ isPaused: true });
         GameEvents.getInstance().emit("gamePaused");
-        console.log("Game paused!");
       }
     },
 
@@ -172,7 +171,6 @@ const initializeAutosave = (() => {
       if (get().isPaused) {
         set({ isPaused: false, lastTickTime: Date.now() });
         GameEvents.getInstance().emit("gameResumed");
-        console.log("Game resumed!");
       }
     },
 
