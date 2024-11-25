@@ -31,6 +31,20 @@ const gameEvents = GameEvents.getInstance();
 export const useHunterStore = create<HunterState & HunterActions>((set, get) => {
   const hunterId = uuidv4();
 
+  // Add listeners for pause/unpause events
+  gameEvents.on("gamePaused", () => {
+    console.log("Pausing tasks for hunter:", hunterId);
+    set({ isWorking: false });
+  });
+
+  gameEvents.on("gameResumed", () => {
+    const { currentTask } = get();
+    if (currentTask) {
+      console.log("Resuming tasks for hunter:", hunterId);
+      set({ isWorking: true });
+    }
+  });
+
   // Subscribe to gameTick event for task progress updates
   gameEvents.on("gameTick", () => {
     const { currentTask, isWorking } = get();
@@ -87,72 +101,71 @@ export const useHunterStore = create<HunterState & HunterActions>((set, get) => 
   const handleCraftingProgress = (ticks: number) => {
     const { currentTask } = get();
     if (!currentTask) return;
-  
+
     const recipe = recipeRegistry.find((r) => r.id === currentTask.taskId);
     if (!recipe) return;
-  
+
     const bankStore = useBankStore.getState();
-  
+
     // Check for sufficient materials
     const hasMaterials = recipe.inputs.every((input) =>
       input.itemIds.some((id) => (bankStore.items[id] || 0) >= input.amount)
     );
-  
+
     if (!hasMaterials) {
       // Stop task due to insufficient materials
       set({ isWorking: false, currentTask: null, progress: 0 });
-  
+
       gameEvents.emit("hunterTaskCompleted", {
         hunterId: get().hunterId,
         task: currentTask.taskId,
         results: { success: false, reason: "Insufficient materials" },
       });
-  
+
       gameEvents.emit("hunterStateChanged", {
         hunterId: get().hunterId,
         newState: "idle",
       });
-  
+
       return;
     }
-  
+
     // Calculate progress increment
     const progressIncrement = (ticks / recipe.craftingTime) * 100;
     const newProgress = Math.min(get().progress + progressIncrement, 100);
-  
+
     if (newProgress === 100) {
       // Add outputs to the bank
       recipe.outputs.forEach((output) => {
         bankStore.addItem(output.itemId, output.amount);
       });
-  
+
       // Remove inputs from the bank
       recipe.inputs.forEach((input) => {
         input.itemIds.forEach((id) => {
           bankStore.removeItem(id, input.amount);
         });
       });
-  
+
       // Gain XP
       const xpGained = recipe.experienceGain || 0;
       if (currentTask.skillId) {
         get().gainSkillXp(currentTask.skillId, xpGained);
-  
+
         gameEvents.emit("hunterSkillXpGained", {
           hunterId: get().hunterId,
           skillName: currentTask.skillId,
           xpGained,
         });
       }
-  
+
       resetOrStopTask();
       return;
     }
-  
+
     // Update progress if task is not yet complete
     set({ progress: newProgress });
   };
-  
 
   return {
     hunterId,
