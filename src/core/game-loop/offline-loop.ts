@@ -118,12 +118,15 @@ function processCraftingTask(
   let progress = hunterStore.progress;
   let totalXpGained = 0;
 
-  const craftingTime = recipe.craftingTime / GameConfig.TICK.DURATION;
+  // Calculate crafting time per tick in terms of progress percentage
+  const craftingTimeInTicks = recipe.craftingTime / GameConfig.TICK.DURATION;
+  const progressPerTick = 100 / craftingTimeInTicks;
 
   for (let i = 0; i < ticks; i++) {
-    progress += 100 / craftingTime;
+    progress += progressPerTick;
 
-    if (progress >= 100) {
+    // Process completed crafts
+    while (progress >= 100) {
       // Check if sufficient materials exist
       const hasMaterials = recipe.inputs.every((input) =>
         input.itemIds.some((id) => (bankStore.items[id] || 0) >= input.amount)
@@ -149,7 +152,7 @@ function processCraftingTask(
         itemsGained[output.itemId] = (itemsGained[output.itemId] || 0) + output.amount;
       });
 
-      // Gain XP using skillConfig
+      // Gain XP using skillsConfig
       const skillId = skillsConfig[recipe.skillId]?.id; // Lookup skill ID
       if (skillId) {
         const xp = recipe.experienceGain || 0;
@@ -165,3 +168,4 @@ function processCraftingTask(
   console.log("Crafting task processed for offline progress.");
   return totalXpGained;
 }
+
