@@ -56,11 +56,17 @@ export const useGameStore = create<GameState & GameActions>((set, get) => {
     saveToLocalStorage(saveData);
   };
 
-  // Initialize event listener for autosave in game loop
-  const initializeAutosave = () => {
-    const gameEvents = GameEvents.getInstance();
+// Initialize event listener for autosave in game loop
+const initializeAutosave = (() => {
+  let isAutosaveInitialized = false; // Flag to track if autosave has been initialized
 
-    // Listen to gameTick to trigger autosave periodically
+  return () => {
+    if (isAutosaveInitialized) {
+      console.warn("Autosave has already been initialized.");
+      return;
+    }
+
+    const gameEvents = GameEvents.getInstance();
     let elapsedTime = 0;
 
     gameEvents.on("gameTick", () => {
@@ -77,8 +83,12 @@ export const useGameStore = create<GameState & GameActions>((set, get) => {
       }
     });
 
+    isAutosaveInitialized = true; // Mark as initialized
     console.log("Autosave integrated into game loop.");
   };
+})();
+
+
 
   return {
     lastSaveTime: Date.now(),
