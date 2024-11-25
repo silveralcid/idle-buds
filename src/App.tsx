@@ -17,10 +17,10 @@ function App() {
 
     console.log("Starting game loop and autosave...");
     gameLoop.start();
-    gameStore.startAutosave();
+    gameStore.startAutosave(); // Initialize autosave
 
     return () => {
-      console.log("Stopping game loop...");
+      console.log("Stopping game loop and autosave...");
       gameLoop.stop();
     };
   }, []);

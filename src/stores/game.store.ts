@@ -56,30 +56,28 @@ export const useGameStore = create<GameState & GameActions>((set, get) => {
     saveToLocalStorage(saveData);
   };
 
-  let autosaveInterval: NodeJS.Timeout | null = null; // Reference for interval
+  // Initialize event listener for autosave in game loop
+  const initializeAutosave = () => {
+    const gameEvents = GameEvents.getInstance();
 
-  const startAutosave = () => {
-    if (autosaveInterval) {
-      console.warn("Autosave is already running.");
-      return;
-    }
+    // Listen to gameTick to trigger autosave periodically
+    let elapsedTime = 0;
 
-    autosaveInterval = setInterval(() => {
+    gameEvents.on("gameTick", () => {
       if (!get().isPaused) {
-        console.log("Autosave triggered...");
-        get().saveGame();
+        const tickDuration = GameConfig.TICK.DURATION || 1000;
+        elapsedTime += tickDuration;
+
+        // Trigger autosave every configured interval
+        if (elapsedTime >= (GameConfig.SAVE.AUTO_INTERVAL || 60000)) {
+          elapsedTime = 0; // Reset elapsed time
+          console.log("Autosave triggered during game tick...");
+          get().saveGame();
+        }
       }
-    }, GameConfig.SAVE.AUTO_INTERVAL || 60000); // Default to 60 seconds if not configured
+    });
 
-    console.log("Autosave started with interval:", GameConfig.SAVE.AUTO_INTERVAL || 60000);
-  };
-
-  const stopAutosave = () => {
-    if (autosaveInterval) {
-      clearInterval(autosaveInterval);
-      autosaveInterval = null;
-      console.log("Autosave stopped.");
-    }
+    console.log("Autosave integrated into game loop.");
   };
 
   return {
@@ -164,7 +162,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => {
       if (get().isPaused) {
         set({ isPaused: false, lastTickTime: Date.now() });
         GameEvents.getInstance().emit("gameResumed");
-        console.log("Game unpaused!");
+        console.log("Game resumed!");
       }
     },
 
@@ -232,6 +230,6 @@ export const useGameStore = create<GameState & GameActions>((set, get) => {
       }
     },
 
-    startAutosave,
+    startAutosave: initializeAutosave,
   };
 });
