@@ -26,8 +26,9 @@ function App() {
   useEffect(() => {
     const gameLoop = GameLoop.getInstance();
 
-    // Start the game loop
+    // Start the game loop and autosave
     gameLoop.start();
+    gameStore.startAutosave();
 
     // Handle visibility changes
     const handleVisibilityChange = () => {
