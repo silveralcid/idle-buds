@@ -5,6 +5,7 @@ export const miningNodes: ResourceNode[] = [
   {
     id: 'coal_vein',
     name: 'Coal Vein',
+    skillId: 'mining',
     type: 'mining',
     tier: 1,
     levelRequired: 1,
@@ -22,6 +23,7 @@ export const miningNodes: ResourceNode[] = [
   {
     id: 'copper_vein',
     name: 'Copper Vein',
+    skillId: 'mining',
     type: 'mining',
     tier: 1,
     levelRequired: 1,
@@ -39,6 +41,7 @@ export const miningNodes: ResourceNode[] = [
   {
     id: 'iron_vein',
     name: 'Iron Vein',
+    skillId: 'mining',
     type: 'mining',
     tier: 2,
     levelRequired: 2,
@@ -56,6 +59,7 @@ export const miningNodes: ResourceNode[] = [
   {
     id: 'silver_vein',
     name: 'Silver Vein',
+    skillId: 'mining',
     type: 'mining',
     tier: 3,
     levelRequired: 3,
@@ -73,6 +77,7 @@ export const miningNodes: ResourceNode[] = [
   {
     id: 'gold_vein',
     name: 'Gold Vein',
+    skillId: 'mining',
     type: 'mining',
     tier: 4,
     levelRequired: 4,
@@ -90,6 +95,7 @@ export const miningNodes: ResourceNode[] = [
   {
     id: 'platinum_vein',
     name: 'Platinum Vein',
+    skillId: 'mining',
     type: 'mining',
     tier: 5,
     levelRequired: 5,
@@ -107,6 +113,7 @@ export const miningNodes: ResourceNode[] = [
   {
     id: 'mithril_vein',
     name: 'Mithril Vein',
+    skillId: 'mining',
     type: 'mining',
     tier: 6,
     levelRequired: 6,
@@ -124,6 +131,7 @@ export const miningNodes: ResourceNode[] = [
   {
     id: 'adamantite_vein',
     name: 'Adamantite Vein',
+    skillId: 'mining',
     type: 'mining',
     tier: 7,
     levelRequired: 7,
@@ -141,6 +149,7 @@ export const miningNodes: ResourceNode[] = [
   {
     id: 'runite_vein',
     name: 'Runite Vein',
+    skillId: 'mining',
     type: 'mining',
     tier: 8,
     levelRequired: 8, 

@@ -4,6 +4,7 @@ export interface Recipe {
   id: string; // Unique identifier for the recipe
   name: string; // Name of the recipe
   workbenchType: WorkbenchType;
+  skillId: string; // Skill ID for crafting this recipe
   itemType: ItemType; // Type of recipe (e.g., crafting, smelting, etc.)
   inputs: {
     itemIds: string[]; // List of possible item IDs for this input

@@ -1,6 +1,6 @@
 import { useBankStore } from "../../stores/bank.store";
 import { useGameStore } from "../../stores/game.store";
-import { useHunterStore } from "../../stores/hunter.store"; // Ensure you import the hunter store
+import { useHunterStore } from "../../stores/hunter.store";
 import { GameConfig } from "../constants/game-config";
 import { recipeRegistry } from "../../data/recipe-registry";
 import { resourceRegistry } from "../../data/resource-registry";
@@ -23,9 +23,10 @@ export function calculateOfflineProgress() {
   const offlineProgressTicks = Math.floor(deltaTime / (1000 / tickRate));
   console.log(`Processing ${offlineProgressTicks} offline ticks.`);
 
-  let xpGained = 0;
   const itemsGained: Record<string, number> = {};
   const itemsLost: Record<string, number> = {};
+
+  let xpGained = 0;
 
   // Simulate gathering and crafting tasks
   if (hunterStore.currentTask) {
@@ -33,10 +34,16 @@ export function calculateOfflineProgress() {
 
     switch (type) {
       case "gathering":
-        processGatheringTask(offlineProgressTicks, hunterStore, bankStore, xpGained, itemsGained);
+        xpGained += processGatheringTask(offlineProgressTicks, hunterStore, bankStore, itemsGained);
         break;
       case "crafting":
-        processCraftingTask(offlineProgressTicks, hunterStore, bankStore, xpGained, itemsGained, itemsLost);
+        xpGained += processCraftingTask(
+          offlineProgressTicks,
+          hunterStore,
+          bankStore,
+          itemsGained,
+          itemsLost
+        );
         break;
       default:
         console.warn(`Unknown task type: ${type}`);
@@ -53,105 +60,108 @@ export function calculateOfflineProgress() {
 }
 
 function processGatheringTask(
-    ticks: number,
-    hunterStore: any,
-    bankStore: any,
-    xpGained: number,
-    itemsGained: Record<string, number>
-  ) {
-    const taskDefinition = resourceRegistry[hunterStore.currentTask.taskId];
-    if (!taskDefinition) {
-      console.warn("Invalid gathering task ID:", hunterStore.currentTask.taskId);
-      return;
-    }
-  
-    let progress = hunterStore.progress;
-  
-    for (let i = 0; i < ticks; i++) {
-      progress += (100 / (taskDefinition.gatherRate / GameConfig.TICK.DURATION));
-  
-      if (progress >= 100) {
-        const itemId = taskDefinition.resourceNodeYields[0];
-        const quantity = 1;
-  
-        // Add to items gained
-        itemsGained[itemId] = (itemsGained[itemId] || 0) + quantity;
-        bankStore.addItem(itemId, quantity);
-  
-        // Gain XP
-        const skillId = skillsConfig[taskDefinition.id]?.id; // Example skill lookup
-        if (skillId) {
-          const xp = taskDefinition.experienceGain || 0;
-          xpGained += xp;
-          hunterStore.gainSkillXp(skillId, xp);
-        }
-  
-        progress -= 100;
-      }
-    }
-  
-    hunterStore.updateTaskProgress(progress);
-    console.log("Gathering task processed for offline progress.");
+  ticks: number,
+  hunterStore: any,
+  bankStore: any,
+  itemsGained: Record<string, number>
+) {
+  const taskDefinition = resourceRegistry[hunterStore.currentTask.taskId];
+  if (!taskDefinition) {
+    console.warn("Invalid gathering task ID:", hunterStore.currentTask.taskId);
+    return 0;
   }
 
-  function processCraftingTask(
-    ticks: number,
-    hunterStore: any,
-    bankStore: any,
-    xpGained: number,
-    itemsGained: Record<string, number>,
-    itemsLost: Record<string, number>
-  ) {
-    const recipe = recipeRegistry.find((r) => r.id === hunterStore.currentTask.taskId);
-    if (!recipe) {
-      console.warn("Invalid crafting task ID:", hunterStore.currentTask.taskId);
-      return;
-    }
-  
-    let progress = hunterStore.progress;
-    const craftingTime = recipe.craftingTime / GameConfig.TICK.DURATION;
-  
-    for (let i = 0; i < ticks; i++) {
-      progress += (100 / craftingTime);
-  
-      if (progress >= 100) {
-        // Check if sufficient materials exist
-        const hasMaterials = recipe.inputs.every((input) =>
-          input.itemIds.some((id) => (bankStore.items[id] || 0) >= input.amount)
-        );
-  
-        if (!hasMaterials) {
-          console.warn("Insufficient materials for crafting during offline progress.");
-          hunterStore.stopTask();
-          return;
-        }
-  
-        // Consume inputs
-        recipe.inputs.forEach((input) => {
-          input.itemIds.forEach((id) => {
-            bankStore.removeItem(id, input.amount);
-            itemsLost[id] = (itemsLost[id] || 0) + input.amount;
-          });
-        });
-  
-        // Add outputs
-        recipe.outputs.forEach((output) => {
-          bankStore.addItem(output.itemId, output.amount);
-          itemsGained[output.itemId] = (itemsGained[output.itemId] || 0) + output.amount;
-        });
-  
-        // Gain XP using skillRegistry
-        const skillId = skillsConfig[recipe.id]?.id; // Example: Look up skill for recipe
-        if (skillId) {
-          const xp = recipe.experienceGain || 0;
-          xpGained += xp;
-          hunterStore.gainSkillXp(skillId, xp);
-        }
-  
-        progress -= 100;
+  let progress = hunterStore.progress;
+  let totalXpGained = 0;
+
+  for (let i = 0; i < ticks; i++) {
+    progress += 100 / (taskDefinition.gatherRate / GameConfig.TICK.DURATION);
+
+    if (progress >= 100) {
+      const itemId = taskDefinition.resourceNodeYields[0];
+      const quantity = 1;
+
+      // Add to items gained
+      itemsGained[itemId] = (itemsGained[itemId] || 0) + quantity;
+      bankStore.addItem(itemId, quantity);
+
+      // Gain XP
+      const skillId = skillsConfig[taskDefinition.skillId]?.id; // Lookup skill ID
+      if (skillId) {
+        const xp = taskDefinition.experienceGain || 0;
+        totalXpGained += xp;
+        hunterStore.gainSkillXp(skillId, xp);
       }
+
+      progress -= 100;
     }
-  
-    hunterStore.updateTaskProgress(progress);
-    console.log("Crafting task processed for offline progress.");
   }
+
+  hunterStore.updateTaskProgress(progress);
+  console.log("Gathering task processed for offline progress.");
+  return totalXpGained;
+}
+
+function processCraftingTask(
+  ticks: number,
+  hunterStore: any,
+  bankStore: any,
+  itemsGained: Record<string, number>,
+  itemsLost: Record<string, number>
+) {
+  const recipe = recipeRegistry.find((r) => r.id === hunterStore.currentTask.taskId);
+  if (!recipe) {
+    console.warn("Invalid crafting task ID:", hunterStore.currentTask.taskId);
+    return 0;
+  }
+
+  let progress = hunterStore.progress;
+  let totalXpGained = 0;
+
+  const craftingTime = recipe.craftingTime / GameConfig.TICK.DURATION;
+
+  for (let i = 0; i < ticks; i++) {
+    progress += 100 / craftingTime;
+
+    if (progress >= 100) {
+      // Check if sufficient materials exist
+      const hasMaterials = recipe.inputs.every((input) =>
+        input.itemIds.some((id) => (bankStore.items[id] || 0) >= input.amount)
+      );
+
+      if (!hasMaterials) {
+        console.warn("Insufficient materials for crafting during offline progress.");
+        hunterStore.stopTask();
+        return totalXpGained;
+      }
+
+      // Consume inputs
+      recipe.inputs.forEach((input) => {
+        input.itemIds.forEach((id) => {
+          bankStore.removeItem(id, input.amount);
+          itemsLost[id] = (itemsLost[id] || 0) + input.amount;
+        });
+      });
+
+      // Add outputs
+      recipe.outputs.forEach((output) => {
+        bankStore.addItem(output.itemId, output.amount);
+        itemsGained[output.itemId] = (itemsGained[output.itemId] || 0) + output.amount;
+      });
+
+      // Gain XP using skillConfig
+      const skillId = skillsConfig[recipe.skillId]?.id; // Lookup skill ID
+      if (skillId) {
+        const xp = recipe.experienceGain || 0;
+        totalXpGained += xp;
+        hunterStore.gainSkillXp(skillId, xp);
+      }
+
+      progress -= 100;
+    }
+  }
+
+  hunterStore.updateTaskProgress(progress);
+  console.log("Crafting task processed for offline progress.");
+  return totalXpGained;
+}

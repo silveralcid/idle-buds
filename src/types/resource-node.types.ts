@@ -5,6 +5,7 @@ export interface ResourceNode {
   id: string; // Unique identifier for the node
   name: string; // Name of the node (e.g., "Oak Tree", "Iron Vein")
   type: ResourceNodeType; // Type of node (e.g., "Tree", "Ore", "Herb")
+  skillId: string; // Skill ID for gathering this resource
  // Category of resource node
   
   // Progression and Unlocking
