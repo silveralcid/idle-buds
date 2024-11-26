@@ -1,11 +1,35 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useViewStore } from "./core/view.state";
 import GameContainer from "./views/GameContainer";
 import MiningView from "./views/MiningView";
 import Sidebar from "./core/components/Sidebar";
+import { GameLoop } from "./core/game-loop";
+import { GameEvents } from "./core/game-events";
+import { processMiningTick } from "./features/mining/mining.logic";
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
+
+  useEffect(() => {
+    // Initialize the game loop
+    const gameLoop = GameLoop.getInstance();
+    const gameEvents = GameEvents.getInstance();
+
+    // Add the mining tick to the game events
+    const handleGameTick = (deltaTime: number) => {
+      processMiningTick(deltaTime);
+    };
+
+    gameEvents.on("gameTick", handleGameTick);
+
+    gameLoop.start();
+
+    // Cleanup on unmount
+    return () => {
+      gameLoop.stop();
+      gameEvents.off("gameTick", handleGameTick);
+    };
+  }, []);
 
   const renderView = () => {
     switch (currentView) {
@@ -18,13 +42,8 @@ function App() {
 
   return (
     <div className="flex h-screen">
-      {/* Sidebar */}
-      <div className="w-64 bg-gray-800 text-white">
-        <Sidebar />
-      </div>
-
-      {/* Main Content */}
-      <main className="flex-1 p-4 bg-gray-100">
+      <Sidebar /> {/* Sidebar on the left */}
+      <main className="flex-1 p-4 bg-base-300">
         <GameContainer>{renderView()}</GameContainer>
       </main>
     </div>

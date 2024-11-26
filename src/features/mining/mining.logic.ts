@@ -30,47 +30,50 @@ export const startMining = (nodeId: string): void => {
  * Process mining tick (progress and rewards).
  */
 export const processMiningTick = (deltaTime: number): void => {
-  const miningStore = useMiningStore.getState();
-  const { currentNode, nodes, ores, setOres, setXp } = miningStore;
-
-  if (!currentNode) return;
-
-  const node = nodes[currentNode];
-  if (!node) return;
-
-  // Simulate mining progress
-  const progress = node.gatherRate * deltaTime;
-  const newOres: Record<string, number> = { ...ores };
-
-  // Collect resources and deplete node health
-  node.resourceNodeYields.forEach((ore) => {
-    newOres[ore] = (newOres[ore] || 0) + progress;
-  });
-
-  node.nodeHealth -= progress;
-
-  // Update the bank and mining store
-  setOres(newOres);
-
-  if (node.nodeHealth <= 0) {
-    console.log(`${node.name} is depleted!`);
-    node.nodeHealth = 0;
-
-    // Optionally handle node regeneration
-    if (node.isRenewable) {
-      setTimeout(() => {
-        node.nodeHealth = node.maxHealth;
-        console.log(`${node.name} has regenerated.`);
-      }, node.regenRate * 1000); // Convert regen rate to milliseconds
+    const { currentNode, nodes, ores, setOres, setXp, xp, setNodes } = useMiningStore.getState();
+  
+    if (!currentNode) return;
+  
+    const node = nodes[currentNode];
+    if (!node) return;
+  
+    // Simulate mining progress
+    const progress = node.gatherRate * deltaTime;
+    const newOres: Record<string, number> = { ...ores };
+  
+    // Collect resources and deplete node health
+    node.resourceNodeYields.forEach((ore) => {
+      newOres[ore] = (newOres[ore] || 0) + progress;
+    });
+  
+    // Update node health immutably
+    const updatedNode = { ...node, nodeHealth: Math.max(0, node.nodeHealth - progress) };
+  
+    // Update nodes immutably in the store
+    setNodes({ ...nodes, [currentNode]: updatedNode });
+  
+    // Update ores
+    setOres(newOres);
+  
+    // Award XP
+    const xpGain = node.experienceGain * deltaTime;
+    setXp(xp + xpGain);
+  
+    console.log(`Mined ${progress} from "${node.name}", gained ${xpGain} XP.`);
+  
+    // Handle depletion and regeneration
+    if (updatedNode.nodeHealth <= 0) {
+      console.log(`${node.name} is depleted!`);
+      if (node.isRenewable) {
+        setTimeout(() => {
+          const regeneratedNode = { ...updatedNode, nodeHealth: node.maxHealth };
+          setNodes({ ...nodes, [currentNode]: regeneratedNode });
+          console.log(`${node.name} has regenerated.`);
+        }, node.regenRate * 1000);
+      }
     }
-  }
-
-  // Award XP
-  const xpGain = node.experienceGain * deltaTime;
-  setXp(miningStore.xp + xpGain);
-
-  console.log(`Mined ${progress} from "${node.name}", gained ${xpGain} XP.`);
-};
+  };
+  
 
 /**
  * Stop mining action.
