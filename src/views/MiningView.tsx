@@ -1,7 +1,7 @@
 import React from "react";
-import { useViewStore } from "../core/view.state";
+import { useViewStore } from "../core/view.store";
 import MiningNode from "../features/mining/components/MiningNode";
-import { useMiningStore } from "../features/mining/mining.state";
+import { useMiningStore } from "../features/mining/mining.store";
 
 const MiningView: React.FC = () => {
   const setView = useViewStore((state) => state.setView);

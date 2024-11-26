@@ -1,4 +1,4 @@
-import { useMiningStore } from "./mining.state";
+import { useMiningStore } from "./mining.store";
 
 /**
  * Start mining on a node.

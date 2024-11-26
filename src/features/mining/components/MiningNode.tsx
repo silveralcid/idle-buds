@@ -1,5 +1,5 @@
 import React from "react";
-import { useMiningStore } from "../mining.state";
+import { useMiningStore } from "../mining.store";
 import { startMining, stopMining } from "../mining.logic";
 
 interface MiningNodeProps {

@@ -1,7 +1,7 @@
 import React from "react";
-import { useMiningStore } from "../../features/mining/mining.state";
+import { useMiningStore } from "../../features/mining/mining.store";
 import { useBankStore } from "../../features/bank/bank.state";
-import { useViewStore } from "../../core/view.state";
+import { useViewStore } from "../view.store";
 
 const Sidebar: React.FC = () => {
   // Access mining state values directly to avoid creating a new object on each render

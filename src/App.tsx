@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useViewStore } from "./core/view.state";
+import { useViewStore } from "./core/view.store";
 import GameContainer from "./views/GameContainer";
 import MiningView from "./views/MiningView";
 import Sidebar from "./core/components/Sidebar";
