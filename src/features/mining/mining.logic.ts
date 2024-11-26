@@ -30,7 +30,8 @@ export const startMining = (nodeId: string): void => {
  * Process mining tick (progress and rewards).
  */
 export const processMiningTick = (deltaTime: number): void => {
-    const { currentNode, nodes, ores, setOres, setXp, xp, setNodes } = useMiningStore.getState();
+    const { currentNode, nodes, ores, setOres, setXp, xp, level, setLevel, setNodes, xpToNextLevel } =
+      useMiningStore.getState();
   
     if (!currentNode) return;
   
@@ -57,10 +58,20 @@ export const processMiningTick = (deltaTime: number): void => {
   
     // Award XP
     const xpGain = node.experienceGain * deltaTime;
-    setXp(xp + xpGain);
+    const newXp = xp + xpGain;
+    setXp(newXp);
+  
+    // Handle level-up
+    const requiredXp = xpToNextLevel();
+    if (newXp >= requiredXp) {
+      const newLevel = level + 1;
+      setLevel(newLevel);
+      setXp(newXp - requiredXp); // Carry over excess XP
+      console.log(`Congratulations! Reached level ${newLevel}.`);
+    }
   
     console.log(`Mined ${progress} from "${node.name}", gained ${xpGain} XP.`);
-  
+    
     // Handle depletion and regeneration
     if (updatedNode.nodeHealth <= 0) {
       console.log(`${node.name} is depleted!`);

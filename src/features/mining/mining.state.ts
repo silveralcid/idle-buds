@@ -4,6 +4,7 @@ import { useBankStore } from "../bank/bank.state";
 import { convertNodesToRecord } from "../../utils/nodes-to-record";
 import { miningNodes } from "../../data/nodes/mining.data";
 import { BaseSkill } from "../../types/base-skill.types";
+import { calculateXpToNextLevel } from "../../utils/experience";
 
 export interface MiningState extends BaseSkill {
     currentNode: string | null;
@@ -12,6 +13,7 @@ export interface MiningState extends BaseSkill {
     setXp: (xp: number) => void;
     setLevel: (level: number) => void;
     setProgress: (progress: number) => void;
+    xpToNextLevel: () => number;
     setCurrentNode: (nodeId: string | null) => void;
     setOres: (newOres: Record<string, number>) => void;
     setNodes: (nodes: Record<string, ResourceNode>) => void; // Add this
@@ -19,13 +21,14 @@ export interface MiningState extends BaseSkill {
   }
   
 
-  export const useMiningStore = create<MiningState>((set) => ({
+  export const useMiningStore = create<MiningState>((set, get) => ({
     id: "mining",
     name: "Mining",
     description: "Extract valuable ores from the earth.",
     xp: 0,
     level: 1,
     progress: 0,
+    xpToNextLevel: () => calculateXpToNextLevel(get().level), 
     isUnlocked: true,
     unlockRequirements: undefined,
     currentNode: null,
