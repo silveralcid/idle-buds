@@ -1,15 +1,11 @@
-import React from 'react';
-import HunterInfo from '../components/HunterInfo';
+import React from "react";
 
 interface GameContainerProps {
   children: React.ReactNode;
 }
 
-const GameContainer = ({ children }: GameContainerProps) => {
-  return (
-    <h1>Hello</h1>
-  );
+const GameContainer: React.FC<GameContainerProps> = ({ children }) => {
+  return <div className="p-4 bg-base-100">{children}</div>; // Styled container for your views
 };
-    
 
 export default GameContainer;

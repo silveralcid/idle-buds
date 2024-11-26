@@ -3,9 +3,10 @@ import mitt, { Emitter } from "mitt";
 export type GameEventPayloads = {
   // Global Events
   gameInitialized: void;
-  gameTick: void;
+  gameTick: number;
   gamePaused: void;
   gameResumed: void;
+  offlineProgress: number;
 };
 
 export class GameEvents {

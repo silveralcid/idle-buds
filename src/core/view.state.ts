@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface ViewState {
   currentView: string;
@@ -6,6 +6,6 @@ interface ViewState {
 }
 
 export const useViewStore = create<ViewState>((set) => ({
-  currentView: 'LumberingView', // Default view
-  setView: (view) => set({ currentView: view }),
+  currentView: "MiningView", // Default view
+  setView: (view: string) => set({ currentView: view }), // Explicitly typed parameter
 }));
