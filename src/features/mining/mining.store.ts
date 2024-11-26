@@ -51,8 +51,12 @@ export interface MiningState extends BaseSkill {
       });
     },
     setProgress: (progress: number) => set(() => ({ progress })),
-    setCurrentNode: (nodeId: string | null) => set(() => ({ currentNode: nodeId })),
-    setOres: (newOres: Record<string, number>) =>
+    setCurrentNode: (nodeId: string | null) =>
+      set(() => {
+        console.log("Setting currentNode:", nodeId);
+        return { currentNode: nodeId };
+      }),
+        setOres: (newOres: Record<string, number>) =>
       set(() => {
         const bankStore = useBankStore.getState();
         Object.entries(newOres).forEach(([ore, quantity]) => {

@@ -8,7 +8,7 @@ interface MiningNodeProps {
 
 const MiningNode: React.FC<MiningNodeProps> = ({ nodeId }) => {
   const node = useMiningStore((state) => state.nodes[nodeId]);
-  const currentNode = useMiningStore((state) => state.currentNode); // Track the currently mined node
+  const currentNode = useMiningStore((state) => state.currentNode);
 
   if (!node) {
     return (
@@ -18,23 +18,11 @@ const MiningNode: React.FC<MiningNodeProps> = ({ nodeId }) => {
     );
   }
 
-  const handleMine = () => {
-    startMining(nodeId);
-  };
-
-  const handleStop = () => {
-    stopMining();
-  };
+  const handleMine = () => startMining(nodeId);
+  const handleStop = () => stopMining();
 
   const isMiningThisNode = currentNode === nodeId;
-  const isLocked = !node.isUnlocked; // Check if the node is locked
-
-  // Calculate rounded health percentage
-  const healthPercentage = Math.max(
-    0,
-    Number(((node.nodeHealth / node.maxHealth) * 100).toFixed(0))
-  );
-  
+  const isLocked = !node.isUnlocked;
 
   return (
     <div
@@ -43,10 +31,9 @@ const MiningNode: React.FC<MiningNodeProps> = ({ nodeId }) => {
       }`}
     >
       <h3 className="text-lg font-bold mb-2">{node.name}</h3>
-      <p>Type: {node.type}</p>
       <p>
         Health: {node.nodeHealth.toFixed(2)} / {node.maxHealth.toFixed(2)} (
-        {healthPercentage}%)
+        {((node.nodeHealth / node.maxHealth) * 100).toFixed(0)}%)
       </p>
       <p>Level Required: {node.levelRequired}</p>
       <p>XP Gain: {node.experienceGain.toFixed(2)}</p>
