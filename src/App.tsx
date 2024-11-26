@@ -1,4 +1,4 @@
-import { useViewStore } from "./stores/view.store";
+import { useViewStore } from "./states/view.state";
 
 
 function App() {
