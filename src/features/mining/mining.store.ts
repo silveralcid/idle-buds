@@ -7,14 +7,14 @@ import { BaseSkill } from "../../types/base-skill.types";
 import { calculateXpToNextLevel } from "../../utils/experience";
 
 export interface MiningState extends BaseSkill {
-    currentNode: string | null;
+    activeNode: string | null;
     nodes: Record<string, ResourceNode>;
     ores: Record<string, number>;
     setXp: (xp: number) => void;
     setLevel: (level: number) => void;
     setProgress: (progress: number) => void;
     xpToNextLevel: () => number;
-    setCurrentNode: (nodeId: string | null) => void;
+    setactiveNode: (nodeId: string | null) => void;
     setOres: (newOres: Record<string, number>) => void;
     setNodes: (nodes: Record<string, ResourceNode>) => void; // Add this
     reset: () => void;
@@ -30,7 +30,7 @@ export interface MiningState extends BaseSkill {
     progress: 0,
     isUnlocked: true,
     unlockRequirements: undefined,
-    currentNode: null,
+    activeNode: null,
     nodes: convertNodesToRecord(miningNodes),
     ores: {},
     setXp: (xp: number) => set(() => ({ xp })),
@@ -51,10 +51,10 @@ export interface MiningState extends BaseSkill {
       });
     },
     setProgress: (progress: number) => set(() => ({ progress })),
-    setCurrentNode: (nodeId: string | null) =>
+    setactiveNode: (nodeId: string | null) =>
       set(() => {
-        console.log("Setting currentNode:", nodeId);
-        return { currentNode: nodeId };
+        console.log("Setting activeNode:", nodeId);
+        return { activeNode: nodeId };
       }),
       setOres: (newOres: Record<string, number>) =>
         set((state) => {
@@ -62,7 +62,7 @@ export interface MiningState extends BaseSkill {
       
           // Only update the bank with ores being mined currently
           Object.entries(newOres).forEach(([ore, quantity]) => {
-            if (state.currentNode && state.currentNode in state.ores) {
+            if (state.activeNode && state.activeNode in state.ores) {
               bankStore.addItem(ore, quantity - (state.ores[ore] || 0)); // Add only the difference
             } else {
               bankStore.addItem(ore, quantity); // Add all if no current ore entry
@@ -78,7 +78,7 @@ export interface MiningState extends BaseSkill {
         xp: 0,
         level: 1,
         progress: 0,
-        currentNode: null,
+        activeNode: null,
         nodes: convertNodesToRecord(miningNodes),
         ores: {},
       })),

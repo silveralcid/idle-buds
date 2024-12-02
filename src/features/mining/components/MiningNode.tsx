@@ -8,7 +8,7 @@ interface MiningNodeProps {
 
 const MiningNode: React.FC<MiningNodeProps> = ({ nodeId }) => {
   const node = useMiningStore((state) => state.nodes[nodeId]);
-  const currentNode = useMiningStore((state) => state.currentNode);
+  const activeNode = useMiningStore((state) => state.activeNode);
 
   if (!node) {
     return (
@@ -17,11 +17,11 @@ const MiningNode: React.FC<MiningNodeProps> = ({ nodeId }) => {
       </div>
     );
   }
-
+3333333333333333333333333333
   const handleMine = () => startMining(nodeId);
   const handleStop = () => stopMining();
 
-  const isMiningThisNode = currentNode === nodeId;
+  const isMiningThisNode = activeNode === nodeId;
   const isLocked = !node.isUnlocked;
 
   return (
