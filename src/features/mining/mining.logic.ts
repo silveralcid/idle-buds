@@ -5,7 +5,7 @@ import { useMiningStore } from "./mining.store";
  */
 
 export const startMining = (nodeId: string): void => {
-  const { nodes, level, currentNode, setCurrentNode } = useMiningStore.getState();
+  const { nodes, level, activeNode, setActiveNode } = useMiningStore.getState();
   const node = nodes[nodeId];
 
   // Validation
@@ -23,13 +23,13 @@ export const startMining = (nodeId: string): void => {
   }
 
   // Stop mining the current node if it's different from the new one
-  if (currentNode && currentNode !== nodeId) {
-    console.log(`Switching from node "${currentNode}" to "${nodeId}".`);
+  if (activeNode && activeNode !== nodeId) {
+    console.log(`Switching from node "${activeNode}" to "${nodeId}".`);
     stopMining();
   }
 
   // Set the new current node
-  setCurrentNode(nodeId);
+  setActiveNode(nodeId);
   console.log(`Started mining "${node.name}".`);
 };
 
@@ -38,12 +38,12 @@ export const startMining = (nodeId: string): void => {
  * Process mining tick (progress and rewards).
  */
 export const processMiningTick = (deltaTime: number): void => {
-    const { currentNode, nodes, ores, setOres, setXp, xp, level, setLevel, setNodes, xpToNextLevel } =
+    const { activeNode, nodes, ores, setOres, setXp, xp, level, setLevel, setNodes, xpToNextLevel } =
       useMiningStore.getState();
   
-    if (!currentNode) return;
+    if (!activeNode) return;
   
-    const node = nodes[currentNode];
+    const node = nodes[activeNode];
     if (!node) return;
   
     // Simulate mining progress
@@ -59,7 +59,7 @@ export const processMiningTick = (deltaTime: number): void => {
     const updatedNode = { ...node, nodeHealth: Math.max(0, node.nodeHealth - progress) };
   
     // Update nodes immutably in the store
-    setNodes({ ...nodes, [currentNode]: updatedNode });
+    setNodes({ ...nodes, [activeNode]: updatedNode });
   
     // Update ores globally (flat structure)
     setOres(newOres);
@@ -86,7 +86,7 @@ export const processMiningTick = (deltaTime: number): void => {
       if (node.isRenewable) {
         setTimeout(() => {
           const regeneratedNode = { ...updatedNode, nodeHealth: node.maxHealth };
-          setNodes({ ...nodes, [currentNode]: regeneratedNode });
+          setNodes({ ...nodes, [activeNode]: regeneratedNode });
           console.log(`${node.name} has regenerated.`);
         }, node.regenRate * 1000);
       }
@@ -100,20 +100,20 @@ export const processMiningTick = (deltaTime: number): void => {
  * Stop mining action.
  */
 export const stopMining = (): void => {
-    const { currentNode, setCurrentNode, setNodes, nodes } = useMiningStore.getState();
+    const { activeNode, setActiveNode, setNodes, nodes } = useMiningStore.getState();
   
-    if (currentNode) {
-      const node = nodes[currentNode];
+    if (activeNode) {
+      const node = nodes[activeNode];
       if (node) {
         console.log(`Stopping mining on node: "${node.name}"`);
         // Optionally reset node state if needed
         const updatedNode = { ...node };
-        setNodes({ ...nodes, [currentNode]: updatedNode });
+        setNodes({ ...nodes, [activeNode]: updatedNode });
       }
     }
   
     // Clear the current node
-    setCurrentNode(null);
+    setActiveNode(null);
     console.log("Mining has been stopped.");
   };
   

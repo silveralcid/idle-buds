@@ -14,7 +14,7 @@ export interface MiningState extends BaseSkill {
     setLevel: (level: number) => void;
     setProgress: (progress: number) => void;
     xpToNextLevel: () => number;
-    setactiveNode: (nodeId: string | null) => void;
+    setActiveNode: (nodeId: string | null) => void;
     setOres: (newOres: Record<string, number>) => void;
     setNodes: (nodes: Record<string, ResourceNode>) => void; // Add this
     reset: () => void;
@@ -51,7 +51,7 @@ export interface MiningState extends BaseSkill {
       });
     },
     setProgress: (progress: number) => set(() => ({ progress })),
-    setactiveNode: (nodeId: string | null) =>
+    setActiveNode: (nodeId: string | null) =>
       set(() => {
         console.log("Setting activeNode:", nodeId);
         return { activeNode: nodeId };
