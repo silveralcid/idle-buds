@@ -48,21 +48,24 @@ export const processMiningTick = (deltaTime: number): void => {
   
     // Simulate mining progress
     const progress = node.gatherRate * deltaTime;
-    const newOres: Record<string, number> = { ...ores };
+    const newOres: Record<string, number> = {};
   
     // Collect resources for the current node
     node.resourceNodeYields.forEach((ore) => {
-      newOres[ore] = (newOres[ore] || 0) + progress; // Update quantities of mined ores
+      // Calculate only the difference instead of total
+      const newQuantity = progress;
+      newOres[ore] = (newOres[ore] || 0) + newQuantity;
     });
+
+    // Update ores globally (flat structure)
+    setOres(newOres);
   
     // Update node health immutably
     const updatedNode = { ...node, nodeHealth: Math.max(0, node.nodeHealth - progress) };
   
     // Update nodes immutably in the store
     setNodes({ ...nodes, [activeNode]: updatedNode });
-  
-    // Update ores globally (flat structure)
-    setOres(newOres);
+
   
     // Award XP
     const xpGain = node.experienceGain * deltaTime;

@@ -56,21 +56,18 @@ export interface MiningState extends BaseSkill {
         console.log("Setting activeNode:", nodeId);
         return { activeNode: nodeId };
       }),
-      setOres: (newOres: Record<string, number>) =>
-        set((state) => {
-          const bankStore = useBankStore.getState();
+    setOres: (newOres: Record<string, number>) =>
+      set((state) => {
+        const bankStore = useBankStore.getState();
+        
+        // Add the new quantities directly to bank since they're already differences
+        Object.entries(newOres).forEach(([ore, quantity]) => {
+          bankStore.addItem(ore, quantity);
+        });
+        
+        return { ores: newOres };
+      }),
       
-          // Only update the bank with ores being mined currently
-          Object.entries(newOres).forEach(([ore, quantity]) => {
-            if (state.activeNode && state.activeNode in state.ores) {
-              bankStore.addItem(ore, quantity - (state.ores[ore] || 0)); // Add only the difference
-            } else {
-              bankStore.addItem(ore, quantity); // Add all if no current ore entry
-            }
-          });
-      
-          return { ores: { ...state.ores, ...newOres } }; // Merge with current ores
-        }),
       
     setNodes: (nodes: Record<string, ResourceNode>) => set(() => ({ nodes })),
     reset: () =>
