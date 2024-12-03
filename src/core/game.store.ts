@@ -114,6 +114,7 @@ interface GameActions {
 
   // Autosave
   setInterval(() => {
-    useGameStore.getState().saveGame();
+    if (!gameLoop.isPaused) {  // Only save if game loop is running
+      useGameStore.getState().saveGame();
+    }
   }, GameConfig.SAVE.AUTO_INTERVAL);
-  

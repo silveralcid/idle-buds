@@ -26,6 +26,7 @@ export class GameLoop {
     }
 
     this.running = true;
+    this.isPaused = false;
     this.lastTimestamp = performance.now();
 
     const gameEvents = GameEvents.getInstance();
@@ -56,6 +57,7 @@ export class GameLoop {
   /** Stops the game loop */
   stop(): void {
     this.running = false;
+    this.isPaused = true;
     this.lastStopTimestamp = performance.now();
     console.log("Game loop stopped.");
   }
