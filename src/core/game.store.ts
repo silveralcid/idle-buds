@@ -111,9 +111,9 @@ interface GameActions {
     stopGame: () => gameLoop.stop(),
   }));
   
-  // Setup auto-save functionality
+
+  // Autosave
   setInterval(() => {
-    if (!gameLoop.isPaused && !useGameStore.getState().isInitialLoad) {
-      useGameStore.getState().saveGame();
-    }
+    useGameStore.getState().saveGame();
   }, GameConfig.SAVE.AUTO_INTERVAL);
+  
