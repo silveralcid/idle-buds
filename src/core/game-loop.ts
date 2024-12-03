@@ -5,7 +5,7 @@ import { processMiningTick } from "../features/mining/mining.logic";
 export class GameLoop {
   private static instance: GameLoop;
   private lastTimestamp: number = 0;
-  private isPaused: boolean = false;
+  public isPaused: boolean = false;
   private running: boolean = false;
   private lastStopTimestamp: number | null = null;
 
