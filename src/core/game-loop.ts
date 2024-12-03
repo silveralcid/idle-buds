@@ -61,6 +61,7 @@ export class GameLoop {
   }
 
   /** Pauses the game loop */
+  // Not sure if we actually need pause/resume since start/stop does this already...
   pause(): void {
     if (!this.isPaused) {
       this.isPaused = true;

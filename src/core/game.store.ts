@@ -15,8 +15,8 @@ interface GameActions {
     saveGame: () => void;
     loadGame: () => void;
     resetGame: () => void;
-    pauseGame: () => void;
-    resumeGame: () => void;
+    stopGame: () => void;
+    startGame: () => void;
   }
   
   const gameLoop = GameLoop.getInstance();
@@ -104,8 +104,8 @@ interface GameActions {
       gameLoop.start();
     },
   
-    pauseGame: () => gameLoop.pause(),
-    resumeGame: () => gameLoop.resume(),
+    startGame: () => gameLoop.start(),
+    stopGame: () => gameLoop.stop(),
   }));
   
   // Setup auto-save functionality

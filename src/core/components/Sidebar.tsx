@@ -23,7 +23,7 @@ const Sidebar: React.FC = () => {
     };
     
     // Game control
-    const { saveGame, loadGame, resetGame, pauseGame, resumeGame } = useGameStore();
+    const { saveGame, loadGame, resetGame, stopGame, startGame } = useGameStore();
   
     return (
       <aside className="w-64 bg-gray-800 text-white p-4">
@@ -52,13 +52,13 @@ const Sidebar: React.FC = () => {
               Reset Game
             </button>
             <button 
-              onClick={pauseGame}
+              onClick={stopGame}
               className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded"
             >
               Pause Game
             </button>
             <button 
-              onClick={resumeGame}
+              onClick={startGame}
               className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded"
             >
               Resume Game
