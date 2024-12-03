@@ -5,32 +5,38 @@ import { useMiningStore } from "./mining.store";
  */
 
 export const startMining = (nodeId: string): void => {
+  console.group('Mining Operation');
   const { nodes, level, activeNode, setActiveNode } = useMiningStore.getState();
   const node = nodes[nodeId];
 
   // Validation
   if (!node) {
     console.warn(`Node with ID "${nodeId}" does not exist.`);
+    console.groupEnd();
     return;
   }
   if (!node.isUnlocked) {
     console.warn(`Node "${node.name}" is locked.`);
+    console.groupEnd();
     return;
   }
   if (level < node.levelRequired) {
     console.warn(`Level ${node.levelRequired} required to mine "${node.name}".`);
+    console.groupEnd();
     return;
   }
 
   // Stop mining the current node if it's different from the new one
   if (activeNode && activeNode !== nodeId) {
     console.log(`Switching from node "${activeNode}" to "${nodeId}".`);
+    console.groupEnd();
     stopMining();
   }
 
   // Set the new current node
   setActiveNode(nodeId);
   console.log(`Started mining "${node.name}".`);
+  console.groupEnd();
 };
 
 
@@ -78,10 +84,18 @@ export const processMiningTick = (deltaTime: number): void => {
       const newLevel = level + 1;
       setLevel(newLevel);
       setXp(newXp - requiredXp); // Carry over excess XP
+      console.group('Level Up!');
       console.log(`Congratulations! Reached level ${newLevel}.`);
+      console.groupEnd();
     }
   
-    console.log(`Mined ${progress} from "${node.name}", gained ${xpGain} XP.`);
+  // console.log(`Mined ${progress} from "${node.name}", gained ${xpGain} XP.`);
+  
+  console.groupCollapsed(`Mining ${node.name}`);
+  console.log(`Progress: ${progress}`);
+  console.log(`XP Gained: ${xpGain}`);
+  console.groupEnd();
+
   
     // Handle depletion and regeneration
     if (updatedNode.nodeHealth <= 0) {
@@ -93,7 +107,9 @@ export const processMiningTick = (deltaTime: number): void => {
           console.log(`${node.name} has regenerated.`);
         }, node.regenRate * 1000);
       }
+      console.groupEnd();
     }
+  console.groupEnd();
   };
   
   
@@ -103,6 +119,7 @@ export const processMiningTick = (deltaTime: number): void => {
  * Stop mining action.
  */
 export const stopMining = (): void => {
+    console.group('Stop Mining');
     const { activeNode, setActiveNode, setNodes, nodes } = useMiningStore.getState();
   
     if (activeNode) {
@@ -118,5 +135,6 @@ export const stopMining = (): void => {
     // Clear the current node
     setActiveNode(null);
     console.log("Mining has been stopped.");
+    console.groupEnd();
   };
   
