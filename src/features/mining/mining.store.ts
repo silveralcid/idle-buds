@@ -1,6 +1,6 @@
 import { ResourceNode } from "../../types/resourceNode.types";
 import { create } from "zustand";
-import { useBankStore } from "../bank/bank.state";
+import { useBankStore } from "../bank/bank.store";
 import { convertNodesToRecord } from "../../utils/nodes-to-record";
 import { miningNodes } from "../../data/nodes/mining.data";
 import { BaseSkill } from "../../types/base-skill.types";

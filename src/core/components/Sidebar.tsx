@@ -1,6 +1,6 @@
 import React from "react";
 import { useMiningStore } from "../../features/mining/mining.store";
-import { useBankStore } from "../../features/bank/bank.state";
+import { useBankStore } from "../../features/bank/bank.store";
 import { useViewStore } from "../view.store";
 
 const Sidebar: React.FC = () => {
