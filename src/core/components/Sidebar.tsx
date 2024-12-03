@@ -61,7 +61,7 @@ const Sidebar: React.FC = () => {
               onClick={startGame}
               className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded"
             >
-              Resume Game
+              Start Game
             </button>
           </div>
         </div>
