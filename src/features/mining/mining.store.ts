@@ -33,6 +33,8 @@ export interface MiningState extends BaseSkill {
     activeNode: null,
     nodes: convertNodesToRecord(miningNodes),
     ores: {},
+
+    
     setXp: (xp: number) => set(() => ({ xp })),
     setLevel: (level: number) => {
       set((state) => {

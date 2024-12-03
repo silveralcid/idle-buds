@@ -14,7 +14,7 @@ interface BankState {
   
 
 export const useBankStore = create<BankState>((set) => ({
-  items: {}, // Start with an empty bank
+  items: {},
   filters: [],
   sorting: 'name',
   totalValue: 0,

@@ -75,9 +75,26 @@ interface GameActions {
       gameLoop.stop();
       
       // Reset all stores
-      useBankStore.setState({/* initial bank state */});
-      useMiningStore.setState({/* initial mining state */});
-      useViewStore.setState({/* initial view state */});
+        useBankStore.setState({
+            items: {},
+            filters: [],
+            sorting: 'name',
+            totalValue: 0,
+        });
+        
+        useMiningStore.setState({
+            xp: 0,
+            level: 1,
+            progress: 0,
+            isUnlocked: true,
+            unlockRequirements: undefined,
+            activeNode: null,
+            ores: {},
+        });
+        
+        useViewStore.setState({
+            currentView: "MiningView",
+         });
   
       set({
         isInitialLoad: true,
