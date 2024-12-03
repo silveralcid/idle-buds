@@ -5,6 +5,8 @@ import { useBankStore } from '../features/bank/bank.store';
 import { useMiningStore } from '../features/mining/mining.store';
 import { useViewStore } from './view.store';
 import { GameConfig } from '../core/constants/game-config';
+import { miningNodes } from '../data/nodes/mining.data';
+import { convertNodesToRecord } from '../utils/nodes-to-record';
 
 interface GameState {
   isInitialLoad: boolean;
@@ -89,6 +91,7 @@ interface GameActions {
             isUnlocked: true,
             unlockRequirements: undefined,
             activeNode: null,
+            nodes: convertNodesToRecord(miningNodes),
             ores: {},
         });
         
@@ -109,8 +112,8 @@ interface GameActions {
   }));
   
   // Setup auto-save functionality
-//   setInterval(() => {
-//     if (!gameLoop.isPaused && !useGameStore.getState().isInitialLoad) {
-//       useGameStore.getState().saveGame();
-//     }
-//   }, GameConfig.SAVE.AUTO_INTERVAL);
+  setInterval(() => {
+    if (!gameLoop.isPaused && !useGameStore.getState().isInitialLoad) {
+      useGameStore.getState().saveGame();
+    }
+  }, GameConfig.SAVE.AUTO_INTERVAL);
