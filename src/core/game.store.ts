@@ -66,11 +66,6 @@ interface GameActions {
         useBankStore.setState(state.bank);
         useMiningStore.setState(state.mining);
         useViewStore.setState(state.view);
-  
-        // Handle offline progress through GameLoop
-        const offlineTime = (Date.now() - timestamp) / 1000;
-        gameEvents.emit('offlineProgress', offlineTime);
-        gameEvents.emit('gameInitialized');
       } catch (error) {
         console.error('Failed to load game:', error);
       }
