@@ -40,6 +40,7 @@ interface GameActions {
       console.groupCollapsed('Game Save');
       const currentTime = Date.now();
       set({ lastSaveTime: currentTime });
+      set({ isInitialLoad: false });
       console.log('Current time set for save:', currentTime);
     
       const saveData = {
