@@ -7,6 +7,7 @@ import { useViewStore } from './view.store';
 import { GameConfig } from '../core/constants/game-config';
 import { miningNodes } from '../data/nodes/mining.data';
 import { convertNodesToRecord } from '../utils/nodes-to-record';
+import { processOfflineProgress } from '../core/offline-loop';
 
 interface GameState {
   isInitialLoad: boolean;
@@ -118,16 +119,31 @@ interface GameActions {
     },
     
     stopGame: () => gameLoop.stop(),
+    
     handleVisibilityChange: () => {
-      const isVisible = document.visibilityState === 'visible';
-      set({ isVisible });
+      const isVisible = document.visibilityState === "visible";
+      const gameStore = useGameStore.getState();
+    
       if (!isVisible) {
+        // Game is becoming invisible, save the game state
         gameLoop.stop();
-        useGameStore.getState().saveGame();
+        gameStore.saveGame(); // Save the current state
+        set({ isPaused: true, lastSaveTime: Date.now() });
+      } else {
+        // Game is becoming visible, process offline progress without restarting the game
+        const lastSaveTime = gameStore.lastSaveTime || Date.now();
+        const currentTime = Date.now();
+    
+        // Trigger offline loop
+        processOfflineProgress(lastSaveTime);
+    
+        // Keep the game paused after processing offline progress
         set({ isPaused: true });
       }
+    
+      set({ isVisible });
     },
-  }));
+ }));
 
   // Autosave
   setInterval(() => {

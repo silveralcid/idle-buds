@@ -1,5 +1,5 @@
 import { useGameStore } from "../game.store";
-import { calculateTimeAway } from "../../utils/offline-progression";
+import { calculateTimeAway } from "../../utils/offline-calculation";
 
 export function ResumeModal() {
   const isPaused = useGameStore((state) => state.isPaused);
