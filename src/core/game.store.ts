@@ -11,6 +11,8 @@ import { convertNodesToRecord } from '../utils/nodes-to-record';
 interface GameState {
   isInitialLoad: boolean;
   lastSaveTime: number;
+  isPaused: boolean;
+  isVisible: boolean;
 }
 
 interface GameActions {
@@ -19,6 +21,7 @@ interface GameActions {
     resetGame: () => void;
     stopGame: () => void;
     startGame: () => void;
+    handleVisibilityChange: () => void;
   }
   
   const gameLoop = GameLoop.getInstance();
@@ -28,6 +31,8 @@ interface GameActions {
     // Simplified State
     isInitialLoad: true,
     lastSaveTime: Date.now(),
+    isPaused: false,
+    isVisible: true,
   
     // Actions
     saveGame: () => {
@@ -107,10 +112,22 @@ interface GameActions {
       gameLoop.start();
     },
   
-    startGame: () => gameLoop.start(),
+    startGame: () => {
+      set({ isPaused: false }); // Ensure modal closes
+      gameLoop.start();        // Start the game loop
+    },
+    
     stopGame: () => gameLoop.stop(),
+    handleVisibilityChange: () => {
+      const isVisible = document.visibilityState === 'visible';
+      set({ isVisible });
+      if (!isVisible) {
+        gameLoop.stop();
+        useGameStore.getState().saveGame();
+        set({ isPaused: true });
+      }
+    },
   }));
-  
 
   // Autosave
   setInterval(() => {

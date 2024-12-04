@@ -6,6 +6,8 @@ import Sidebar from "./core/components/Sidebar";
 import { GameLoop } from "./core/game-loop";
 import { GameEvents } from "./core/game-events";
 import { processMiningTick } from "./features/mining/mining.logic";
+import { ResumeModal } from "./core/components/ResumeModal";
+import { VisibilityHandler } from "./core/components/VisibilityHandler";
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
@@ -41,12 +43,16 @@ function App() {
   };
 
   return (
-    <div className="flex h-screen">
-      <Sidebar /> {/* Sidebar on the left */}
-      <main className="flex-1 p-4 bg-base-300">
-        <GameContainer>{renderView()}</GameContainer>
-      </main>
-    </div>
+    <>
+      <ResumeModal />
+      <VisibilityHandler />
+      <div className="flex h-screen">
+        <Sidebar /> {/* Sidebar on the left */}
+        <main className="flex-1 p-4 bg-base-300">
+          <GameContainer>{renderView()}</GameContainer>
+        </main>
+      </div>
+    </>
   );
 }
 
