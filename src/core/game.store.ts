@@ -37,9 +37,11 @@ interface GameActions {
   
     // Actions
     saveGame: () => {
+      console.groupCollapsed('Game Save');
       const currentTime = Date.now();
       set({ lastSaveTime: currentTime });
-  
+      console.log('Current time set for save:', currentTime);
+    
       const saveData = {
         version: GameConfig.SAVE.VERSION,
         timestamp: currentTime,
@@ -47,37 +49,62 @@ interface GameActions {
           game: get(),
           bank: useBankStore.getState(),
           mining: useMiningStore.getState(),
-          view: useViewStore.getState()
-        }
+          view: useViewStore.getState(),
+        },
       };
-  
+    
+      console.groupCollapsed('Save Data Snapshot');
+      console.log('Version:', saveData.version);
+      console.log('Timestamp:', saveData.timestamp);
+      console.log('State:', saveData.state);
+      console.groupEnd();
+    
       try {
         localStorage.setItem('game_save', JSON.stringify(saveData));
         console.log('Game saved successfully');
       } catch (error) {
         console.error('Failed to save game:', error);
       }
+    
+      console.groupEnd();
     },
+    
   
     loadGame: () => {
+      console.groupCollapsed('Game Load');
       try {
+        console.log('Attempting to load game save...');
         const savedData = localStorage.getItem('game_save');
-        if (!savedData) return;
-  
+        if (!savedData) {
+          console.warn('No saved data found.');
+          console.groupEnd();
+          return;
+        }
+    
         const { version, timestamp, state } = JSON.parse(savedData);
-        
+        console.log('Loaded Save Data:', { version, timestamp, state });
+    
         if (version !== GameConfig.SAVE.VERSION) {
           console.warn('Save version mismatch. Some features may not work correctly.');
         }
-  
+    
+        console.groupCollapsed('State Updates');
         set({ ...state.game, isInitialLoad: false });
         useBankStore.setState(state.bank);
+        console.log('Bank state loaded:', state.bank);
         useMiningStore.setState(state.mining);
+        console.log('Mining state loaded:', state.mining);
         useViewStore.setState(state.view);
+        console.log('View state loaded:', state.view);
+        console.groupEnd();
+    
       } catch (error) {
         console.error('Failed to load game:', error);
+      } finally {
+        console.groupEnd();
       }
     },
+    
   
     resetGame: () => {
       gameLoop.pause();

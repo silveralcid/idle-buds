@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useViewStore } from "./core/view.store";
+import { useGameStore } from "./core/game.store"; // Import your game store
 import GameContainer from "./views/GameContainer";
 import MiningView from "./views/MiningView";
 import Sidebar from "./core/components/Sidebar";
@@ -11,8 +12,12 @@ import { VisibilityHandler } from "./core/components/VisibilityHandler";
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
+  const loadGame = useGameStore((state) => state.loadGame); // Access loadGame from the store
 
   useEffect(() => {
+    // Load the game state on app initialization
+    loadGame();
+
     // Initialize the game loop
     const gameLoop = GameLoop.getInstance();
     const gameEvents = GameEvents.getInstance();
@@ -31,7 +36,7 @@ function App() {
       gameLoop.pause();
       gameEvents.off("gameTick", handleGameTick);
     };
-  }, []);
+  }, [loadGame]);
 
   const renderView = () => {
     switch (currentView) {
