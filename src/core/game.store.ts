@@ -75,37 +75,46 @@ interface GameActions {
     loadGame: () => {
       console.groupCollapsed('Game Load');
       try {
-        console.log('Attempting to load game save...');
-        const savedData = localStorage.getItem('game_save');
-        if (!savedData) {
-          console.warn('No saved data found.');
+          console.log('Attempting to load game save...');
+          const savedData = localStorage.getItem('game_save');
+          if (!savedData) {
+              console.warn('No saved data found.');
+              console.groupEnd();
+              return;
+          }
+  
+          const { version, timestamp, state } = JSON.parse(savedData);
+          console.log('Loaded Save Data:', { version, timestamp, state });
+  
+          if (version !== GameConfig.SAVE.VERSION) {
+              console.warn('Save version mismatch. Some features may not work correctly.');
+          }
+  
+          console.groupCollapsed('State Updates');
+          set({ ...state.game, isInitialLoad: false });
+          useBankStore.setState(state.bank);
+          console.log('Bank state loaded:', state.bank);
+          useMiningStore.setState(state.mining);
+          console.log('Mining state loaded:', state.mining);
+          useViewStore.setState(state.view);
+          console.log('View state loaded:', state.view);
           console.groupEnd();
-          return;
-        }
-    
-        const { version, timestamp, state } = JSON.parse(savedData);
-        console.log('Loaded Save Data:', { version, timestamp, state });
-    
-        if (version !== GameConfig.SAVE.VERSION) {
-          console.warn('Save version mismatch. Some features may not work correctly.');
-        }
-    
-        console.groupCollapsed('State Updates');
-        set({ ...state.game, isInitialLoad: false });
-        useBankStore.setState(state.bank);
-        console.log('Bank state loaded:', state.bank);
-        useMiningStore.setState(state.mining);
-        console.log('Mining state loaded:', state.mining);
-        useViewStore.setState(state.view);
-        console.log('View state loaded:', state.view);
-        console.groupEnd();
-    
+  
+          // Pause the game loop after successful load
+          if (gameLoop && typeof gameLoop.pause === 'function') {
+              gameLoop.pause();
+              console.log('Game loop paused successfully after loading.');
+          } else {
+              console.warn('gameLoop.pause is not available or not a function.');
+          }
+  
       } catch (error) {
-        console.error('Failed to load game:', error);
+          console.error('Failed to load game:', error);
       } finally {
-        console.groupEnd();
+          console.groupEnd();
       }
-    },
+   },
+  
     
   
     resetGame: () => {
