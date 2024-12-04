@@ -55,47 +55,11 @@ export class GameLoop {
   }
 
   /** Stops the game loop */
-  stop(): void {
+  pause(): void {
     this.running = false;
     this.isPaused = true;
     this.lastStopTimestamp = performance.now();
-    console.log("Game loop stopped.");
-  }
-
-  /** Pauses the game loop */
-  // Not sure if we actually need pause/resume since start/stop does this already...
-  pause(): void {
-    if (!this.isPaused) {
-      this.isPaused = true;
-      this.lastStopTimestamp = performance.now(); // Record the time of pause
-      console.log("Game loop paused.");
-      GameEvents.getInstance().emit("gamePaused");
-    }
-  }
-
-  /** Resumes the game loop */
-  resume(): void {
-    if (this.isPaused) {
-      const currentTimestamp = performance.now();
-      if (this.lastStopTimestamp) {
-        const offlineTime = (currentTimestamp - this.lastStopTimestamp) / 1000; // Time in seconds
-        GameEvents.getInstance().emit("offlineProgress", offlineTime);
-      }
-
-      this.isPaused = false;
-      this.lastStopTimestamp = null; // Clear the timestamp
-      console.log("Game loop resumed.");
-      GameEvents.getInstance().emit("gameResumed");
-    }
-  }
-
-  /** Toggles between pause and resume */
-  togglePause(): void {
-    if (this.isPaused) {
-      this.resume();
-    } else {
-      this.pause();
-    }
+    console.log("Game loop paused.");
   }
 }
 

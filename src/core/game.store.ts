@@ -20,7 +20,7 @@ interface GameActions {
     saveGame: () => void;
     loadGame: () => void;
     resetGame: () => void;
-    stopGame: () => void;
+    pauseGame: () => void;
     startGame: () => void;
     handleVisibilityChange: () => void;
   }
@@ -80,7 +80,7 @@ interface GameActions {
     },
   
     resetGame: () => {
-      gameLoop.stop();
+      gameLoop.pause();
       
       // Reset all stores
         useBankStore.setState({
@@ -118,15 +118,15 @@ interface GameActions {
       gameLoop.start();        // Start the game loop
     },
     
-    stopGame: () => gameLoop.stop(),
-    
+    pauseGame: () => gameLoop.pause(),
+  
     handleVisibilityChange: () => {
       const isVisible = document.visibilityState === "visible";
       const gameStore = useGameStore.getState();
     
       if (!isVisible) {
         // Game is becoming invisible, save the game state
-        gameLoop.stop();
+        gameLoop.pause();
         gameStore.saveGame(); // Save the current state
         set({ isPaused: true, lastSaveTime: Date.now() });
       } else {

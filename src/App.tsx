@@ -28,7 +28,7 @@ function App() {
 
     // Cleanup on unmount
     return () => {
-      gameLoop.stop();
+      gameLoop.pause();
       gameEvents.off("gameTick", handleGameTick);
     };
   }, []);
