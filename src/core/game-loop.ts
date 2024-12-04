@@ -7,7 +7,7 @@ export class GameLoop {
   private lastTimestamp: number = 0;
   public isPaused: boolean = false;
   private running: boolean = false;
-  private lastStopTimestamp: number | null = null;
+  public lastStopTimestamp: number | null = null;
 
   private constructor() {}
 
