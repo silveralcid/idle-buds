@@ -27,7 +27,7 @@ const Sidebar: React.FC = () => {
 
     
     // Game control
-    const { saveGame, loadGame, resetGame, pauseGame, startGame } = useGameStore();
+    const { saveGame, loadGame, resetGame, pauseGame, startGame, deleteSave } = useGameStore();
   
     return (
       <aside className="w-64 bg-gray-800 text-white p-4">
@@ -50,6 +50,24 @@ const Sidebar: React.FC = () => {
     {isMenuOpen && (
       <div className="flex flex-col gap-2">
         <button 
+          onClick={startGame}
+          className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded"
+        >
+          Start Game
+        </button>
+        <button 
+          onClick={pauseGame}
+          className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded"
+        >
+          Pause Game
+        </button>
+        <button 
+          onClick={resetGame}
+          className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded"
+        >
+          Reset Game
+        </button>
+        <button 
           onClick={saveGame}
           className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
         >
@@ -61,24 +79,13 @@ const Sidebar: React.FC = () => {
         >
           Load Game
         </button>
-        <button 
-          onClick={resetGame}
-          className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded"
-        >
-          Reset Game
-        </button>
-        <button 
-          onClick={pauseGame}
-          className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded"
-        >
-          Pause Game
-        </button>
-        <button 
-          onClick={startGame}
-          className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded"
-        >
-          Start Game
-        </button>
+        <button
+              onClick={deleteSave}
+              className="bg-red-800 hover:bg-red-900 px-4 py-2 rounded"
+            >
+              Delete Save
+            </button>
+
       </div>
     )}
   </div>

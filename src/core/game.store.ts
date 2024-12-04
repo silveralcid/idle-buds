@@ -22,6 +22,7 @@ interface GameActions {
     resetGame: () => void;
     pauseGame: () => void;
     startGame: () => void;
+    deleteSave: () => void;
     handleVisibilityChange: () => void;
   }
   
@@ -138,7 +139,6 @@ interface GameActions {
         lastSaveTime: Date.now()
       });
   
-      gameLoop.start();
     },
   
     startGame: () => {
@@ -170,6 +170,19 @@ interface GameActions {
       }
     
       set({ isVisible });
+    },
+
+    deleteSave: () => {
+      console.groupCollapsed('Delete Save');
+      try {
+          console.log('Attempting to delete save...');
+          localStorage.removeItem('game_save');
+          console.log('Game save deleted successfully.');
+      } catch (error) {
+          console.error('Failed to delete save:', error);
+      } finally {
+          console.groupEnd();
+      }
     },
  }));
 
