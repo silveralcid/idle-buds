@@ -1,3 +1,4 @@
+import { TaskManager } from "../../utils/task-manager";
 import { useMiningStore } from "./mining.store";
 
 /**
@@ -6,10 +7,10 @@ import { useMiningStore } from "./mining.store";
 
 export const startMining = (nodeId: string): void => {
   console.group('Mining Operation');
-  const { nodes, level, activeNode, setActiveNode } = useMiningStore.getState();
+  const { nodes, level, setActiveNode } = useMiningStore.getState();
   const node = nodes[nodeId];
 
-  // Validation
+  // Validation checks...
   if (!node) {
     console.warn(`Node with ID "${nodeId}" does not exist.`);
     console.groupEnd();
@@ -26,14 +27,7 @@ export const startMining = (nodeId: string): void => {
     return;
   }
 
-  // Stop mining the current node if it's different from the new one
-  if (activeNode && activeNode !== nodeId) {
-    console.log(`Switching from node "${activeNode}" to "${nodeId}".`);
-    console.groupEnd();
-    stopMining();
-  }
-
-  // Set the new current node
+  TaskManager.startTask("mining");
   setActiveNode(nodeId);
   console.log(`Started mining "${node.name}".`);
   console.groupEnd();
@@ -119,22 +113,6 @@ export const processMiningTick = (deltaTime: number): void => {
  * Stop mining action.
  */
 export const stopMining = (): void => {
-    console.group('Stop Mining');
-    const { activeNode, setActiveNode, setNodes, nodes } = useMiningStore.getState();
-  
-    if (activeNode) {
-      const node = nodes[activeNode];
-      if (node) {
-        console.log(`Stopping mining on node: "${node.name}"`);
-        // Optionally reset node state if needed
-        const updatedNode = { ...node };
-        setNodes({ ...nodes, [activeNode]: updatedNode });
-      }
-    }
-  
-    // Clear the current node
-    setActiveNode(null);
-    console.log("Mining has been stopped.");
-    console.groupEnd();
-  };
+  TaskManager.stopCurrentTask();
+};
   

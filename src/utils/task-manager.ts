@@ -1,28 +1,40 @@
 import { useGameStore } from '../core/game.store';
 import { HunterTask } from '../types/hunter-task.types';
+import { useMiningStore } from '../features/mining/mining.store';
+import { useLumberingStore } from '../features/lumbering/lumbering.store';
 
 export const TaskManager = {
-  startTask: (task: HunterTask): boolean => {
+  startTask: function(task: HunterTask): void {
     const { currentTask, setCurrentTask } = useGameStore.getState();
 
+    // If there's a different activity running, stop it first
     if (currentTask && currentTask !== task) {
-      console.warn(`Cannot start ${task} while ${currentTask} is active`);
-      return false;
+      this.stopCurrentTask();
     }
 
     setCurrentTask(task);
-    return true;
   },
 
-  stopTask: (task: HunterTask): void => {
-    const { currentTask, clearCurrentTask } = useGameStore.getState();
+  stopCurrentTask: function(): void {
+    const { currentTask } = useGameStore.getState();
+    
+    if (!currentTask) return;
 
-    if (currentTask === task) {
-      clearCurrentTask();
+    // Stop the specific activity based on type
+    switch (currentTask) {
+      case "mining":
+        useMiningStore.setState({ activeNode: null });
+        break;
+      case "lumbering":
+        useLumberingStore.setState({ activeNode: null });
+        break;
+      // Add other activities here as needed
     }
+
+    useGameStore.getState().clearCurrentTask();
   },
 
-  isTaskActive: (task: HunterTask): boolean => {
+  isTaskActive: function(task: HunterTask): boolean {
     const { currentTask } = useGameStore.getState();
     return currentTask === task;
   }

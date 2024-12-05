@@ -1,38 +1,37 @@
+import { TaskManager } from "../../utils/task-manager";
 import { useLumberingStore } from "./lumbering.store";
 
 /**
  * Start lumbering on a tree.
  */
-export const startLumbering = (treeId: string): void => {
+export const startLumbering = (nodeId: string): void => {
   console.group('Lumbering Operation');
-  const { nodes, level, activeNode, setActiveNode } = useLumberingStore.getState();
-  const tree = nodes[treeId];
+  const { nodes, level, setActiveNode } = useLumberingStore.getState();
+  const node = nodes[nodeId];
 
-  if (!tree) {
-    console.warn(`Tree with ID "${treeId}" does not exist.`);
+  // Validation checks...
+  if (!node) {
+    console.warn(`Node with ID "${nodeId}" does not exist.`);
     console.groupEnd();
     return;
   }
-  if (!tree.isUnlocked) {
-    console.warn(`Tree "${tree.name}" is locked.`);
+  if (!node.isUnlocked) {
+    console.warn(`Node "${node.name}" is locked.`);
     console.groupEnd();
     return;
   }
-  if (level < tree.levelRequired) {
-    console.warn(`Level ${tree.levelRequired} required to chop "${tree.name}".`);
+  if (level < node.levelRequired) {
+    console.warn(`Level ${node.levelRequired} required to chop "${node.name}".`);
     console.groupEnd();
     return;
   }
 
-  if (activeNode && activeNode !== treeId) {
-    console.log(`Switching from tree "${activeNode}" to "${treeId}".`);
-    stopLumbering();
-  }
-
-  setActiveNode(treeId);
-  console.log(`Started chopping "${tree.name}".`);
+  TaskManager.startTask("lumbering");
+  setActiveNode(nodeId);
+  console.log(`Started chopping "${node.name}".`);
   console.groupEnd();
 };
+
 
 /**
  * Process lumbering tick (progress and rewards).
@@ -96,19 +95,5 @@ export const processLumberingTick = (deltaTime: number): void => {
  * Stop lumbering action.
  */
 export const stopLumbering = (): void => {
-  console.group('Stop Lumbering');
-  const { activeNode, setActiveNode, setNodes, nodes } = useLumberingStore.getState();
-
-  if (activeNode) {
-    const tree = nodes[activeNode];
-    if (tree) {
-      console.log(`Stopping lumbering on tree: "${tree.name}"`);
-      const updatedTree = { ...tree };
-      setNodes({ ...nodes, [activeNode]: updatedTree });
-    }
-  }
-
-  setActiveNode(null);
-  console.log("Lumbering has been stopped.");
-  console.groupEnd();
+  TaskManager.stopCurrentTask();
 };
