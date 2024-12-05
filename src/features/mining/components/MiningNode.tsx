@@ -17,7 +17,6 @@ const MiningNode: React.FC<MiningNodeProps> = ({ nodeId }) => {
       </div>
     );
   }
-3333333333333333333333333333
   const handleMine = () => startMining(nodeId);
   const handleStop = () => stopMining();
 
