@@ -3,71 +3,60 @@ import { calculateTimeAway } from "../utils/offline-calculation";
 import { useMiningStore } from "../features/mining/mining.store";
 import { GameConfig } from "./constants/game-config";
 
-/**
- * Simulates the game loop for offline progression.
- * @param lastSaveTime - The timestamp of the last save.
- */
 export function processOfflineProgress(lastSaveTime: number): void {
-  // Calculate time spent offline
+  // Calculate and cap offline time
   const { timeAwayMilliseconds } = calculateTimeAway(lastSaveTime);
-  const totalTimeAway = timeAwayMilliseconds / 1000; // Convert to seconds
-  const TICK_DURATION = GameConfig.TICK.DURATION / 1000; // Convert from ms to seconds
-
+  const maxOfflineTime = GameConfig.SAVE.MAX_OFFLINE_TIME;
+  const cappedTimeAway = Math.min(timeAwayMilliseconds, maxOfflineTime);
+  const totalTimeAway = cappedTimeAway / 1000; // Convert to seconds
+  
   console.group("Offline Progress");
-  console.log(`Processing offline progress for ${totalTimeAway.toFixed(2)} seconds.`);
+  console.log(`Processing offline progress for ${totalTimeAway.toFixed(2)} seconds (capped from ${(timeAwayMilliseconds/1000).toFixed(2)})`);
 
-  // Extract necessary state
-  const { nodes, ores, setOres } = useMiningStore.getState();
-
-  let totalXpGained = 0;
-  const minedItems: Record<string, number> = {};
-
-  // Process each node independently based on its gather rate
-  Object.values(nodes).forEach((node) => {
-    if (!node.isUnlocked) return;
-
-    const nodeGatherRate = node.gatherRate * GameConfig.EXPERIENCE.GATHER_RATE_MODIFIER;
-    const nodeTicks = Math.floor(totalTimeAway / (TICK_DURATION / nodeGatherRate));
-
-    console.group(`Node: ${node.name}`);
-    console.log(`Simulating ${nodeTicks} ticks for node "${node.name}" at gather rate: ${nodeGatherRate}.`);
-
-    for (let i = 0; i < nodeTicks; i++) {
-      // Simulate mining tick
-      processMiningTick(TICK_DURATION);
-
-      // Track XP gain
-      totalXpGained += node.experienceGain * TICK_DURATION;
-
-      // Track items mined
-      for (const [ore, quantity] of Object.entries(ores)) {
-        minedItems[ore] = (minedItems[ore] || 0) + quantity;
-      }
-    }
+  // Extract necessary state once
+  const { activeNode, nodes, ores } = useMiningStore.getState();
+  if (!activeNode || !nodes[activeNode].isUnlocked) {
+    console.log("No active node or active node is locked.");
     console.groupEnd();
-  });
-
-  // Log total XP gained
-  console.group("Summary");
-  console.log(`Total XP gained: ${totalXpGained}`);
-
-  // Log mined items
-  console.group("Mined Items");
-  for (const [item, quantity] of Object.entries(minedItems)) {
-    console.log(`${item}: ${quantity}`);
+    return;
   }
-  console.groupEnd();
 
-  // Unlock nodes if level-up occurred
-  const { level } = useMiningStore.getState();
-  console.group("Unlocked Nodes");
-  Object.values(nodes).forEach((node) => {
-    if (!node.isUnlocked && node.levelRequired <= level) {
-      console.log(`Unlocked node: ${node.name}`);
-    }
+  const node = nodes[activeNode];
+  let totalXpGained = 0;
+  const aggregatedOres: Record<string, number> = {};
+
+  // Calculate total resources and XP for the active node
+  const nodeGatherRate = node.gatherRate * GameConfig.EXPERIENCE.GATHER_RATE_MODIFIER;
+  const totalGatherAmount = nodeGatherRate * totalTimeAway;
+  const totalNodeXp = node.experienceGain * totalTimeAway;
+
+  // Aggregate resources
+  node.resourceNodeYields.forEach((ore) => {
+    aggregatedOres[ore] = (aggregatedOres[ore] || 0) + totalGatherAmount;
   });
-  console.groupEnd();
 
-  console.groupEnd(); // Summary
-  console.groupEnd(); // Offline Progress
+  totalXpGained += totalNodeXp;
+
+  console.log(`Node "${node.name}": Gathered ${totalGatherAmount.toFixed(2)} resources, gained ${totalNodeXp.toFixed(2)} XP`);
+
+  // Single state update for all resources
+  useMiningStore.getState().setOres(aggregatedOres);
+  
+  // Update XP and handle level ups in a single operation
+  const { xp, level } = useMiningStore.getState();
+  const newXp = xp + totalXpGained;
+  const xpToNextLevel = useMiningStore.getState().xpToNextLevel();
+  
+  if (newXp >= xpToNextLevel) {
+    const newLevel = level + Math.floor(newXp / xpToNextLevel);
+    useMiningStore.getState().setLevel(newLevel);
+    useMiningStore.getState().setXp(newXp % xpToNextLevel);
+  } else {
+    useMiningStore.getState().setXp(newXp);
+  }
+
+  console.log(`Total Progress Summary:`);
+  console.log(`- XP Gained: ${totalXpGained.toFixed(2)}`);
+  console.log(`- Resources Gathered:`, aggregatedOres);
+  console.groupEnd();
 }
