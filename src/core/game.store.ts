@@ -10,8 +10,9 @@ import { convertNodesToRecord } from '../utils/nodes-to-record';
 import { processOfflineProgress } from '../core/offline-loop';
 import { useLumberingStore } from '../features/lumbering/lumbering.store';
 import { lumberingNodes } from '../data/nodes/lumbering.data';
+import { HunterTask, HunterTaskState } from '../types/hunter-task.types';
 
-interface GameState {
+interface GameState extends HunterTaskState {
   isInitialLoad: boolean;
   lastSaveTime: number;
   isPaused: boolean;
@@ -208,7 +209,14 @@ interface GameActions {
           console.groupEnd();
       }
     },
- }));
+
+    currentTask: null,
+
+    setCurrentTask: (task: HunterTask) => 
+      set(() => ({ currentTask: task })),
+  
+    clearCurrentTask: () => 
+      set(() => ({ currentTask: null })), }));
 
   // Autosave
   setInterval(() => {
