@@ -8,6 +8,8 @@ import { GameConfig } from '../core/constants/game-config';
 import { miningNodes } from '../data/nodes/mining.data';
 import { convertNodesToRecord } from '../utils/nodes-to-record';
 import { processOfflineProgress } from '../core/offline-loop';
+import { useLumberingStore } from '../features/lumbering/lumbering.store';
+import { lumberingNodes } from '../data/nodes/lumbering.data';
 
 interface GameState {
   isInitialLoad: boolean;
@@ -49,9 +51,10 @@ interface GameActions {
         timestamp: currentTime,
         state: {
           game: get(),
+          view: useViewStore.getState(),
           bank: useBankStore.getState(),
           mining: useMiningStore.getState(),
-          view: useViewStore.getState(),
+          lumbering: useLumberingStore.getState(),
         },
       };
     
@@ -98,6 +101,8 @@ interface GameActions {
           console.log('Mining state loaded:', state.mining);
           useViewStore.setState(state.view);
           console.log('View state loaded:', state.view);
+          useLumberingStore.setState(state.lumbering);
+          console.log('Lumbering state loaded:', state.lumbering);
           console.groupEnd();
   
           // Pause the game loop after successful load
@@ -121,6 +126,9 @@ interface GameActions {
       gameLoop.pause();
       
       // Reset all stores
+        useViewStore.setState({
+          currentView: "MiningView",
+        });
         useBankStore.setState({
             items: {},
             filters: [],
@@ -138,10 +146,17 @@ interface GameActions {
             nodes: convertNodesToRecord(miningNodes),
             ores: {},
         });
-        
-        useViewStore.setState({
-            currentView: "MiningView",
-         });
+      
+        useLumberingStore.setState({
+            xp: 0,
+            level: 1,
+            progress: 0,
+            isUnlocked: true,
+            unlockRequirements: undefined,
+            activeNode: null,
+            nodes: convertNodesToRecord(lumberingNodes),
+        });
+
   
       set({
         isInitialLoad: true,
