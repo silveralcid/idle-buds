@@ -7,10 +7,6 @@ const MiningView: React.FC = () => {
   const setView = useViewStore((state) => state.setView);
   const nodes = useMiningStore((state) => state.nodes); // Access all nodes from the mining state
 
-  const goBack = () => {
-    setView("DefaultView"); // Example for switching views
-  };
-
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Mining View</h1>
@@ -20,9 +16,6 @@ const MiningView: React.FC = () => {
           <MiningNode key={node.id} nodeId={node.id} />
         ))}
       </div>
-      <button className="btn btn-primary mt-4" onClick={goBack}>
-        Go Back
-      </button>
     </div>
   );
 };
