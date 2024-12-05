@@ -6,6 +6,7 @@ import Sidebar from "./core/components/Sidebar";
 import { ResumeModal } from "./core/components/ResumeModal";
 import { VisibilityHandler } from "./core/components/VisibilityHandler";
 import { initializeGame } from "./utils/initialize-game";
+import SmithingView from "./views/SmithingView";
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
@@ -22,6 +23,8 @@ function App() {
     switch (currentView) {
       case "MiningView":
         return <MiningView />;
+      case "SmithingView":
+        return <SmithingView />;
       default:
         return <div>No view found.</div>;
     }
