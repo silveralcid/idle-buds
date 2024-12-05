@@ -5,6 +5,7 @@ import { useSmithingStore } from "../../features/smithing/smithing.store"; // Im
 import { useBankStore } from "../../features/bank/bank.store";
 import { useViewStore } from "../view.store";
 import { useGameStore } from "../game.store";
+import { useLumberingStore } from "../../features/lumbering/lumbering.store";
 
 const Sidebar: React.FC = () => {
   // Access mining state
@@ -21,6 +22,13 @@ const Sidebar: React.FC = () => {
 
   const progressSmithing = xpToNextLevelSmithing > 0 ? xpSmithing / xpToNextLevelSmithing : 0;
 
+  // Access lumbering state
+  const xpLumbering = useLumberingStore((state) => state.xp);
+  const levelLumbering = useLumberingStore((state) => state.level);
+  const xpToNextLevelLumbering = useLumberingStore((state) => state.xpToNextLevel());
+
+  const progressLumbering = xpToNextLevelLumbering > 0 ? xpLumbering / xpToNextLevelLumbering : 0;
+
   // Access bank items
   const bankItems = useBankStore((state) => state.items);
 
@@ -33,6 +41,10 @@ const Sidebar: React.FC = () => {
 
   const navigateToSmithing = () => {
     setView("SmithingView");
+  };
+
+  const navigateToLumbering = () => {
+    setView("LumberingView");
   };
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -132,6 +144,21 @@ const Sidebar: React.FC = () => {
           ></div>
         </div>
       </div>
+
+      {/* Lumbering Section */}
+      <div className="mb-6 cursor-pointer" onClick={navigateToLumbering}>
+        <h3 className="text-md font-semibold mb-2 hover:text-gray-300">Lumbering</h3>
+        <p>
+          Level: {levelLumbering} | XP: {xpLumbering.toFixed(0)}/{xpToNextLevelLumbering.toFixed(0)}
+        </p>
+        <div className="h-2 bg-gray-600 rounded mt-1">
+          <div
+            className="h-full bg-green-500 rounded"
+            style={{ width: `${(progressLumbering * 100).toFixed(0)}%` }}
+          ></div>
+        </div>
+      </div>
+
            {/* Bank Items */}
            <div>
         <h3 className="text-md font-semibold mb-2">Bank Items</h3>

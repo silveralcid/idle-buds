@@ -7,6 +7,7 @@ import { ResumeModal } from "./core/components/ResumeModal";
 import { VisibilityHandler } from "./core/components/VisibilityHandler";
 import { initializeGame } from "./utils/initialize-game";
 import SmithingView from "./views/SmithingView";
+import LumberingView from "./views/LumberingView";
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
@@ -25,6 +26,8 @@ function App() {
         return <MiningView />;
       case "SmithingView":
         return <SmithingView />;
+      case "LumberingView":
+        return <LumberingView />;
       default:
         return <div>No view found.</div>;
     }
