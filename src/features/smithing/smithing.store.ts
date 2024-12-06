@@ -176,7 +176,22 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
       xp: 0,
       level: 1,
       progress: 0,
-      workbenches: {},
+      workbenches: {
+        smithing_anvil: {
+          id: "smithing_anvil",
+          type: "smithing",
+          recipe: null,
+          progress: 0,
+          isActive: false,
+        },
+        smelting_furnace: {
+          id: "smelting_furnace",
+          type: "smelting",
+          recipe: null,
+          progress: 0,
+          isActive: false,
+        },
+      },
       recipes: recipeRegistry,
     })),
 
