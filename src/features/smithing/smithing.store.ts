@@ -17,6 +17,7 @@ export interface ActiveWorkbench {
 export interface SmithingState extends BaseSkill {
   workbenches: Record<string, ActiveWorkbench>;
   recipes: Recipe[];
+  unlockedRecipes: string[];
   setXp: (xp: number) => void;
   setLevel: (level: number) => void;
   addWorkbench: (workbench: Workbench) => void;
@@ -24,6 +25,7 @@ export interface SmithingState extends BaseSkill {
   activateWorkbench: (workbenchId: string, recipeId: string) => void;
   updateWorkbenchProgress: (workbenchId: string, delta: number) => void;
   xpToNextLevel: () => number;
+  isRecipeUnlocked: (recipeId: string) => boolean;
   reset: () => void;
 }
 
@@ -32,7 +34,7 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
   name: "Smithing",
   description: "Forge items from raw materials.",
   xp: 0,
-  level: 1,
+  level: 5,
   progress: 0,
   isUnlocked: true,
   unlockRequirements: undefined,
@@ -53,9 +55,19 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
     },
   },
   recipes: recipeRegistry,
+  unlockedRecipes: [],
 
   setXp: (xp: number) => set(() => ({ xp })),
-  setLevel: (level: number) => set(() => ({ level })),
+  setLevel: (level: number) => set((state) => {
+    const newUnlockedRecipes = state.recipes
+      .filter(recipe => recipe.levelRequired <= level)
+      .map(recipe => recipe.id);
+
+    return { 
+      level,
+      unlockedRecipes: newUnlockedRecipes
+    };
+  }),
   xpToNextLevel: () => calculateXpToNextLevel(get().level),
 
   addWorkbench: (workbench: Workbench) =>
@@ -84,7 +96,7 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
       const recipe = state.recipes.find((r) => r.id === recipeId);
       const bankStore = useBankStore.getState();
 
-      if (!workbench || !recipe || state.level < recipe.levelRequired) return state;
+      if (!workbench || !recipe || !state.isRecipeUnlocked(recipeId)) return state;
 
       const hasResources = recipe.inputs.every(input => {
         const hasAny = input.itemIds.some(itemId => 
@@ -167,4 +179,9 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
       workbenches: {},
       recipes: recipeRegistry,
     })),
+
+  isRecipeUnlocked: (recipeId: string) => {
+    const recipe = get().recipes.find(r => r.id === recipeId);
+    return recipe ? get().level >= recipe.levelRequired : false;
+  },
 }));
