@@ -11,6 +11,7 @@ import { processOfflineProgress } from '../core/offline-loop';
 import { useLumberingStore } from '../features/lumbering/lumbering.store';
 import { lumberingNodes } from '../data/nodes/lumbering.data';
 import { HunterTask, HunterTaskState } from '../types/hunter-task.types';
+import { useSmithingStore } from '../features/smithing/smithing.store';
 
 interface GameState extends HunterTaskState {
   isInitialLoad: boolean;
@@ -56,6 +57,7 @@ interface GameActions {
           bank: useBankStore.getState(),
           mining: useMiningStore.getState(),
           lumbering: useLumberingStore.getState(),
+          smithing: useSmithingStore.getState(),
         },
       };
     
@@ -104,6 +106,8 @@ interface GameActions {
           console.log('View state loaded:', state.view);
           useLumberingStore.setState(state.lumbering);
           console.log('Lumbering state loaded:', state.lumbering);
+          useSmithingStore.setState(state.smithing);
+          console.log('Smithing state loaded:', state.smithing);
           console.groupEnd();
   
           // Pause the game loop after successful load
@@ -156,6 +160,15 @@ interface GameActions {
             unlockRequirements: undefined,
             activeNode: null,
             nodes: convertNodesToRecord(lumberingNodes),
+        });
+      
+        useSmithingStore.setState({
+            xp: 0,
+            level: 5,
+            progress: 0,
+            isUnlocked: true,
+            unlockRequirements: undefined,
+            workbenches: {},
         });
 
   
