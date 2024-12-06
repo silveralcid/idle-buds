@@ -3,9 +3,12 @@ import { calculateXpToNextLevel } from "../../utils/experience";
 import { BaseSkill } from "../../types/base-skill.types";
 import { Workbench } from "../../types/workbench.types";
 import { Recipe } from "../../types/recipe.types";
+import { recipeRegistry, getRecipesByWorkbench } from "../../data/recipe-registry";
+import { useBankStore } from "../../features/bank/bank.store";
 
 export interface ActiveWorkbench {
   id: string;
+  type: string;
   recipe: Recipe | null;
   progress: number;
   isActive: boolean;
@@ -13,14 +16,14 @@ export interface ActiveWorkbench {
 
 export interface SmithingState extends BaseSkill {
   workbenches: Record<string, ActiveWorkbench>;
-  recipes: Recipe[]; // Available recipes for smithing
+  recipes: Recipe[];
   setXp: (xp: number) => void;
   setLevel: (level: number) => void;
-  setProgress: (progress: number) => void;
-  xpToNextLevel: () => number;
   addWorkbench: (workbench: Workbench) => void;
+  removeWorkbench: (workbenchId: string) => void;
   activateWorkbench: (workbenchId: string, recipeId: string) => void;
   updateWorkbenchProgress: (workbenchId: string, delta: number) => void;
+  xpToNextLevel: () => number;
   reset: () => void;
 }
 
@@ -33,12 +36,26 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
   progress: 0,
   isUnlocked: true,
   unlockRequirements: undefined,
-  workbenches: {}, // Initially no workbenches
-  recipes: [], // Initialize recipes
+  workbenches: {
+    smithing_anvil: {
+      id: "smithing_anvil",
+      type: "smithing",
+      recipe: null,
+      progress: 0,
+      isActive: false,
+    },
+    smelting_furnace: {
+      id: "smelting_furnace",
+      type: "smelting",
+      recipe: null,
+      progress: 0,
+      isActive: false,
+    },
+  },
+  recipes: recipeRegistry,
 
   setXp: (xp: number) => set(() => ({ xp })),
   setLevel: (level: number) => set(() => ({ level })),
-  setProgress: (progress: number) => set(() => ({ progress })),
   xpToNextLevel: () => calculateXpToNextLevel(get().level),
 
   addWorkbench: (workbench: Workbench) =>
@@ -47,6 +64,7 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
         ...state.workbenches,
         [workbench.id]: {
           id: workbench.id,
+          type: workbench.workbenchType,
           recipe: null,
           progress: 0,
           isActive: false,
@@ -54,12 +72,28 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
       },
     })),
 
+  removeWorkbench: (workbenchId: string) =>
+    set((state) => {
+      const { [workbenchId]: _, ...remaining } = state.workbenches;
+      return { workbenches: remaining };
+    }),
+
   activateWorkbench: (workbenchId: string, recipeId: string) =>
     set((state) => {
       const workbench = state.workbenches[workbenchId];
       const recipe = state.recipes.find((r) => r.id === recipeId);
+      const bankStore = useBankStore.getState();
 
       if (!workbench || !recipe || state.level < recipe.levelRequired) return state;
+
+      const hasResources = recipe.inputs.every(input => {
+        const hasAny = input.itemIds.some(itemId => 
+          (bankStore.items[itemId] || 0) >= input.amount
+        );
+        return hasAny;
+      });
+
+      if (!hasResources) return state;
 
       return {
         workbenches: {
@@ -81,12 +115,28 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
 
       const newProgress = workbench.progress + delta;
       const recipe = workbench.recipe;
+      const bankStore = useBankStore.getState();
 
       if (newProgress >= recipe.craftingTime) {
-        // Add outputs to the bank/store and reset progress
-        // Bank handling logic goes here
-        console.log(`Crafting complete for ${recipe.name}`);
+        // Consume inputs
+        recipe.inputs.forEach(input => {
+          const availableItemId = input.itemIds.find(id => 
+            (bankStore.items[id] || 0) >= input.amount
+          );
+          if (availableItemId) {
+            bankStore.removeItem(availableItemId, input.amount);
+          }
+        });
+
+        // Add outputs
+        recipe.outputs.forEach(output => {
+          bankStore.addItem(output.itemId, output.amount);
+        });
+
+        // Add experience
+        const newXp = state.xp + recipe.experienceGain;
         return {
+          xp: newXp,
           workbenches: {
             ...state.workbenches,
             [workbenchId]: {
@@ -115,6 +165,6 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
       level: 1,
       progress: 0,
       workbenches: {},
-      recipes: [],
+      recipes: recipeRegistry,
     })),
 }));
