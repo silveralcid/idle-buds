@@ -1,4 +1,4 @@
-## About: Idle Buds - Collect, Train, & Dominate!
+## Idle Buds - Collect, Train, & Dominate!
 
 ### Inspiration  
 Inspired by the charm of creature-collecting adventures and the convenience of idle progression games, *Idle Buds* combines the best of both worlds. Drawing influence from timeless RPG mechanics, we envisioned a world where strategy, resource management, and exciting battles meet the joy of nurturing and evolving unique creatures—Buds.
