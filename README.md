@@ -23,28 +23,6 @@ We crafted *Idle Buds* using:
 
 ---
 
-### Challenges We Ran Into  
-- **System Balance**: Designing a stat matrix and synergy system that feels rewarding yet competitive.  
-- **UI Optimization**: Ensuring seamless performance for idle mechanics across platforms.  
-- **Idle Time Management**: Balancing real-time progression (e.g., hatchery and shrines) without frustrating players.
-
----
-
-### Accomplishments That We're Proud Of  
-- Building a **unique evolution system** where Buds grow stronger through time and dedication.  
-- Creating a **region-based exploration system** that evolves alongside player progression.  
-- Implementing **Hunter-Bud synergy mechanics** that add strategic depth to resource gathering and combat.
-
----
-
-### What We Learned
-- How to use and why AWS services are great for game development
-- How to balance **active vs. idle gameplay** to keep players engaged without overwhelming them.  
-- The importance of **scalability** when designing features that allow endless progression.  
-- How storytelling and pixel art bring a game world to life, enhancing immersion and charm.
-
----
-
 ### What's Next for Idle Buds - Collect, Train, & Dominate!  
 We’re just getting started! Here’s what’s next:
 - **Art & Visual Rework**: We had to work quickly and focus on gameplay due to time constraints. We plan to revisit the art and aesthetics in a big way!
