@@ -33,7 +33,7 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
   name: "Smithing",
   description: "Forge items from raw materials.",
   xp: 0,
-  level: 5,
+  level: 1,
   progress: 0,
   isUnlocked: true,
   unlockRequirements: undefined,
