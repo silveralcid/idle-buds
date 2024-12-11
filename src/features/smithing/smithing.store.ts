@@ -20,8 +20,6 @@ export interface SmithingState extends BaseSkill {
   unlockedRecipes: string[];
   setXp: (xp: number) => void;
   setLevel: (level: number) => void;
-  addWorkbench: (workbench: Workbench) => void;
-  removeWorkbench: (workbenchId: string) => void;
   activateWorkbench: (workbenchId: string, recipeId: string) => void;
   updateWorkbenchProgress: (workbenchId: string, delta: number) => void;
   xpToNextLevel: () => number;
@@ -69,26 +67,6 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
     };
   }),
   xpToNextLevel: () => calculateXpToNextLevel(get().level),
-
-  addWorkbench: (workbench: Workbench) =>
-    set((state) => ({
-      workbenches: {
-        ...state.workbenches,
-        [workbench.id]: {
-          id: workbench.id,
-          type: workbench.workbenchType,
-          recipe: null,
-          progress: 0,
-          isActive: false,
-        },
-      },
-    })),
-
-  removeWorkbench: (workbenchId: string) =>
-    set((state) => {
-      const { [workbenchId]: _, ...remaining } = state.workbenches;
-      return { workbenches: remaining };
-    }),
 
   activateWorkbench: (workbenchId: string, recipeId: string) =>
     set((state) => {
