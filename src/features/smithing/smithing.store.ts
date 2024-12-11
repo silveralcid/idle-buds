@@ -5,6 +5,7 @@ import { Workbench } from "../../types/workbench.types";
 import { Recipe } from "../../types/recipe.types";
 import { recipeRegistry, getRecipesByWorkbench } from "../../data/recipe-registry";
 import { useBankStore } from "../../features/bank/bank.store";
+import { TaskManager } from "../../utils/task-manager";
 
 export interface ActiveWorkbench {
   id: string;
@@ -33,7 +34,7 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
   name: "Smithing",
   description: "Forge items from raw materials.",
   xp: 0,
-  level: 1,
+  level: 5,
   progress: 0,
   isUnlocked: true,
   unlockRequirements: undefined,
@@ -79,6 +80,7 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
 
       // Toggle off if already active with same recipe
       if (workbench.isActive && workbench.recipe?.id === recipeId) {
+        TaskManager.stopCurrentTask();
         return {
           workbenches: {
             ...state.workbenches,
@@ -101,6 +103,10 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
       });
 
       if (!hasResources) return state;
+
+      // Start appropriate task based on workbench type
+      const taskType = workbench.type === 'smelting' ? 'smelting' : 'smithing';
+      TaskManager.startTask(taskType);
 
       // Activate workbench with new recipe
       return {
