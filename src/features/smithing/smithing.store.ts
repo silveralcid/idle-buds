@@ -165,8 +165,27 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
           bankStore.addItem(output.itemId, output.amount);
         });
 
-        // Add experience and continue crafting
+        // Award full XP only on completion
         const newXp = state.xp + recipe.experienceGain;
+        const requiredXp = state.xpToNextLevel();
+
+        // Handle potential level up
+        if (newXp >= requiredXp) {
+          const newLevel = state.level + 1;
+          return {
+            xp: newXp - requiredXp,
+            level: newLevel,
+            workbenches: {
+              ...state.workbenches,
+              [workbenchId]: {
+                ...workbench,
+                progress: 0, // Reset progress but keep crafting active
+              },
+            },
+          };
+        }
+
+        // No level up, just add XP
         return {
           xp: newXp,
           workbenches: {
@@ -179,7 +198,7 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
         };
       }
 
-      // Update progress
+      // Just update progress if not complete
       return {
         workbenches: {
           ...state.workbenches,
