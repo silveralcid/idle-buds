@@ -24,6 +24,7 @@ export interface SmithingState extends BaseSkill {
   updateWorkbenchProgress: (workbenchId: string, delta: number) => void;
   xpToNextLevel: () => number;
   isRecipeUnlocked: (recipeId: string) => boolean;
+  canCraftRecipe: (recipe: Recipe) => boolean;
   reset: () => void;
 }
 
@@ -76,6 +77,22 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
 
       if (!workbench || !recipe || !state.isRecipeUnlocked(recipeId)) return state;
 
+      // Toggle off if already active with same recipe
+      if (workbench.isActive && workbench.recipe?.id === recipeId) {
+        return {
+          workbenches: {
+            ...state.workbenches,
+            [workbenchId]: {
+              ...workbench,
+              isActive: false,
+              recipe: null,
+              progress: 0,
+            },
+          },
+        };
+      }
+
+      // Check resources before starting
       const hasResources = recipe.inputs.every(input => {
         const hasAny = input.itemIds.some(itemId => 
           (bankStore.items[itemId] || 0) >= input.amount
@@ -85,6 +102,7 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
 
       if (!hasResources) return state;
 
+      // Activate workbench with new recipe
       return {
         workbenches: {
           ...state.workbenches,
@@ -107,7 +125,31 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
       const recipe = workbench.recipe;
       const bankStore = useBankStore.getState();
 
+      // Check if crafting cycle is complete
       if (newProgress >= recipe.craftingTime) {
+        // Verify resources are still available
+        const hasResources = recipe.inputs.every(input => {
+          const hasAny = input.itemIds.some(itemId => 
+            (bankStore.items[itemId] || 0) >= input.amount
+          );
+          return hasAny;
+        });
+
+        if (!hasResources) {
+          // Stop crafting if resources depleted
+          return {
+            workbenches: {
+              ...state.workbenches,
+              [workbenchId]: {
+                ...workbench,
+                isActive: false,
+                recipe: null,
+                progress: 0,
+              },
+            },
+          };
+        }
+
         // Consume inputs
         recipe.inputs.forEach(input => {
           const availableItemId = input.itemIds.find(id => 
@@ -123,7 +165,7 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
           bankStore.addItem(output.itemId, output.amount);
         });
 
-        // Add experience
+        // Add experience and continue crafting
         const newXp = state.xp + recipe.experienceGain;
         return {
           xp: newXp,
@@ -131,13 +173,13 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
             ...state.workbenches,
             [workbenchId]: {
               ...workbench,
-              isActive: false,
-              progress: 0,
+              progress: 0, // Reset progress but keep crafting active
             },
           },
         };
       }
 
+      // Update progress
       return {
         workbenches: {
           ...state.workbenches,
@@ -176,5 +218,14 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
   isRecipeUnlocked: (recipeId: string) => {
     const recipe = get().recipes.find(r => r.id === recipeId);
     return recipe ? get().level >= recipe.levelRequired : false;
+  },
+
+  canCraftRecipe: (recipe: Recipe) => {
+    const bankStore = useBankStore.getState();
+    return recipe.inputs.every(input => {
+      return input.itemIds.some(itemId => 
+        (bankStore.items[itemId] || 0) >= input.amount
+      );
+    });
   },
 }));
