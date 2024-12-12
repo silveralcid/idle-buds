@@ -20,7 +20,6 @@ const TestingView: React.FC = () => {
   const smithingStore = useSmithingStore();
   const miningStore = useMiningStore();
   const lumberingStore = useLumberingStore();
-  const { resetGame } = useGameStore();
 
   const allItems = [...miningItems, ...lumberingItems, ...smeltedItems, ...melee];
 
@@ -28,10 +27,6 @@ const TestingView: React.FC = () => {
     if (selectedItem && itemAmount > 0) {
       bankStore.addItem(selectedItem, itemAmount);
     }
-  };
-
-  const handleClearBank = () => {
-    bankStore.setState({ items: {} });
   };
 
   const handleSkillLevelChange = () => {
@@ -109,12 +104,6 @@ const TestingView: React.FC = () => {
               className="flex-1 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded"
             >
               Add Item
-            </button>
-            <button 
-              onClick={handleClearBank} 
-              className="flex-1 bg-red-500 hover:bg-red-600 text-white p-2 rounded"
-            >
-              Clear Bank
             </button>
           </div>
         </div>
