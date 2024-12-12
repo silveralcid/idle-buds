@@ -8,6 +8,9 @@ import { VisibilityHandler } from "./core/components/VisibilityHandler";
 import { initializeGame } from "./utils/initialize-game";
 import SmithingView from "./views/SmithingView";
 import LumberingView from "./views/LumberingView";
+import TestingView from "./views/TestingView";
+import BankView from "./views/BankView";
+import BudBoxView from "./views/BudBoxView";
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
@@ -28,6 +31,12 @@ function App() {
         return <SmithingView />;
       case "LumberingView":
         return <LumberingView />;
+      case "TestingView":
+        return <TestingView />;
+      case "BankView":
+        return <BankView />;
+      case "BudBoxView":
+        return <BudBoxView />;
       default:
         return <div>No view found.</div>;
     }

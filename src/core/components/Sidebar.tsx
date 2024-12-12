@@ -47,6 +47,18 @@ const Sidebar: React.FC = () => {
     setView("LumberingView");
   };
 
+  const navigateToBank = () => {
+    setView("BankView");
+  };
+
+  const navigateToBudBox = () => {
+    setView("BudBoxView");
+  };
+
+  const navigateToTesting = () => {
+    setView("TestingView");
+  };
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Game control
@@ -115,6 +127,28 @@ const Sidebar: React.FC = () => {
         )}
       </div>
 
+      <div className="mb-6">
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={navigateToTesting}
+          className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded"
+        >
+          Testing
+        </button>
+        <button
+          onClick={navigateToBank}
+          className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded"
+        >
+          Bank
+        </button>
+        <button
+          onClick={navigateToBudBox}
+          className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded"
+        >
+          Budbox
+        </button>
+      </div>
+    </div>
  
 
       {/* Mining Section */}
