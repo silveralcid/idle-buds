@@ -2,6 +2,7 @@ import { useGameStore } from '../core/game.store';
 import { HunterTask } from '../types/hunter-task.types';
 import { useMiningStore } from '../features/mining/mining.store';
 import { useLumberingStore } from '../features/lumbering/lumbering.store';
+import { useSmithingStore } from '../features/smithing/smithing.store';
 
 export const TaskManager = {
   startTask: function(task: HunterTask): void {
@@ -28,7 +29,17 @@ export const TaskManager = {
       case "lumbering":
         useLumberingStore.setState({ activeNode: null });
         break;
-      // Add other activities here as needed
+      case "smithing":
+      case "smelting":
+        const smithingStore = useSmithingStore.getState();
+        // Deactivate all workbenches
+        Object.keys(smithingStore.workbenches).forEach(workbenchId => {
+          const workbench = smithingStore.workbenches[workbenchId];
+          if (workbench.isActive) {
+            smithingStore.updateWorkbenchProgress(workbenchId, -workbench.progress);
+          }
+        });
+        break;
     }
 
     useGameStore.getState().clearCurrentTask();

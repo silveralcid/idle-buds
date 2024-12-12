@@ -11,6 +11,7 @@ import { processOfflineProgress } from '../core/offline-loop';
 import { useLumberingStore } from '../features/lumbering/lumbering.store';
 import { lumberingNodes } from '../data/nodes/lumbering.data';
 import { HunterTask, HunterTaskState } from '../types/hunter-task.types';
+import { useSmithingStore } from '../features/smithing/smithing.store';
 
 interface GameState extends HunterTaskState {
   isInitialLoad: boolean;

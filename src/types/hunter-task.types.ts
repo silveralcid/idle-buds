@@ -1,4 +1,4 @@
-export type HunterTask = "mining" | "lumbering" | null;
+export type HunterTask = "mining" | "lumbering" | "smithing" | "smelting" | null;
 
 export interface HunterTaskState {
   currentTask: HunterTask;
