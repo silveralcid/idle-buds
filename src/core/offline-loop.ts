@@ -2,6 +2,8 @@ import { calculateTimeAway } from "../utils/offline-calculation";
 import { useMiningStore } from "../features/mining/mining.store";
 import { useLumberingStore } from "../features/lumbering/lumbering.store";
 import { GameConfig } from "./constants/game-config";
+import { useBankStore } from "../features/bank/bank.store";
+import { useSmithingStore } from "../features/smithing/smithing.store";
 
 export function processOfflineProgress(lastSaveTime: number): void {
   // Calculate and cap offline time
@@ -63,8 +65,65 @@ export function processOfflineProgress(lastSaveTime: number): void {
     console.log("Lumbering: No active node or active node is locked.");
   }
 
+  // **Smithing Offline Progress**
+const smithingStore = useSmithingStore.getState();
+const { workbenches } = smithingStore;
+
+Object.entries(workbenches).forEach(([workbenchId, workbench]) => {
+  if (!workbench.isActive || !workbench.recipe) return;
+
+  const recipe = workbench.recipe;
+  const bankStore = useBankStore.getState();
+  
+  // Calculate how many complete crafts can be done
+  const craftTimePerItem = recipe.craftingTime / GameConfig.TICK.RATE.DEFAULT;
+  const potentialCrafts = Math.floor(totalTimeAway / craftTimePerItem);
+  
+  // Check resource availability
+  const maxCraftsFromResources = recipe.inputs.reduce((min, input) => {
+    const availableResource = input.itemIds.reduce((sum, itemId) => 
+      sum + (bankStore.items[itemId] || 0), 0);
+    const possibleCrafts = Math.floor(availableResource / input.amount);
+    return Math.min(min, possibleCrafts);
+  }, Infinity);
+
+  const actualCrafts = Math.min(potentialCrafts, maxCraftsFromResources);
+  
+  if (actualCrafts > 0) {
+    // Consume inputs
+    recipe.inputs.forEach(input => {
+      const totalRequired = input.amount * actualCrafts;
+      let remaining = totalRequired;
+      
+      input.itemIds.some(itemId => {
+        const available = bankStore.items[itemId] || 0;
+        if (available > 0) {
+          const toConsume = Math.min(available, remaining);
+          bankStore.removeItem(itemId, toConsume);
+          remaining -= toConsume;
+        }
+        return remaining === 0;
+      });
+    });
+
+    // Add outputs
+    recipe.outputs.forEach(output => {
+      bankStore.addItem(output.itemId, output.amount * actualCrafts);
+    });
+
+    // Calculate and award XP
+    const totalXpGained = recipe.experienceGain * actualCrafts;
+    updateXpAndLevel(smithingStore, totalXpGained);
+
+    console.log(`${workbench.type}: Crafted ${actualCrafts}x ${recipe.name}, gained ${totalXpGained.toFixed(2)} XP`);
+  } else {
+    console.log(`${workbench.type}: No crafts completed due to insufficient resources or time.`);
+  }
+  });
+
   console.groupEnd();
 }
+
 
 // Helper to update XP and handle level-ups
 function updateXpAndLevel(store: any, totalXpGained: number): void {

@@ -13,6 +13,8 @@ export const TaskManager = {
       this.stopCurrentTask();
     }
 
+    // Ensure game is running when starting a task
+    useGameStore.getState().startGame();
     setCurrentTask(task);
   },
 
@@ -34,14 +36,13 @@ export const TaskManager = {
         const smithingStore = useSmithingStore.getState();
         // Deactivate all workbenches
         Object.keys(smithingStore.workbenches).forEach(workbenchId => {
-          const workbench = smithingStore.workbenches[workbenchId];
-          if (workbench.isActive) {
-            smithingStore.updateWorkbenchProgress(workbenchId, -workbench.progress);
-          }
+          smithingStore.activateWorkbench(workbenchId, ''); // Pass empty string to deactivate
         });
         break;
     }
 
+    // Ensure game is paused when stopping a task
+    useGameStore.getState().pauseGame();
     useGameStore.getState().clearCurrentTask();
   },
 
