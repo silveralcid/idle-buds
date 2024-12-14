@@ -12,6 +12,7 @@ import { useLumberingStore } from '../features/lumbering/lumbering.store';
 import { lumberingNodes } from '../data/nodes/lumbering.data';
 import { HunterTask, HunterTaskState } from '../types/hunter-task.types';
 import { useSmithingStore } from '../features/smithing/smithing.store';
+import { recipeRegistry } from '../data/recipe-registry';
 
 interface GameState extends HunterTaskState {
   isInitialLoad: boolean;
@@ -160,6 +161,32 @@ interface GameActions {
             unlockRequirements: undefined,
             activeNode: null,
             nodes: convertNodesToRecord(lumberingNodes),
+        });
+      
+        useSmithingStore.setState({
+          xp: 0,
+          level: 1,
+          progress: 0,
+          isUnlocked: true,
+          unlockRequirements: undefined,
+          workbenches: {
+            smithing_anvil: {
+              id: "smithing_anvil",
+              type: "smithing",
+              recipe: null,
+              progress: 0,
+              isActive: false,
+            },
+            smelting_furnace: {
+              id: "smelting_furnace",
+              type: "smelting",
+              recipe: null,
+              progress: 0,
+              isActive: false,
+            },
+          },
+          recipes: recipeRegistry,
+          unlockedRecipes: [],
         });
 
   
