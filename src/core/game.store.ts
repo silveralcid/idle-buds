@@ -106,6 +106,8 @@ interface GameActions {
           console.log('View state loaded:', state.view);
           useLumberingStore.setState(state.lumbering);
           console.log('Lumbering state loaded:', state.lumbering);
+          useSmithingStore.setState(state.smithing);
+          console.log('Smithing state loaded:', state.smithing);
           console.groupEnd();
   
           // Pause the game loop after successful load
