@@ -71,6 +71,21 @@ const BankView: React.FC = () => {
             >
               Sell
             </button>
+            <button
+              onClick={() => {
+                const wholeQuantity = Math.floor(quantity);
+                if (wholeQuantity > 0 && itemId !== 'gold_coin') {
+                  const itemValue = getItemValue(itemId);
+                  const totalValue = itemValue * wholeQuantity;
+                  removeItem(itemId, wholeQuantity);
+                  addItem('gold_coin', totalValue);
+                }
+              }}
+              className="ml-2 bg-green-700 text-white p-1 rounded"
+              disabled={itemId === 'gold_coin'}
+            >
+              Sell All
+            </button>
           </div>
         ))}
       </div>
