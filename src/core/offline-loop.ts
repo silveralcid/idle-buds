@@ -113,13 +113,25 @@ Object.entries(workbenches).forEach(([workbenchId, workbench]) => {
 
     // Calculate and award XP
     const totalXpGained = recipe.experienceGain * actualCrafts;
-    updateXpAndLevel(smithingStore, totalXpGained);
+    
+    // Update XP and handle level-ups
+    const { xp, level } = smithingStore;
+    const newXp = xp + totalXpGained;
+    const xpToNextLevel = smithingStore.xpToNextLevel();
+
+    if (newXp >= xpToNextLevel) {
+      const newLevel = level + Math.floor(newXp / xpToNextLevel);
+      smithingStore.setLevel(newLevel);
+      smithingStore.setXp(newXp % xpToNextLevel);
+    } else {
+      smithingStore.setXp(newXp);
+    }
 
     console.log(`${workbench.type}: Crafted ${actualCrafts}x ${recipe.name}, gained ${totalXpGained.toFixed(2)} XP`);
   } else {
     console.log(`${workbench.type}: No crafts completed due to insufficient resources or time.`);
   }
-  });
+});
 
   console.groupEnd();
 }
