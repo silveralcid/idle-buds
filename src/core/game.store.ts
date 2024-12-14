@@ -57,6 +57,7 @@ interface GameActions {
           bank: useBankStore.getState(),
           mining: useMiningStore.getState(),
           lumbering: useLumberingStore.getState(),
+          smithing: useSmithingStore.getState(),
         },
       };
     
