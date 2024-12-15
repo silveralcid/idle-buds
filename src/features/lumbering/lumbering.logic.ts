@@ -45,50 +45,67 @@ export const processLumberingTick = (deltaTime: number): void => {
   const tree = nodes[activeNode];
   if (!tree) return;
 
-  const progress = tree.gatherRate * deltaTime;
-  const newLogs: Record<string, number> = {};
+  // Calculate time-based progress
+  const secondsPerResource = 1 / tree.gatherRate; // Convert gather rate to seconds per resource
+  const currentProgress = tree.currentProgress || 0;
+  const newProgress = currentProgress + deltaTime; // Accumulate actual seconds
 
-  tree.resourceNodeYields.forEach((log) => {
-    const newQuantity = progress;
-    newLogs[log] = (newLogs[log] || 0) + newQuantity;
-  });
+  if (newProgress >= secondsPerResource) {
+    // Only award one resource at a time
+    const newLogs: Record<string, number> = {};
+    
+    // Award exactly one unit of each resource
+    tree.resourceNodeYields.forEach((log) => {
+      newLogs[log] = 1;
+    });
 
-  setLogs(newLogs);
+    // Update logs globally
+    setLogs(newLogs);
 
-  const updatedTree = { ...tree, nodeHealth: Math.max(0, tree.nodeHealth - progress) };
-  setNodes({ ...nodes, [activeNode]: updatedTree });
+    // Update tree health (one point per resource gathered)
+    const updatedTree = { 
+      ...tree, 
+      nodeHealth: Math.max(0, tree.nodeHealth - 1),
+      currentProgress: newProgress % secondsPerResource // Keep remainder progress
+    };
+    setNodes({ ...nodes, [activeNode]: updatedTree });
 
-  const xpGain = tree.experienceGain * deltaTime;
-  const newXp = xp + xpGain;
-  setXp(newXp);
+    // Award XP for the single resource gathered
+    const xpGain = tree.experienceGain;
+    const newXp = xp + xpGain;
+    setXp(newXp);
 
-  const requiredXp = xpToNextLevel();
-  if (newXp >= requiredXp) {
-    const newLevel = level + 1;
-    setLevel(newLevel);
-    setXp(newXp - requiredXp);
-    console.group('Level Up!');
-    console.log(`Congratulations! Reached level ${newLevel}.`);
-    console.groupEnd();
-  }
-
-  console.groupCollapsed(`Chopping ${tree.name}`);
-  console.log(`Progress: ${progress}`);
-  console.log(`XP Gained: ${xpGain}`);
-  console.groupEnd();
-
-  if (updatedTree.nodeHealth <= 0) {
-    console.log(`${tree.name} is depleted!`);
-    if (tree.isRenewable) {
-      setTimeout(() => {
-        const regeneratedTree = { ...updatedTree, nodeHealth: tree.maxHealth };
-        setNodes({ ...nodes, [activeNode]: regeneratedTree });
-        console.log(`${tree.name} has regenerated.`);
-      }, tree.regenRate * 1000);
+    // Handle level-up
+    const requiredXp = xpToNextLevel();
+    if (newXp >= requiredXp) {
+      const newLevel = level + 1;
+      setLevel(newLevel);
+      setXp(newXp - requiredXp);
+      console.group('Level Up!');
+      console.log(`Congratulations! Reached level ${newLevel}.`);
+      console.groupEnd();
     }
-    console.groupEnd();
+
+    // Handle depletion and regeneration
+    if (updatedTree.nodeHealth <= 0) {
+      console.log(`${tree.name} is depleted!`);
+      if (tree.isRenewable) {
+        setTimeout(() => {
+          const regeneratedTree = { 
+            ...updatedTree, 
+            nodeHealth: tree.maxHealth,
+            currentProgress: 0 
+          };
+          setNodes({ ...nodes, [activeNode]: regeneratedTree });
+          console.log(`${tree.name} has regenerated.`);
+        }, tree.regenRate * 1000);
+      }
+    }
+  } else {
+    // Just update progress
+    const updatedTree = { ...tree, currentProgress: newProgress };
+    setNodes({ ...nodes, [activeNode]: updatedTree });
   }
-  console.groupEnd();
 };
 
 /**

@@ -30,4 +30,6 @@ export interface ResourceNode {
   // Yields
   resourceNodeYields: string[]; // List of resources/items this node can yield
   dropTableID?: string; // ID of the drop table for this node
+
+  currentProgress?: number; // Track progress towards next mining action
 }
