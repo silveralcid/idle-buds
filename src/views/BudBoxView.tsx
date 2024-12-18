@@ -62,8 +62,8 @@ const BudBoxView: React.FC = () => {
                   {bud.nickname || bud.name}
                 </h3>
                 <p className="text-sm opacity-75">Level {bud.level}</p>
-                <p className="text-sm">
-                  Affinity: {bud.primaryAffinity}
+                <p className="text-sm text-opacity-75 font-mono text-xs">
+                  ID: {bud.id.slice(0, 8)}...
                 </p>
               </div>
             </div>
