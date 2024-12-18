@@ -7,24 +7,6 @@ const availableSpecies = ['001', '002', '003'];
 const randomSpeciesId = availableSpecies[Math.floor(Math.random() * availableSpecies.length)];
 
 export const eggHatchingData: EggHatchData[] = [
-  {
-    id: 'test_egg_hatch',
-    name: 'Test Egg Hatch',
-    description: 'A test egg used for hatching mechanics.',
-    speciesId: randomSpeciesId,
-    hatchDuration: 10, // In game ticks
-    levelRequired: 1,
-    experienceReward: 100,
-    tier: 'common',
-    requirements: {
-      items: [
-        {
-          itemId: 'test_egg',
-          amount: 1
-        }
-      ],
-    },
-    },
     {
         id: 'poodoo_egg_hatch',
         name: 'Poodoo Egg Hatch',

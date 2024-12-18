@@ -12,6 +12,7 @@ const Hatchery: React.FC = () => {
   const bankItems = useBankStore(state => state.items);
   const tendingLevel = useTendingStore(state => state.level);
   const isPartyFull = usePartyStore(state => state.isPartyFull);
+  const addItem = useBankStore(state => state.addItem);
 
   // Memoize available eggs to prevent recalculation on every render
   const availableEggs = useMemo(() => 
@@ -41,8 +42,23 @@ const Hatchery: React.FC = () => {
     }
   }, [selectedEggId]);
 
+  const handleAddRandomEgg = useCallback(() => {
+    const availableEggItems = eggHatchingData.map(egg => egg.requirements.items?.[0]?.itemId).filter(Boolean);
+    const randomEggId = availableEggItems[Math.floor(Math.random() * availableEggItems.length)];
+    if (randomEggId) {
+      addItem(randomEggId, 1);
+    }
+  }, [addItem]);
+
   return (
     <div className="space-y-4">
+      <button
+        onClick={handleAddRandomEgg}
+        className="btn btn-secondary w-full"
+      >
+        Add Random Egg (Testing)
+      </button>
+
       {/* Active Hatching Display */}
       {activeHatching && (
         <div className="bg-base-200 p-4 rounded-lg">
