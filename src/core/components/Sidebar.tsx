@@ -6,6 +6,7 @@ import { useBankStore } from "../../features/bank/bank.store";
 import { useViewStore } from "../view.store";
 import { useGameStore } from "../game.store";
 import { useLumberingStore } from "../../features/lumbering/lumbering.store";
+import PartyDisplay from '../../features/party/components/PartyDisplay';
 
 const Sidebar: React.FC = () => {
   // Access mining state
@@ -149,7 +150,9 @@ const Sidebar: React.FC = () => {
         </button>
       </div>
     </div>
- 
+
+      {/* Party Display */}
+      <PartyDisplay />
 
       {/* Mining Section */}
       <div className="mb-6 cursor-pointer" onClick={navigateToMining}>
