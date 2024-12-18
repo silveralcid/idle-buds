@@ -10,7 +10,7 @@ import { miningItems } from "../data/items/ore.data";
 import { lumberingItems } from "../data/items/log.data";
 import { smeltedItems } from "../data/items/smelted.data";
 import { melee } from "../data/items/melee.data";
-import { eggItems } from "../data/items/egg.data";
+import { eggItems } from "../data/buds/eggItems.data";
 
 const LevelControls: React.FC<{
   budId: string;
