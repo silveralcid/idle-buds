@@ -1,93 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useBankStore } from '../../bank/bank.store';
 import { useTendingStore } from '../tending.store';
 import { usePartyStore } from '../../party/party.store';
 import { eggHatchingData } from '../../../data/buds/eggHatching.data';
 import { EggHatchData } from '../../../types/egg.types';
-import { GameConfig } from '../../../core/constants/game-config';
-
-interface HatchingProgress {
-  eggId: string;
-  progress: number;
-  totalTicks: number;
-}
+import { startHatching } from '../tending.logic';
 
 const Hatchery: React.FC = () => {
-  const [activeHatching, setActiveHatching] = useState<HatchingProgress | null>(null);
+  const activeHatching = useTendingStore(state => state.activeHatching);
   const bankItems = useBankStore(state => state.items);
-  const removeItem = useBankStore(state => state.removeItem);
   const tendingLevel = useTendingStore(state => state.level);
-  const setTendingXp = useTendingStore(state => state.setXp);
-  const tendingXp = useTendingStore(state => state.xp);
   const isPartyFull = usePartyStore(state => state.isPartyFull);
-  const addToParty = usePartyStore(state => state.addBud);
 
-  const availableEggs = eggHatchingData.filter(egg => {
-    const hasRequiredItems = egg.requirements.items?.every(item =>
-      (bankItems[item.itemId] || 0) >= item.amount
-    );
-    const meetsLevelRequirement = tendingLevel >= egg.levelRequired;
-    return hasRequiredItems && meetsLevelRequirement;
-  });
+  // Memoize available eggs to prevent recalculation on every render
+  const availableEggs = useMemo(() => 
+    eggHatchingData.filter(egg => {
+      const hasRequiredItems = egg.requirements.items?.every(item =>
+        (bankItems[item.itemId] || 0) >= item.amount
+      );
+      const meetsLevelRequirement = tendingLevel >= egg.levelRequired;
+      return hasRequiredItems && meetsLevelRequirement;
+    }), [bankItems, tendingLevel]
+  );
 
-  const canStartHatching = (egg: EggHatchData): boolean => {
+  const canStartHatching = useCallback((egg: EggHatchData): boolean => {
     if (isPartyFull()) return false;
     if (activeHatching) return false;
     return true;
-  };
+  }, [isPartyFull, activeHatching]);
 
-  const startHatching = (egg: EggHatchData) => {
-    if (!canStartHatching(egg)) return;
-
-    // Consume required items
-    egg.requirements.items?.forEach(item => {
-      removeItem(item.itemId, item.amount);
-    });
-
-    setActiveHatching({
-      eggId: egg.id,
-      progress: 0,
-      totalTicks: egg.hatchDuration
-    });
-  };
-
-  const handleStartHatching = (egg: EggHatchData) => {
-    startHatching(egg);
-  };
-
-  useEffect(() => {
-    if (!activeHatching) return;
-
-    const interval = setInterval(() => {
-      setActiveHatching(current => {
-        if (!current) return null;
-        
-        const tickProgress = GameConfig.TICK.RATE.DEFAULT;
-        const newProgress = current.progress + tickProgress;
-
-        if (newProgress >= current.totalTicks) {
-          // Hatching complete
-          const eggData = eggHatchingData.find(e => e.id === current.eggId);
-          if (eggData) {
-            // Award XP
-            const newXp = tendingXp + eggData.experienceReward;
-            setTendingXp(newXp);
-
-            // TODO: Generate new bud and add to party
-            // Implementation needed based on your bud generation logic
-          }
-          return null;
-        }
-
-        return {
-          ...current,
-          progress: newProgress
-        };
-      });
-    }, 1000 / GameConfig.TICK.RATE.DEFAULT); // Adjust interval based on tick rate
-
-    return () => clearInterval(interval);
-  }, [activeHatching, tendingXp, setTendingXp]);
+  const handleStartHatching = useCallback((egg: EggHatchData) => {
+    startHatching(egg.id);
+  }, []);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

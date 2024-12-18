@@ -1,3 +1,4 @@
+import { TaskManager } from "../../utils/task-manager";
 import { useTendingStore } from "./tending.store";
 import { useBankStore } from "../bank/bank.store";
 import { usePartyStore } from "../party/party.store";
@@ -37,6 +38,9 @@ export const startHatching = (eggId: string): boolean => {
     totalTicks: eggData.hatchDuration,
     startTime: Date.now()
   });
+
+  // Start the task in TaskManager
+  TaskManager.startTask("tending");
 
   return true;
 };

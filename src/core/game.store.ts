@@ -15,6 +15,7 @@ import { useSmithingStore } from '../features/smithing/smithing.store';
 import { recipeRegistry } from '../data/recipe-registry';
 import { useBudBoxStore } from '../features/budbox/budbox.store';
 import { usePartyStore } from '../features/party/party.store';
+import { processHatchingTick } from '../features/tending/tending.logic';
 
 interface GameState extends HunterTaskState {
   isInitialLoad: boolean;
@@ -265,7 +266,8 @@ interface GameActions {
       set(() => ({ currentTask: task })),
   
     clearCurrentTask: () => 
-      set(() => ({ currentTask: null })), }));
+      set(() => ({ currentTask: null })),
+  }));
 
   // Autosave
   setInterval(() => {

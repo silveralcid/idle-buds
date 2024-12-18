@@ -3,6 +3,7 @@ import { HunterTask } from '../types/hunter-task.types';
 import { useMiningStore } from '../features/mining/mining.store';
 import { useLumberingStore } from '../features/lumbering/lumbering.store';
 import { useSmithingStore } from '../features/smithing/smithing.store';
+import { useTendingStore } from '../features/tending/tending.store';
 
 export const TaskManager = {
   startTask: function(task: HunterTask): void {
@@ -38,6 +39,9 @@ export const TaskManager = {
         Object.keys(smithingStore.workbenches).forEach(workbenchId => {
           smithingStore.activateWorkbench(workbenchId, ''); // Pass empty string to deactivate
         });
+        break;
+      case "tending":
+        useTendingStore.getState().cancelHatching();
         break;
     }
 

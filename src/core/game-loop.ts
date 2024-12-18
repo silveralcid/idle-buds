@@ -3,6 +3,7 @@ import { GameEvents } from "./game-events";
 import { processMiningTick } from "../features/mining/mining.logic";
 import { processLumberingTick } from "../features/lumbering/lumbering.logic";
 import { processSmithingTick } from "../features/smithing/smithing.logic";
+import { processHatchingTick } from "../features/tending/tending.logic";
 
 export class GameLoop {
   private static instance: GameLoop;
@@ -45,7 +46,8 @@ export class GameLoop {
         
         processMiningTick(deltaTime);
         processLumberingTick(deltaTime);
-        processSmithingTick(deltaTime); 
+        processSmithingTick(deltaTime);
+        processHatchingTick(deltaTime);
 
         this.lastTimestamp = currentTimestamp; // Adjust to the current time
       }
