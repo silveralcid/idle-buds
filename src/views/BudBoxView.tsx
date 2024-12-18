@@ -10,6 +10,7 @@ const BudBoxView: React.FC = () => {
   const selectBud = useBudBoxStore(state => state.selectBud);
   const addBud = useBudBoxStore(state => state.addBud);
   const removeBud = useBudBoxStore(state => state.removeBud);
+  const deleteAllBuds = useBudBoxStore(state => state.deleteAllBuds);
 
   // Party store hooks
   const addToBudParty = usePartyStore(state => state.addBud);
@@ -46,16 +47,30 @@ const BudBoxView: React.FC = () => {
     }
   };
 
+  const handleDeleteAllBuds = () => {
+    if (window.confirm('Are you sure you want to delete all buds? This cannot be undone.')) {
+      deleteAllBuds();
+    }
+  };
+
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">BudBox ({buds.length} Buds)</h1>
-        <button
-          onClick={handleGenerateRandomBud}
-          className="btn btn-primary"
-        >
-          Generate Random Bud
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleDeleteAllBuds}
+            className="btn btn-error"
+          >
+            Delete All
+          </button>
+          <button
+            onClick={handleGenerateRandomBud}
+            className="btn btn-primary"
+          >
+            Generate Random Bud
+          </button>
+        </div>
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

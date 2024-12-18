@@ -13,6 +13,7 @@ interface BudBoxState {
   selectBud: (budId: string | null) => void;
   renameBud: (budId: string, nickname: string) => void;
   adjustBudLevel: (budId: string, newLevel: number) => void;
+  deleteAllBuds: () => void;
 }
 
 export const useBudBoxStore = create<BudBoxState>((set, get) => ({
@@ -83,4 +84,10 @@ export const useBudBoxStore = create<BudBoxState>((set, get) => ({
         }
       };
     }),
+
+  deleteAllBuds: () => 
+    set(() => ({
+      buds: {},
+      selectedBudId: null
+    })),
 }));
