@@ -13,6 +13,7 @@ import { lumberingNodes } from '../data/nodes/lumbering.data';
 import { HunterTask, HunterTaskState } from '../types/hunter-task.types';
 import { useSmithingStore } from '../features/smithing/smithing.store';
 import { recipeRegistry } from '../data/recipe-registry';
+import { useBudBoxStore } from '../features/budbox/budbox.store';
 
 interface GameState extends HunterTaskState {
   isInitialLoad: boolean;
@@ -56,6 +57,7 @@ interface GameActions {
           game: get(),
           view: useViewStore.getState(),
           bank: useBankStore.getState(),
+          budBox: useBudBoxStore.getState(),
           mining: useMiningStore.getState(),
           lumbering: useLumberingStore.getState(),
           smithing: useSmithingStore.getState(),
@@ -101,6 +103,8 @@ interface GameActions {
           set({ ...state.game, isInitialLoad: false });
           useBankStore.setState(state.bank);
           console.log('Bank state loaded:', state.bank);
+          useBudBoxStore.setState(state.budBox);
+          console.log('BudBox state loaded:', state.budBox);
           useMiningStore.setState(state.mining);
           console.log('Mining state loaded:', state.mining);
           useViewStore.setState(state.view);
@@ -141,7 +145,12 @@ interface GameActions {
             sorting: 'name',
             totalValue: 0,
         });
-        
+      
+        useBudBoxStore.setState({
+            buds: {},
+            selectedBudId: null,
+        });
+
         useMiningStore.setState({
             xp: 0,
             level: 1,
