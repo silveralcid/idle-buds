@@ -5,4 +5,5 @@ export type ItemType =
   | 'equipment'     // Weapons, armor, accessories
   | 'consumable'    // Potions, food, scrolls
   | 'quest'         // Quest-specific items that can't be traded or crafted
-  | 'currency';     // Money or special tokens
+  | 'currency'     // Money or special tokens
+  | 'egg';          // Eggs for hatching pets
