@@ -4,11 +4,12 @@ import { useTendingStore } from '../tending.store';
 import { usePartyStore } from '../../party/party.store';
 import { eggHatchingData } from '../../../data/buds/eggHatching.data';
 import { EggHatchData } from '../../../types/egg.types';
+import { GameConfig } from '../../../core/constants/game-config';
 
 interface HatchingProgress {
   eggId: string;
   progress: number;
-  totalTime: number;
+  totalTicks: number;
 }
 
 const Hatchery: React.FC = () => {
@@ -16,6 +17,8 @@ const Hatchery: React.FC = () => {
   const bankItems = useBankStore(state => state.items);
   const removeItem = useBankStore(state => state.removeItem);
   const tendingLevel = useTendingStore(state => state.level);
+  const setTendingXp = useTendingStore(state => state.setXp);
+  const tendingXp = useTendingStore(state => state.xp);
   const isPartyFull = usePartyStore(state => state.isPartyFull);
   const addToParty = usePartyStore(state => state.addBud);
 
@@ -44,7 +47,7 @@ const Hatchery: React.FC = () => {
     setActiveHatching({
       eggId: egg.id,
       progress: 0,
-      totalTime: egg.hatchDuration
+      totalTicks: egg.hatchDuration
     });
   };
 
@@ -55,12 +58,18 @@ const Hatchery: React.FC = () => {
       setActiveHatching(current => {
         if (!current) return null;
         
-        const newProgress = current.progress + 1;
-        if (newProgress >= current.totalTime) {
+        const tickProgress = GameConfig.TICK.RATE.DEFAULT;
+        const newProgress = current.progress + tickProgress;
+
+        if (newProgress >= current.totalTicks) {
           // Hatching complete
           const eggData = eggHatchingData.find(e => e.id === current.eggId);
           if (eggData) {
-            // Generate new bud and add to party
+            // Award XP
+            const newXp = tendingXp + eggData.experienceReward;
+            setTendingXp(newXp);
+
+            // TODO: Generate new bud and add to party
             // Implementation needed based on your bud generation logic
           }
           return null;
@@ -71,10 +80,10 @@ const Hatchery: React.FC = () => {
           progress: newProgress
         };
       });
-    }, 1000); // Update every second
+    }, 1000 / GameConfig.TICK.RATE.DEFAULT); // Adjust interval based on tick rate
 
     return () => clearInterval(interval);
-  }, [activeHatching]);
+  }, [activeHatching, tendingXp, setTendingXp]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -86,12 +95,12 @@ const Hatchery: React.FC = () => {
             <div 
               className="bg-primary h-full rounded-full transition-all"
               style={{ 
-                width: `${(activeHatching.progress / activeHatching.totalTime) * 100}%` 
+                width: `${(activeHatching.progress / activeHatching.totalTicks) * 100}%` 
               }}
             />
           </div>
           <p className="mt-2">
-            Progress: {activeHatching.progress} / {activeHatching.totalTime}
+            Progress: {Math.floor(activeHatching.progress)} / {activeHatching.totalTicks} ticks
           </p>
         </div>
       )}
@@ -112,6 +121,7 @@ const Hatchery: React.FC = () => {
                 </li>
               ))}
               <li>Required Level: {egg.levelRequired}</li>
+              <li>Hatch Time: {egg.hatchDuration} ticks</li>
             </ul>
           </div>
 
