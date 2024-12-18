@@ -51,6 +51,10 @@ const Hatchery: React.FC = () => {
     });
   };
 
+  const handleStartHatching = (egg: EggHatchData) => {
+    startHatching(egg);
+  };
+
   useEffect(() => {
     if (!activeHatching) return;
 
@@ -129,7 +133,7 @@ const Hatchery: React.FC = () => {
             className={`mt-4 btn btn-primary w-full ${
               !canStartHatching(egg) ? 'btn-disabled' : ''
             }`}
-            onClick={() => startHatching(egg)}
+            onClick={() => handleStartHatching(egg)}
             disabled={!canStartHatching(egg)}
           >
             {isPartyFull() ? 'Party Full' : 'Start Hatching'}
