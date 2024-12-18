@@ -156,8 +156,8 @@ Cooking
 Lumbering
 Mining
 Combat
-Hatching
-Offering
+Tending (Combines Hatching and Offering)
+
 
 # Combat
 
