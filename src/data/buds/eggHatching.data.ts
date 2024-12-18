@@ -11,7 +11,7 @@ export const eggHatchingData: EggHatchData[] = [
     id: 'test_egg_hatch',
     name: 'Test Egg Hatch',
     description: 'A test egg used for hatching mechanics.',
-    speciesId: randomSpeciesId, // References Poodoo from budSpecies
+    speciesId: randomSpeciesId,
     hatchDuration: 500, // In game ticks
     levelRequired: 1,
     experienceReward: 100,
