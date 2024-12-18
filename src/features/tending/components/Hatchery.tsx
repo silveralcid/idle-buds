@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import { useBankStore } from '../../bank/bank.store';
 import { useTendingStore } from '../tending.store';
 import { usePartyStore } from '../../party/party.store';
@@ -7,6 +7,7 @@ import { EggHatchData } from '../../../types/egg.types';
 import { startHatching } from '../tending.logic';
 
 const Hatchery: React.FC = () => {
+  const [selectedEggId, setSelectedEggId] = useState<string>('');
   const activeHatching = useTendingStore(state => state.activeHatching);
   const bankItems = useBankStore(state => state.items);
   const tendingLevel = useTendingStore(state => state.level);
@@ -23,21 +24,28 @@ const Hatchery: React.FC = () => {
     }), [bankItems, tendingLevel]
   );
 
+  const selectedEgg = useMemo(() => 
+    eggHatchingData.find(egg => egg.id === selectedEggId),
+    [selectedEggId]
+  );
+
   const canStartHatching = useCallback((egg: EggHatchData): boolean => {
     if (isPartyFull()) return false;
     if (activeHatching) return false;
     return true;
   }, [isPartyFull, activeHatching]);
 
-  const handleStartHatching = useCallback((egg: EggHatchData) => {
-    startHatching(egg.id);
-  }, []);
+  const handleStartHatching = useCallback(() => {
+    if (selectedEggId) {
+      startHatching(selectedEggId);
+    }
+  }, [selectedEggId]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-4">
       {/* Active Hatching Display */}
       {activeHatching && (
-        <div className="col-span-full bg-base-200 p-4 rounded-lg">
+        <div className="bg-base-200 p-4 rounded-lg">
           <h3 className="text-lg font-bold mb-2">Currently Hatching</h3>
           <div className="w-full bg-base-300 rounded-full h-4">
             <div 
@@ -53,37 +61,52 @@ const Hatchery: React.FC = () => {
         </div>
       )}
 
-      {/* Available Eggs List */}
-      {availableEggs.map(egg => (
-        <div key={egg.id} className="bg-base-200 p-4 rounded-lg">
-          <h3 className="font-bold">{egg.name}</h3>
-          <p className="text-sm opacity-75">{egg.description}</p>
-          
-          <div className="mt-2">
-            <h4 className="font-semibold">Requirements:</h4>
-            <ul className="text-sm">
-              {egg.requirements.items?.map(item => (
-                <li key={item.itemId} className="flex justify-between">
-                  <span>{item.itemId}</span>
-                  <span>{bankItems[item.itemId] || 0}/{item.amount}</span>
-                </li>
-              ))}
-              <li>Required Level: {egg.levelRequired}</li>
-              <li>Hatch Time: {egg.hatchDuration} ticks</li>
-            </ul>
-          </div>
+      {/* Egg Selection */}
+      <div className="bg-base-200 p-4 rounded-lg">
+        <select
+          value={selectedEggId}
+          onChange={(e) => setSelectedEggId(e.target.value)}
+          className="select select-bordered w-full mb-4"
+          disabled={!!activeHatching}
+        >
+          <option value="">Select an egg to hatch</option>
+          {availableEggs.map(egg => (
+            <option key={egg.id} value={egg.id}>
+              {egg.name}
+            </option>
+          ))}
+        </select>
 
-          <button
-            className={`mt-4 btn btn-primary w-full ${
-              !canStartHatching(egg) ? 'btn-disabled' : ''
-            }`}
-            onClick={() => handleStartHatching(egg)}
-            disabled={!canStartHatching(egg)}
-          >
-            {isPartyFull() ? 'Party Full' : 'Start Hatching'}
-          </button>
-        </div>
-      ))}
+        {selectedEgg && (
+          <div className="space-y-2">
+            <p className="text-sm opacity-75">{selectedEgg.description}</p>
+            
+            <div>
+              <h4 className="font-semibold">Requirements:</h4>
+              <ul className="text-sm">
+                {selectedEgg.requirements.items?.map(item => (
+                  <li key={item.itemId} className="flex justify-between">
+                    <span>{item.itemId}</span>
+                    <span>{bankItems[item.itemId] || 0}/{item.amount}</span>
+                  </li>
+                ))}
+                <li>Required Level: {selectedEgg.levelRequired}</li>
+                <li>Hatch Time: {selectedEgg.hatchDuration} ticks</li>
+              </ul>
+            </div>
+
+            <button
+              className={`mt-4 btn btn-primary w-full ${
+                !canStartHatching(selectedEgg) ? 'btn-disabled' : ''
+              }`}
+              onClick={handleStartHatching}
+              disabled={!canStartHatching(selectedEgg)}
+            >
+              {isPartyFull() ? 'Party Full' : 'Start Hatching'}
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
