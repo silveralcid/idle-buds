@@ -6,6 +6,7 @@ import { useBankStore } from "../../features/bank/bank.store";
 import { useViewStore } from "../view.store";
 import { useGameStore } from "../game.store";
 import { useLumberingStore } from "../../features/lumbering/lumbering.store";
+import { useTendingStore } from "../../features/tending/tending.store";
 import PartyDisplay from '../../features/party/components/PartyDisplay';
 
 const Sidebar: React.FC = () => {
@@ -60,10 +61,21 @@ const Sidebar: React.FC = () => {
     setView("TestingView");
   };
 
+  const navigateToTending = () => {
+    setView("TendingView");
+  };
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Game control
   const { saveGame, loadGame, resetGame, pauseGame, startGame, deleteSave } = useGameStore();
+
+  // Access tending state
+  const xpTending = useTendingStore((state) => state.xp);
+  const levelTending = useTendingStore((state) => state.level);
+  const xpToNextLevelTending = useTendingStore((state) => state.xpToNextLevel());
+
+  const progressTending = xpToNextLevelTending > 0 ? xpTending / xpToNextLevelTending : 0;
 
   return (
     <aside className="w-64 bg-gray-800 text-white p-4">
@@ -154,6 +166,18 @@ const Sidebar: React.FC = () => {
       {/* Party Display */}
       <PartyDisplay />
 
+      {/* Bank Items */}
+      <div>
+        <h3 className="text-md font-semibold mb-2">Bank Items</h3>
+        <ul>
+          {Object.entries(bankItems).map(([itemId, quantity]) => (
+            <li key={itemId}>
+              {itemId}: {Math.floor(quantity)}
+            </li>
+          ))}
+        </ul>
+      </div>
+
       {/* Mining Section */}
       <div className="mb-6 cursor-pointer" onClick={navigateToMining}>
         <h3 className="text-md font-semibold mb-2 hover:text-gray-300">Mining</h3>
@@ -196,17 +220,20 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
 
-           {/* Bank Items */}
-           <div>
-        <h3 className="text-md font-semibold mb-2">Bank Items</h3>
-        <ul>
-          {Object.entries(bankItems).map(([itemId, quantity]) => (
-            <li key={itemId}>
-              {itemId}: {Math.floor(quantity)}
-            </li>
-          ))}
-        </ul>
+      {/* Tending Section */}
+      <div className="mb-6 cursor-pointer" onClick={navigateToTending}>
+        <h3 className="text-md font-semibold mb-2 hover:text-gray-300">Tending</h3>
+        <p>
+          Level: {levelTending} | XP: {xpTending.toFixed(0)}/{xpToNextLevelTending.toFixed(0)}
+        </p>
+        <div className="h-2 bg-gray-600 rounded mt-1">
+          <div
+            className="h-full bg-purple-500 rounded"
+            style={{ width: `${(progressTending * 100).toFixed(0)}%` }}
+          ></div>
+        </div>
       </div>
+
     </aside>
   );
 };
