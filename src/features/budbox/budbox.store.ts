@@ -12,6 +12,7 @@ interface BudBoxState {
   getAllBuds: () => budInstance[];
   selectBud: (budId: string | null) => void;
   renameBud: (budId: string, nickname: string) => void;
+  adjustBudLevel: (budId: string, newLevel: number) => void;
 }
 
 export const useBudBoxStore = create<BudBoxState>((set, get) => ({
@@ -65,5 +66,21 @@ export const useBudBoxStore = create<BudBoxState>((set, get) => ({
           }
         }
       };
-    })
+    }),
+
+  adjustBudLevel: (budId: string, newLevel: number) =>
+    set((state) => {
+      const bud = state.buds[budId];
+      if (!bud) return state;
+
+      return {
+        buds: {
+          ...state.buds,
+          [budId]: {
+            ...bud,
+            level: Math.min(Math.max(1, newLevel), 100)
+          }
+        }
+      };
+    }),
 }));

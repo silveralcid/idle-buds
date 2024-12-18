@@ -14,6 +14,7 @@ interface PartyState {
   isPartyFull: () => boolean;
   getPartySize: () => number;
   MAX_PARTY_SIZE: number;
+  adjustBudLevel: (budId: string, newLevel: number) => void;
 }
 
 export const usePartyStore = create<PartyState>((set, get) => ({
@@ -66,5 +67,21 @@ export const usePartyStore = create<PartyState>((set, get) => ({
   getPartySize: () => {
     const state = get();
     return Object.keys(state.buds).length;
-  }
+  },
+
+  adjustBudLevel: (budId: string, newLevel: number) =>
+    set((state) => {
+      const bud = state.buds[budId];
+      if (!bud) return state;
+
+      return {
+        buds: {
+          ...state.buds,
+          [budId]: {
+            ...bud,
+            level: Math.min(Math.max(1, newLevel), 100)
+          }
+        }
+      };
+    }),
 }));

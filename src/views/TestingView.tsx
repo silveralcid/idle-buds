@@ -11,6 +11,39 @@ import { lumberingItems } from "../data/items/log.data";
 import { smeltedItems } from "../data/items/smelted.data";
 import { melee } from "../data/items/melee.data";
 
+const LevelControls: React.FC<{
+  budId: string;
+  currentLevel: number;
+  onAdjustLevel: (budId: string, newLevel: number) => void;
+}> = ({ budId, currentLevel, onAdjustLevel }) => {
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        onClick={() => onAdjustLevel(budId, currentLevel - 1)}
+        disabled={currentLevel <= 1}
+        className="btn btn-xs btn-circle"
+      >
+        -
+      </button>
+      <span className="text-sm">{currentLevel}</span>
+      <button
+        onClick={() => onAdjustLevel(budId, currentLevel + 1)}
+        disabled={currentLevel >= 100}
+        className="btn btn-xs btn-circle"
+      >
+        +
+      </button>
+      <button
+        onClick={() => onAdjustLevel(budId, 100)}
+        disabled={currentLevel >= 100}
+        className="btn btn-xs"
+      >
+        Max
+      </button>
+    </div>
+  );
+};
+
 const TestingView: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<string>("");
   const [itemAmount, setItemAmount] = useState<number>(0);
@@ -82,6 +115,9 @@ const TestingView: React.FC = () => {
         break;
     }
   };
+
+  const adjustPartyBudLevel = usePartyStore(state => state.adjustBudLevel);
+  const adjustBudBoxBudLevel = useBudBoxStore(state => state.adjustBudLevel);
 
   return (
     <div className="p-4">
@@ -199,8 +235,14 @@ const TestingView: React.FC = () => {
               <tbody>
                 {partyBudsList.map((bud) => (
                   <tr key={bud.id}>
-                    <td>{bud.nickname || bud.name}</td>
-                    <td>{bud.level}</td>
+                    <td>{bud.id}</td>
+                    <td>
+                      <LevelControls
+                        budId={bud.id}
+                        currentLevel={bud.level}
+                        onAdjustLevel={adjustPartyBudLevel}
+                      />
+                    </td>
                     <td>{bud.experience}/{bud.experienceToNextLevel}</td>
                     <td>{bud.primaryAffinity}</td>
                     <td>{bud.gender}</td>
@@ -245,7 +287,13 @@ const TestingView: React.FC = () => {
                   </tr>
                   <tr>
                     <td className="font-bold">Level</td>
-                    <td>{selectedBud.level}</td>
+                    <td>
+                      <LevelControls
+                        budId={selectedBud.id}
+                        currentLevel={selectedBud.level}
+                        onAdjustLevel={adjustBudBoxBudLevel}
+                      />
+                    </td>
                   </tr>
                   <tr>
                     <td className="font-bold">Experience</td>
