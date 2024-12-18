@@ -8,12 +8,13 @@ interface HatchingProcess {
   progress: number;
   totalTicks: number;
   startTime: number;
+  lastProcessedTime: number;
 }
 
 interface TendingState extends BaseSkill {
   activeHatching: HatchingProcess | null;
   setActiveHatching: (process: HatchingProcess | null) => void;
-  updateHatchingProgress: (progress: number) => void;
+  updateHatchingProgress: (progress: number, currentTime?: number) => void;
   cancelHatching: () => void;
   setXp: (xp: number) => void;
   setLevel: (level: number) => void;
@@ -32,11 +33,27 @@ export const useTendingStore = create<TendingState>((set, get) => ({
   unlockRequirements: undefined,
   activeHatching: null,
 
-  setActiveHatching: (process) => set({ activeHatching: process }),
+  setActiveHatching: (process) => {
+    if (process) {
+      const currentTime = Date.now();
+      set({ 
+        activeHatching: {
+          ...process,
+          lastProcessedTime: process.lastProcessedTime || currentTime
+        }
+      });
+    } else {
+      set({ activeHatching: null });
+    }
+  },
   
-  updateHatchingProgress: (progress) => set((state) => ({
+  updateHatchingProgress: (progress: number, currentTime: number = Date.now()) => set((state) => ({
     activeHatching: state.activeHatching 
-      ? { ...state.activeHatching, progress }
+      ? { 
+          ...state.activeHatching, 
+          progress,
+          lastProcessedTime: currentTime
+        }
       : null
   })),
 

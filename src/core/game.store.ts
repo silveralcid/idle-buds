@@ -16,6 +16,7 @@ import { recipeRegistry } from '../data/recipe-registry';
 import { useBudBoxStore } from '../features/budbox/budbox.store';
 import { usePartyStore } from '../features/party/party.store';
 import { processHatchingTick } from '../features/tending/tending.logic';
+import { useTendingStore } from '../features/tending/tending.store';
 
 interface GameState extends HunterTaskState {
   isInitialLoad: boolean;
@@ -64,6 +65,7 @@ interface GameActions {
           mining: useMiningStore.getState(),
           lumbering: useLumberingStore.getState(),
           smithing: useSmithingStore.getState(),
+          tending: useTendingStore.getState(),
         },
       };
     
@@ -116,6 +118,8 @@ interface GameActions {
           console.log('View state loaded:', state.view);
           useLumberingStore.setState(state.lumbering);
           console.log('Lumbering state loaded:', state.lumbering);
+          useTendingStore.setState(state.tending);
+          console.log('Tending state loaded:', state.tending);
           useSmithingStore.setState(state.smithing);
           console.log('Smithing state loaded:', state.smithing);
           console.groupEnd();
@@ -127,6 +131,9 @@ interface GameActions {
           } else {
               console.warn('gameLoop.pause is not available or not a function.');
           }
+  
+          // Process offline progress after state restoration
+          processOfflineProgress(timestamp);
   
       } catch (error) {
           console.error('Failed to load game:', error);

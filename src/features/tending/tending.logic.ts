@@ -31,12 +31,15 @@ export const startHatching = (eggId: string): boolean => {
     bankStore.removeItem(item.itemId, item.amount);
   });
 
-  // Start hatching process
+  const currentTime = Date.now();
+  
+  // Start hatching process with proper time tracking
   tendingStore.setActiveHatching({
     eggId,
     progress: 0,
     totalTicks: eggData.hatchDuration,
-    startTime: Date.now()
+    startTime: currentTime,
+    lastProcessedTime: currentTime
   });
 
   // Start the task in TaskManager
@@ -61,7 +64,7 @@ export const processHatchingTick = (deltaTime: number): void => {
   }
 };
 
-const completeHatching = (eggId: string): void => {
+export const completeHatching = (eggId: string): void => {
   const tendingStore = useTendingStore.getState();
   const partyStore = usePartyStore.getState();
   const eggData = eggHatchingData.find(e => e.id === eggId);
@@ -89,4 +92,18 @@ const completeHatching = (eggId: string): void => {
   }
 
   tendingStore.cancelHatching();
+};
+
+export const calculateHatchingProgress = (
+  currentProgress: number,
+  totalTicks: number,
+  timeElapsed: number
+): { progress: number; isComplete: boolean } => {
+  const tickProgress = timeElapsed * GameConfig.TICK.RATE.DEFAULT;
+  const newProgress = currentProgress + tickProgress;
+  
+  return {
+    progress: Math.min(newProgress, totalTicks),
+    isComplete: newProgress >= totalTicks
+  };
 };

@@ -4,6 +4,8 @@ import { useLumberingStore } from "../features/lumbering/lumbering.store";
 import { GameConfig } from "./constants/game-config";
 import { useBankStore } from "../features/bank/bank.store";
 import { useSmithingStore } from "../features/smithing/smithing.store";
+import { useTendingStore } from "../features/tending/tending.store";
+import { completeHatching } from "../features/tending/tending.logic";
 
 export function processOfflineProgress(lastSaveTime: number): void {
   const { timeAwayMilliseconds } = calculateTimeAway(lastSaveTime);
@@ -65,6 +67,25 @@ export function processOfflineProgress(lastSaveTime: number): void {
       console.log(`Lumbering: Completed ${completedCycles} cycles, gained ${lumberingXpGained.toFixed(2)} XP`);
     } else {
       console.log("Lumbering: Not enough time passed for a complete gathering cycle");
+    }
+  }
+
+  // **Tending Offline Progress**
+  const { activeHatching } = useTendingStore.getState();
+  if (activeHatching) {
+    const currentTime = Date.now();
+    const timeElapsedSinceLastProcess = (currentTime - activeHatching.lastProcessedTime) / 1000;
+    const tickProgress = timeElapsedSinceLastProcess * GameConfig.TICK.RATE.DEFAULT;
+    const totalProgress = activeHatching.progress + tickProgress;
+
+    if (totalProgress >= activeHatching.totalTicks) {
+      // Complete the hatching
+      completeHatching(activeHatching.eggId);
+      console.log(`Tending: Egg hatching completed while offline`);
+    } else {
+      // Update progress and last processed time
+      useTendingStore.getState().updateHatchingProgress(totalProgress, currentTime);
+      console.log(`Tending: Advanced egg hatching progress by ${tickProgress.toFixed(2)} ticks`);
     }
   }
 

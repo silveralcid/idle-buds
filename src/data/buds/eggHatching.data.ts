@@ -12,7 +12,7 @@ export const eggHatchingData: EggHatchData[] = [
         name: 'Poodoo Egg Hatch',
         description: 'A Poodoo egg used for hatching mechanics.',
         speciesId: '001',
-        hatchDuration: 10, // In game ticks
+        hatchDuration: 100, // In game ticks
         levelRequired: 1,
         experienceReward: 100,
         tier: 'common',
@@ -30,7 +30,7 @@ export const eggHatchingData: EggHatchData[] = [
         name: 'Wach Egg Hatch',
         description: 'A Wach egg used for hatching mechanics.',
         speciesId: '002',
-        hatchDuration: 10, // In game ticks
+        hatchDuration: 200, // In game ticks
         levelRequired: 1,
         experienceReward: 100,
         tier: 'common',
@@ -48,7 +48,7 @@ export const eggHatchingData: EggHatchData[] = [
         name: 'Fothy Egg Hatch',
         description: 'A Fothy egg used for hatching mechanics.',
         speciesId: '003',
-        hatchDuration: 10, // In game ticks
+        hatchDuration: 300, // In game ticks
         levelRequired: 1,
         experienceReward: 100,
         tier: 'common',
