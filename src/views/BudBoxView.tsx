@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { useBudBoxStore } from "../features/budbox/budbox.store";
+import { usePartyStore } from "../features/party/party.store";
 import { budSpecies } from "../data/buds/budSpecies.data";
 
 const BudBoxView: React.FC = () => {
@@ -10,8 +11,30 @@ const BudBoxView: React.FC = () => {
   const addBud = useBudBoxStore(state => state.addBud);
   const removeBud = useBudBoxStore(state => state.removeBud);
 
+  // Party store hooks
+  const addToBudParty = usePartyStore(state => state.addBud);
+  const isPartyFull = usePartyStore(state => state.isPartyFull);
+
   // Memoize the buds array
   const buds = useMemo(() => Object.values(budsObject), [budsObject]);
+
+  const handleTransferToParty = (budId: string) => {
+    try {
+      if (isPartyFull()) {
+        return;
+      }
+
+      const bud = budsObject[budId];
+      if (!bud) return;
+
+      const success = addToBudParty(bud);
+      if (success) {
+        removeBud(budId);
+      }
+    } catch (error) {
+      console.error('Error transferring bud to party:', error);
+    }
+  };
 
   const handleGenerateRandomBud = () => {
     try {
@@ -46,15 +69,28 @@ const BudBoxView: React.FC = () => {
             }`}
             onClick={() => selectBud(selectedBudId === bud.id ? null : bud.id)}
           >
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                removeBud(bud.id);
-              }}
-              className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white transition-colors"
-            >
-              ×
-            </button>
+            <div className="absolute top-2 right-2 flex gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleTransferToParty(bud.id);
+                }}
+                disabled={isPartyFull()}
+                className="px-2 py-1 text-xs rounded-full bg-secondary hover:bg-secondary-focus disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                title={isPartyFull() ? "Party is full" : "Move to Party"}
+              >
+                To Party
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeBud(bud.id);
+                }}
+                className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white transition-colors"
+              >
+                ×
+              </button>
+            </div>
             <div className="flex items-center gap-4">
               <img
                 src={bud.spriteRef}

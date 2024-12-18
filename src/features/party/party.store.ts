@@ -6,7 +6,7 @@ import { createBudInstance } from '../../factories/budFactory';
 interface PartyState {
   buds: Record<string, budInstance>;
   selectedBudId: string | null;
-  addBud: (budId: string) => boolean; // Returns success status
+  addBud: (bud: budInstance) => boolean;
   removeBud: (budId: string) => void;
   getBud: (budId: string) => budInstance | undefined;
   getAllBuds: () => budInstance[];
@@ -21,7 +21,7 @@ export const usePartyStore = create<PartyState>((set, get) => ({
   selectedBudId: null,
   MAX_PARTY_SIZE: 6,
 
-  addBud: (budId: string) => {
+  addBud: (bud: budInstance) => {
     const state = get();
     if (Object.keys(state.buds).length >= state.MAX_PARTY_SIZE) {
       return false;
@@ -30,7 +30,7 @@ export const usePartyStore = create<PartyState>((set, get) => ({
     set((state) => ({
       buds: {
         ...state.buds,
-        [budId]: state.buds[budId]
+        [bud.id]: bud
       }
     }));
     return true;
