@@ -10,6 +10,7 @@ import { miningItems } from "../data/items/ore.data";
 import { lumberingItems } from "../data/items/log.data";
 import { smeltedItems } from "../data/items/smelted.data";
 import { melee } from "../data/items/melee.data";
+import { eggItems } from "../data/items/egg.data";
 
 const LevelControls: React.FC<{
   budId: string;
@@ -66,7 +67,7 @@ const TestingView: React.FC = () => {
     budboxBuds[selectedBudId], [selectedBudId, budboxBuds]
   );
 
-  const allItems = [...miningItems, ...lumberingItems, ...smeltedItems, ...melee];
+  const allItems = [...miningItems, ...lumberingItems, ...smeltedItems, ...melee, ...eggItems];
 
   const handleAddItem = () => {
     if (selectedItem && itemAmount > 0) {
