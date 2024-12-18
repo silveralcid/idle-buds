@@ -1,28 +1,23 @@
-import React, { useEffect } from "react";
+import React, { useMemo } from "react";
 import { useBudBoxStore } from "../features/budbox/budbox.store";
 import { budSpecies } from "../data/buds/budSpecies.data";
 
 const BudBoxView: React.FC = () => {
-  const getAllBuds = useBudBoxStore(state => state.getAllBuds);
+  // Get the raw buds object from the store
+  const budsObject = useBudBoxStore(state => state.buds);
   const selectedBudId = useBudBoxStore(state => state.selectedBudId);
   const selectBud = useBudBoxStore(state => state.selectBud);
   const addBud = useBudBoxStore(state => state.addBud);
+  const removeBud = useBudBoxStore(state => state.removeBud);
 
-  const buds = getAllBuds();
-
-  useEffect(() => {
-    console.log('Current buds in store:', buds);
-  }, [buds]);
+  // Memoize the buds array
+  const buds = useMemo(() => Object.values(budsObject), [budsObject]);
 
   const handleGenerateRandomBud = () => {
     try {
       const randomIndex = Math.floor(Math.random() * budSpecies.length);
       const randomBudBase = budSpecies[randomIndex];
-      console.log('Generating bud from base:', randomBudBase);
       addBud(randomBudBase);
-      
-      const updatedBuds = getAllBuds();
-      console.log('Updated buds after generation:', updatedBuds);
     } catch (error) {
       console.error('Error generating bud:', error);
     }
@@ -41,16 +36,25 @@ const BudBoxView: React.FC = () => {
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Array.isArray(buds) && buds.map((bud) => (
+        {buds.map((bud) => (
           <div
             key={bud.id}
-            className={`p-4 rounded-lg cursor-pointer transition-all ${
+            className={`p-4 rounded-lg cursor-pointer transition-all relative ${
               selectedBudId === bud.id
                 ? "bg-primary text-primary-content"
                 : "bg-base-200 hover:bg-base-300"
             }`}
             onClick={() => selectBud(selectedBudId === bud.id ? null : bud.id)}
           >
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                removeBud(bud.id);
+              }}
+              className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white transition-colors"
+            >
+              ×
+            </button>
             <div className="flex items-center gap-4">
               <img
                 src={bud.spriteRef}
@@ -73,7 +77,7 @@ const BudBoxView: React.FC = () => {
         ))}
       </div>
 
-      {(!buds || buds.length === 0) && (
+      {buds.length === 0 && (
         <div className="text-center py-8 text-gray-500">
           No Buds found. Generate some Buds to get started!
         </div>
