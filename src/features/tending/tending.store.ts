@@ -18,6 +18,7 @@ interface TendingState extends BaseSkill {
   setXp: (xp: number) => void;
   setLevel: (level: number) => void;
   xpToNextLevel: () => number;
+  reset: () => void;
 }
 
 export const useTendingStore = create<TendingState>((set, get) => ({
@@ -28,6 +29,7 @@ export const useTendingStore = create<TendingState>((set, get) => ({
   level: 1,
   progress: 0,
   isUnlocked: true,
+  unlockRequirements: undefined,
   activeHatching: null,
 
   setActiveHatching: (process) => set({ activeHatching: process }),
@@ -40,7 +42,31 @@ export const useTendingStore = create<TendingState>((set, get) => ({
 
   cancelHatching: () => set({ activeHatching: null }),
   
-  setXp: (xp) => set({ xp }),
+  setXp: (xp) => set((state) => {
+    const requiredXp = get().xpToNextLevel();
+    
+    // Handle potential level up
+    if (xp >= requiredXp) {
+      const newLevel = state.level + 1;
+      return {
+        level: newLevel,
+        xp: xp - requiredXp
+      };
+    }
+    
+    return { xp };
+  }),
+
   setLevel: (level) => set({ level }),
-  xpToNextLevel: () => calculateXpToNextLevel(get().level)
+  
+  xpToNextLevel: () => calculateXpToNextLevel(get().level),
+
+  reset: () => set({
+    xp: 0,
+    level: 1,
+    progress: 0,
+    activeHatching: null,
+    isUnlocked: true,
+    unlockRequirements: undefined
+  })
 }));
