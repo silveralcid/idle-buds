@@ -19,7 +19,6 @@ export const useTendingStore = create<TendingState>((set, get) => ({
     progress: 0,
     isUnlocked: true,
     unlockRequirements: undefined,
-    activeBud: null,
     buds: {},
 
     setXp: (xp: number) => set(() => ({ xp })),
