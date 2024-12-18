@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import { useBankStore } from '../../bank/bank.store';
 import { useTendingStore } from '../tending.store';
 import { usePartyStore } from '../../party/party.store';
@@ -11,7 +11,9 @@ const Hatchery: React.FC = () => {
   const activeHatching = useTendingStore(state => state.activeHatching);
   const bankItems = useBankStore(state => state.items);
   const tendingLevel = useTendingStore(state => state.level);
-  const isPartyFull = usePartyStore(state => state.isPartyFull);
+  const partySize = usePartyStore(state => state.getPartySize());
+  const maxPartySize = usePartyStore(state => state.MAX_PARTY_SIZE);
+  const isPartyFull = useCallback(() => partySize >= maxPartySize, [partySize, maxPartySize]);
   const addItem = useBankStore(state => state.addItem);
 
   // Memoize available eggs to prevent recalculation on every render
