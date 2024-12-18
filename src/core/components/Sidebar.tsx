@@ -65,6 +65,10 @@ const Sidebar: React.FC = () => {
     setView("TendingView");
   };
 
+  const navigateToShop = () => {
+    setView("ShopView");
+  };
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Game control
@@ -159,6 +163,12 @@ const Sidebar: React.FC = () => {
           className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded"
         >
           Budbox
+        </button>
+        <button
+          onClick={navigateToShop}
+          className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded"
+        >
+          Shop
         </button>
       </div>
     </div>

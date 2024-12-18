@@ -12,6 +12,7 @@ import TestingView from "./views/TestingView";
 import BankView from "./views/BankView";
 import BudBoxView from "./views/BudBoxView";
 import TendingView from "./views/TendingView";
+import ShopView from "./views/ShopView";
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
@@ -40,6 +41,8 @@ function App() {
         return <BudBoxView />;
       case "TendingView":
         return <TendingView />;
+      case "ShopView":
+        return <ShopView />;
       default:
         return <div>No view found.</div>;
     }
