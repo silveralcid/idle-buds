@@ -69,6 +69,10 @@ const Sidebar: React.FC = () => {
     setView("ShopView");
   };
 
+  const navigateToAssignment = () => {
+    setView("AssignmentView");
+  };
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Game control
@@ -145,10 +149,16 @@ const Sidebar: React.FC = () => {
       </div>
 
       <div className="mb-6">
-      <div className="flex flex-col gap-2">
-        <button
-          onClick={navigateToTesting}
-          className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded"
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={navigateToAssignment}
+            className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded"
+          >
+            Assignment
+          </button>
+          <button
+            onClick={navigateToTesting}
+            className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded"
         >
           Testing
         </button>
