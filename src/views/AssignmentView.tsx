@@ -1,5 +1,5 @@
 import React from "react";
-import { useAssignmentStore } from "../features/assignments/assignment.store";
+import { useAssignmentStore } from "../features/assignment/assignment.store";
 import { format } from "date-fns";
 
 const AssignmentView: React.FC = () => {
