@@ -46,7 +46,6 @@ export const TaskManager = {
     }
 
     // Ensure game is paused when stopping a task
-    useGameStore.getState().pauseGame();
     useGameStore.getState().clearCurrentTask();
   },
 
