@@ -6,6 +6,8 @@ import { useBankStore } from "../features/bank/bank.store";
 import { useSmithingStore } from "../features/smithing/smithing.store";
 import { useTendingStore } from "../features/tending/tending.store";
 import { completeHatching } from "../features/tending/tending.logic";
+import { useAssignmentStore } from "../features/assignment/assignment.store";
+import { usePartyStore } from "../features/party/party.store";
 
 export function processOfflineProgress(lastSaveTime: number): void {
   const { timeAwayMilliseconds } = calculateTimeAway(lastSaveTime);
@@ -15,6 +17,48 @@ export function processOfflineProgress(lastSaveTime: number): void {
   
   console.group("Offline Progress");
   console.log(`Processing offline progress for ${totalTimeAway.toFixed(2)} seconds`);
+
+  // Process Bud Mining
+  const miningStore = useMiningStore.getState();
+  const assignmentStore = useAssignmentStore.getState();
+  const partyStore = usePartyStore.getState();
+  
+  // Get all buds assigned to mining
+  const miningBuds = assignmentStore.getBudsByAssignment("mining");
+  
+  miningBuds.forEach(budId => {
+    const assignment = assignmentStore.getBudAssignment(budId);
+    if (!assignment || assignment.task?.taskType !== "resourceNode") return;
+    
+    const nodeId = assignment.task.nodeID;
+    if (!nodeId) return;
+    
+    const node = miningStore.nodes[nodeId];
+    const bud = assignmentStore.getBud(budId);
+    
+    if (!node || !bud || !node.isUnlocked) return;
+    
+    // Calculate efficiency and resources gathered
+    const baseEfficiency = 1.0;
+    const levelBonus = 1 + (bud.level * 0.05); // 5% increase per level
+    const efficiency = baseEfficiency * levelBonus;
+    
+    const secondsPerResource = 1 / (node.gatherRate * efficiency);
+    const completedCycles = Math.floor(totalTimeAway / secondsPerResource);
+    
+    if (completedCycles > 0) {
+      // Award resources
+      const miningAggregatedOres: Record<string, number> = {};
+      node.resourceNodeYields.forEach(ore => {
+        miningAggregatedOres[ore] = completedCycles;
+      });
+      
+      // Update bank with gathered resources
+      miningStore.setOres(miningAggregatedOres);
+      
+      console.log(`Bud ${bud.nickname || bud.name} completed ${completedCycles} mining cycles at ${node.name}`);
+    }
+  });
 
   // **Mining Offline Progress**
   const { activeNode: miningNode, nodes: miningNodes } = useMiningStore.getState();
