@@ -17,6 +17,7 @@ import { useBudBoxStore } from '../features/budbox/budbox.store';
 import { usePartyStore } from '../features/party/party.store';
 import { processHatchingTick } from '../features/tending/tending.logic';
 import { useTendingStore } from '../features/tending/tending.store';
+import { useShopStore } from '../features/shop/shop.store';
 
 interface GameState extends HunterTaskState {
   isInitialLoad: boolean;
@@ -167,6 +168,21 @@ interface GameActions {
             buds: {},
             selectedBudId: null,
         }); 
+      
+        useShopStore.setState({
+            items: [],
+            purchaseItem: () => false,
+            sellItem: () => {},
+        });
+      
+        useTendingStore.setState({
+          xp: 0,
+          level: 1,
+          progress: 0,
+          isUnlocked: true,
+          unlockRequirements: undefined,
+          activeHatching: null,
+        });
 
         useMiningStore.setState({
             xp: 0,

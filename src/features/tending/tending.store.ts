@@ -32,7 +32,7 @@ export const useTendingStore = create<TendingState>((set, get) => ({
   isUnlocked: true,
   unlockRequirements: undefined,
   activeHatching: null,
-
+  
   setActiveHatching: (process) => {
     if (process) {
       const currentTime = Date.now();
