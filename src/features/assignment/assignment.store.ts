@@ -2,19 +2,23 @@ import { create } from 'zustand';
 import { budInstance } from '../../types/budInstance.types';
 import { BudAssignment, BudTask } from '../../types/budInstance.types';
 import { TaskManager } from '../../utils/task-manager';
+import { usePartyStore } from '../party/party.store';
+import { useBudBoxStore } from '../budbox/budbox.store';
 
 interface AssignmentState {
+  buds: Record<string, budInstance>;
   assignments: Record<string, {
     budId: string;
     assignment: BudAssignment;
     task: BudTask;
     startTime: number;
-    
   }>;
   
   // Core assignment actions
   assignBud: (budId: string, assignment: BudAssignment, task?: BudTask) => boolean;
   unassignBud: (budId: string) => void;
+  getBud: (budId: string) => budInstance | undefined;
+  getAllBuds: () => budInstance[];
   
   // Getters
   getBudAssignment: (budId: string) => { assignment: BudAssignment; task: BudTask } | undefined;
@@ -28,17 +32,38 @@ interface AssignmentState {
 }
 
 export const useAssignmentStore = create<AssignmentState>((set, get) => ({
+  buds: {},
   assignments: {},
 
   assignBud: (budId, assignment, task = { taskType: null }) => {
     const state = get();
+    const partyStore = usePartyStore.getState();
+    const budBoxStore = useBudBoxStore.getState();
     
-    // Check if bud is already assigned
     if (state.assignments[budId]) {
       return false;
     }
 
+    const partyBud = partyStore.getBud(budId);
+    const boxBud = budBoxStore.getBud(budId);
+    const bud = partyBud || boxBud;
+
+    if (!bud) return false;
+
+    if (partyBud) {
+      partyStore.removeBud(budId);
+    } else if (boxBud) {
+      budBoxStore.removeBud(budId);
+    }
+
     set((state) => ({
+      buds: {
+        ...state.buds,
+        [budId]: {
+          ...bud,
+          assignment,
+        }
+      },
       assignments: {
         ...state.assignments,
         [budId]: {
@@ -55,17 +80,50 @@ export const useAssignmentStore = create<AssignmentState>((set, get) => ({
 
   unassignBud: (budId) => {
     const state = get();
+    const partyStore = usePartyStore.getState();
+    const budBoxStore = useBudBoxStore.getState();
     const assignment = state.assignments[budId];
+    const bud = state.buds[budId];
+
+    if (!assignment || !bud) return;
 
     if (assignment?.task?.taskType) {
       TaskManager.stopCurrentTask();
     }
 
+    // Remove from assignments and buds
     set((state) => {
       const newAssignments = { ...state.assignments };
+      const newBuds = { ...state.buds };
       delete newAssignments[budId];
-      return { assignments: newAssignments };
+      delete newBuds[budId];
+      return { 
+        assignments: newAssignments,
+        buds: newBuds
+      };
     });
+
+    // Add to appropriate store based on party capacity
+    const budInstance = {
+      ...bud,
+      assignment: 'box' as BudAssignment // Default to box when unassigning
+    };
+
+    if (!partyStore.isPartyFull()) {
+      partyStore.addBud(budInstance);
+    } else {
+      budBoxStore.addBud(budInstance);
+    }
+  },
+
+  getBud: (budId) => {
+    const state = get();
+    return state.buds[budId];
+  },
+
+  getAllBuds: () => {
+    const state = get();
+    return Object.values(state.buds);
   },
 
   getBudAssignment: (budId) => {
