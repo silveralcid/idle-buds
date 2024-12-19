@@ -13,6 +13,7 @@ const MiningNode: React.FC<MiningNodeProps> = ({ nodeId }) => {
   const activeNode = useMiningStore((state) => state.activeNode);
   const partyBuds = usePartyStore((state) => state.buds);
   const assignBud = useAssignmentStore((state) => state.assignBud);
+  const unassignBud = useAssignmentStore((state) => state.unassignBud);
   const getBudsByNode = useAssignmentStore((state) => state.getBudsByNode);
   const assignments = useAssignmentStore((state) => state.assignments);
 
@@ -41,6 +42,10 @@ const MiningNode: React.FC<MiningNodeProps> = ({ nodeId }) => {
     }
   };
 
+  const handleUnassignBud = (budId: string) => {
+    unassignBud(budId);
+  };
+
   const handleMine = () => {
     startMining(nodeId);
   };
@@ -64,52 +69,69 @@ const MiningNode: React.FC<MiningNodeProps> = ({ nodeId }) => {
       {!isLocked && (
         <>
           <div className="mt-4">
-            <select 
-              className="select select-bordered w-full max-w-xs mb-2"
-              onChange={(e) => handleAssignBud(e.target.value)}
-              value=""
-            >
-              <option value="">Assign Bud...</option>
-              {availableBuds.map(bud => (
-                <option key={bud.id} value={bud.id}>
-                  {bud.nickname || bud.name} (Level {bud.level})
-                </option>
-              ))}
-            </select>
-
-            {assignedBuds.length > 0 && (
-              <div className="mt-2 mb-4">
+            {assignedBuds.length > 0 ? (
+              <div className="space-y-2">
                 <h4 className="font-semibold mb-1">Assigned Buds:</h4>
-                <div className="flex flex-wrap gap-2">
-                  {assignedBuds.map(budId => {
-                    const assignment = assignments[budId];
-                    return assignment && (
-                      <span key={budId} className="badge badge-primary">
-                        {assignment.budId}
-                      </span>
-                    );
-                  })}
-                </div>
+                {assignedBuds.map(budId => (
+                  <div key={budId} className="flex items-center justify-between bg-base-200 p-2 rounded">
+                    <span className="font-mono text-sm">
+                      {budId} 
+                    </span>
+                    <button
+                      onClick={() => handleUnassignBud(budId)}
+                      className="btn btn-ghost btn-xs text-error"
+                      title="Unassign Bud"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
               </div>
+            ) : (
+              <select 
+                className="select select-bordered w-full max-w-xs mb-2"
+                onChange={(e) => handleAssignBud(e.target.value)}
+                value=""
+              >
+                <option value="">Assign Bud...</option>
+                {availableBuds.map(bud => (
+                  <option key={bud.id} value={bud.id}>
+                    {bud.nickname || bud.name} (Level {bud.level})
+                  </option>
+                ))}
+              </select>
             )}
           </div>
 
-          {isMiningThisNode ? (
-            <button
-              className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
-              onClick={handleStop}
-            >
-              Stop Mining
-            </button>
-          ) : (
-            <button
-              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-              onClick={handleMine}
-              disabled={node.nodeHealth <= 0}
-            >
-              {node.nodeHealth > 0 ? "Mine" : "Depleted"}
-            </button>
-          )}
+          <div className="flex gap-2 mt-2">
+            {isMiningThisNode ? (
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
+                onClick={handleStop}
+              >
+                Stop Mining
+              </button>
+            ) : (
+              <>
+                <button
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  onClick={handleMine}
+                  disabled={node.nodeHealth <= 0 || assignedBuds.length > 0}
+                >
+                  {node.nodeHealth > 0 ? "Mine" : "Depleted"}
+                </button>
+                
+                {assignedBuds.length > 0 && (
+                  <button
+                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    disabled={node.nodeHealth <= 0}
+                  >
+                    Bud Mine
+                  </button>
+                )}
+              </>
+            )}
+          </div>
         </>
       )}
 

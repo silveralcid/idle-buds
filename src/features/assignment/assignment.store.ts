@@ -4,6 +4,8 @@ import { BudAssignment, BudTask } from '../../types/budInstance.types';
 import { TaskManager } from '../../utils/task-manager';
 import { usePartyStore } from '../party/party.store';
 import { useBudBoxStore } from '../budbox/budbox.store';
+import { useMiningStore } from '../mining/mining.store';
+import { useSmithingStore } from '../smithing/smithing.store';
 
 interface AssignmentState {
   buds: Record<string, budInstance>;
@@ -49,6 +51,17 @@ export const useAssignmentStore = create<AssignmentState>((set, get) => ({
     const bud = partyBud || boxBud;
 
     if (!bud) return false;
+
+    // Check level requirements if task is for a resource node
+    if (task?.taskType === "resourceNode" && task.nodeID) {
+      const miningStore = useMiningStore.getState();
+      const node = miningStore.nodes[task.nodeID];
+      
+      if (node && node.levelRequired && bud.level < node.levelRequired) {
+        console.log(`Bud level ${bud.level} is too low for node requiring level ${node.levelRequired}`);
+        return false;
+      }
+    }
 
     if (partyBud) {
       partyStore.removeBud(budId);

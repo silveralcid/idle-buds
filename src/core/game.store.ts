@@ -18,6 +18,7 @@ import { usePartyStore } from '../features/party/party.store';
 import { processHatchingTick } from '../features/tending/tending.logic';
 import { useTendingStore } from '../features/tending/tending.store';
 import { useShopStore } from '../features/shop/shop.store';
+import { useAssignmentStore } from '../features/assignment/assignment.store';
 
 interface GameState extends HunterTaskState {
   isInitialLoad: boolean;
@@ -63,6 +64,7 @@ interface GameActions {
           bank: useBankStore.getState(),
           party: usePartyStore.getState(),
           budBox: useBudBoxStore.getState(),
+          assignment: useAssignmentStore.getState(),
           mining: useMiningStore.getState(),
           lumbering: useLumberingStore.getState(),
           smithing: useSmithingStore.getState(),
@@ -113,6 +115,8 @@ interface GameActions {
           console.log('BudBox state loaded:', state.budBox);
           usePartyStore.setState(state.party);
           console.log('Party state loaded:', state.party);
+          useAssignmentStore.setState(state.assignment);
+          console.log('Assignment state loaded:', state.assignment);
           useMiningStore.setState(state.mining);
           console.log('Mining state loaded:', state.mining);
           useViewStore.setState(state.view);
@@ -169,6 +173,12 @@ interface GameActions {
             selectedBudId: null,
         }); 
       
+        useAssignmentStore.setState({
+            buds: {},
+            assignments: {},
+        });
+      
+
         useShopStore.setState({
             items: [],
             purchaseItem: () => false,
