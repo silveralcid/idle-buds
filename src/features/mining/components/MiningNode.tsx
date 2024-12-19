@@ -160,35 +160,11 @@ const MiningNode: React.FC<MiningNodeProps> = ({ nodeId }) => {
                 >
                   {node.nodeHealth > 0 ? "Mine" : "Depleted"}
                 </button>
-                
-                {assignedBuds.length > 0 && (
-                  <button
-                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    onClick={isAnyBudMining ? handleStopBudMining : handleBudMine}
-                    disabled={node.nodeHealth <= 0}
-                  >
-                    {isAnyBudMining ? "Stop Bud Mining" : "Start Bud Mining"}
-                  </button>
-                )}
               </>
             )}
           </div>
 
-          {assignedBuds.length > 0 && (
-            <div className="mt-4">
-              <h4 className="font-semibold">Mining Progress</h4>
-              {assignedBuds.map(budId => (
-                <div key={budId} className="flex items-center gap-2 mt-2">
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div 
-                      className="bg-blue-600 h-2.5 rounded-full transition-all duration-200" 
-                      style={{ width: `${getBudMiningProgress(budId)}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          
         </>
       )}
 
