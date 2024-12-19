@@ -1,7 +1,7 @@
 import { budBase } from "./budBase.types";
 
 // Define valid Bud assignments
-export type BudAssignment = "party" | "box" | "mining" | "smithing" | "woodcutting" | "farming" | null ;
+export type BudAssignment = "party" | "box" | "mining" | "smithing" | "lumbering" | "farming" | null ;
 
 // Define optional task tracking, similar to HunterTask
 export type BudTask = {

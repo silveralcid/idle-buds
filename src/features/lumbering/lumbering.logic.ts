@@ -1,5 +1,6 @@
 import { TaskManager } from "../../utils/task-manager";
 import { useLumberingStore } from "./lumbering.store";
+import { useAssignmentStore } from "../assignment/assignment.store";
 
 /**
  * Start lumbering on a tree.
@@ -113,4 +114,131 @@ export const processLumberingTick = (deltaTime: number): void => {
  */
 export const stopLumbering = (): void => {
   TaskManager.stopCurrentTask();
+};
+
+/**
+ * Start bud lumbering on a node.
+ */
+export const startBudLumbering = (budId: string, nodeId: string): void => {
+  console.group('Bud Lumbering Operation');
+  const { nodes } = useLumberingStore.getState();
+  const node = nodes[nodeId];
+  const assignmentStore = useAssignmentStore.getState();
+  const bud = assignmentStore.getBud(budId);
+
+  // Validation checks
+  if (!node) {
+    console.warn(`Node with ID "${nodeId}" does not exist.`);
+    console.groupEnd();
+    return;
+  }
+
+  if (!bud) {
+    console.warn(`Bud with ID "${budId}" does not exist.`);
+    console.groupEnd();
+    return;
+  }
+
+  if (!node.isUnlocked) {
+    console.warn(`Node "${node.name}" is locked.`);
+    console.groupEnd();
+    return;
+  }
+
+  if (bud.level < node.levelRequired) {
+    console.warn(`Bud level ${node.levelRequired} required to chop "${node.name}".`);
+    console.groupEnd();
+    return;
+  }
+
+  // Assign the bud to lumbering task
+  const success = assignmentStore.assignBud(budId, "lumbering", {
+    taskType: "resourceNode",
+    nodeID: nodeId
+  });
+
+  if (success) {
+    console.log(`Started bud lumbering with "${bud.nickname || bud.name}" on "${node.name}".`);
+  } else {
+    console.warn(`Failed to assign bud "${bud.nickname || bud.name}" to lumbering task.`);
+  }
+  
+  console.groupEnd();
+};
+
+/**
+ * Process bud lumbering tick (progress and rewards).
+ */
+export const processBudLumberingTick = (deltaTime: number): void => {
+  const { nodes, setLogs, setNodes } = useLumberingStore.getState();
+  const assignmentStore = useAssignmentStore.getState();
+
+  // Get all buds assigned to lumbering
+  const lumberingBuds = assignmentStore.getBudsByAssignment("lumbering");
+
+  lumberingBuds.forEach((budId) => {
+    const assignment = assignmentStore.getBudAssignment(budId);
+    if (!assignment || assignment.task?.taskType !== "resourceNode") return;
+
+    const nodeId = assignment.task.nodeID;
+    if (!nodeId) return;
+
+    const node = nodes[nodeId];
+    const bud = assignmentStore.getBud(budId);
+    if (!node || !bud || node.nodeHealth <= 0) return;
+
+    // Calculate progress based on Bud's efficiency
+    const baseEfficiency = 1.0;
+    const levelBonus = 1 + (bud.level * 0.05); // 5% increase per level
+    const efficiency = baseEfficiency * levelBonus;
+    
+    const secondsPerResource = 1 / (node.gatherRate * efficiency);
+    const currentProgress = node.currentProgress || 0;
+    const newProgress = currentProgress + deltaTime;
+
+    if (newProgress >= secondsPerResource) {
+      // Award resources
+      const newLogs: Record<string, number> = {};
+      node.resourceNodeYields.forEach((log) => {
+        newLogs[log] = 1;
+      });
+      setLogs(newLogs);
+
+      // Update node health
+      const updatedNode = {
+        ...node,
+        currentProgress: newProgress % secondsPerResource
+      };
+      setNodes({ ...nodes, [nodeId]: updatedNode });
+
+      // Handle node depletion
+      if (updatedNode.nodeHealth <= 0) {
+        assignmentStore.clearTask(budId);
+      }
+    } else {
+      // Just update progress
+      const updatedNode = { ...node, currentProgress: newProgress };
+      setNodes({ ...nodes, [nodeId]: updatedNode });
+    }
+  });
+};
+
+/**
+ * Stop bud lumbering action.
+ */
+export const stopBudLumbering = (budId: string): void => {
+  console.group('Stop Bud Lumbering');
+  const assignmentStore = useAssignmentStore.getState();
+  
+  const assignment = assignmentStore.getBudAssignment(budId);
+  if (!assignment || assignment.assignment !== "lumbering") {
+    console.warn(`No active lumbering operation for bud ${budId}`);
+    console.groupEnd();
+    return;
+  }
+
+  assignmentStore.clearTask(budId);
+  assignmentStore.unassignBud(budId);
+  console.log(`Stopped bud lumbering for ${budId}`);
+  console.groupEnd();
 };

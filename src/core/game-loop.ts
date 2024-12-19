@@ -1,7 +1,7 @@
 import { GameConfig } from "./constants/game-config";
 import { GameEvents } from "./game-events";
 import { processBudMiningTick, processMiningTick } from "../features/mining/mining.logic";
-import { processLumberingTick } from "../features/lumbering/lumbering.logic";
+import { processBudLumberingTick, processLumberingTick } from "../features/lumbering/lumbering.logic";
 import { processSmithingTick } from "../features/smithing/smithing.logic";
 import { processHatchingTick } from "../features/tending/tending.logic";
 
@@ -50,6 +50,7 @@ export class GameLoop {
         processHatchingTick(deltaTime);
 
         processBudMiningTick(deltaTime);
+        processBudLumberingTick(deltaTime);
 
         this.lastTimestamp = currentTimestamp; // Adjust to the current time
       }
