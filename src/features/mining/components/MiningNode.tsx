@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { useMiningStore } from "../mining.store";
-import { startMining, stopMining } from "../mining.logic";
+import { startMining, stopMining, startBudMining, stopBudMining } from "../mining.logic";
 import { usePartyStore } from "../../party/party.store";
 import { useAssignmentStore } from "../../assignment/assignment.store";
 
@@ -15,23 +15,23 @@ const MiningNode: React.FC<MiningNodeProps> = ({ nodeId }) => {
   const assignBud = useAssignmentStore((state) => state.assignBud);
   const unassignBud = useAssignmentStore((state) => state.unassignBud);
   const getBudsByNode = useAssignmentStore((state) => state.getBudsByNode);
-  const assignments = useAssignmentStore((state) => state.assignments);
+  const budMiningNodes = useMiningStore((state) => state.budMiningNodes);
+  const isBudMiningActive = useMiningStore((state) => state.isBudMiningActive);
 
   const assignedBuds = getBudsByNode(nodeId);
   const availableBuds = useMemo(() => {
     return Object.values(partyBuds).filter(bud => 
       !assignedBuds.includes(bud.id) && 
-      bud.allowedTasks.includes('mining')
+      bud.allowedTasks.includes('mining') &&
+      bud.level >= node.levelRequired
     );
-  }, [partyBuds, assignedBuds]);
+  }, [partyBuds, assignedBuds, node.levelRequired]);
 
-  if (!node) {
-    return (
-      <div className="p-4 bg-red-500 text-white rounded">
-        <p>Node not found.</p>
-      </div>
-    );
-  }
+  const getBudMiningProgress = (budId: string) => {
+    const miningData = budMiningNodes[budId];
+    if (!miningData) return 0;
+    return (miningData.progress / (1 / (node.gatherRate * miningData.efficiency))) * 100;
+  };
 
   const handleAssignBud = (budId: string) => {
     if (budId) {
@@ -43,6 +43,7 @@ const MiningNode: React.FC<MiningNodeProps> = ({ nodeId }) => {
   };
 
   const handleUnassignBud = (budId: string) => {
+    stopBudMining(budId);
     unassignBud(budId);
   };
 
@@ -54,8 +55,39 @@ const MiningNode: React.FC<MiningNodeProps> = ({ nodeId }) => {
     stopMining();
   };
 
+  const handleBudMine = () => {
+    assignedBuds.forEach(budId => {
+      const miningStore = useMiningStore.getState();
+      const node = miningStore.nodes[nodeId];
+      const bud = partyBuds[budId];
+      
+      if (!node || !bud) return;
+      
+      miningStore.startBudMining(budId, nodeId);
+    });
+  };
+
+  const handleStopBudMining = () => {
+    assignedBuds.forEach(budId => {
+      stopBudMining(budId);
+    });
+  };
+
   const isMiningThisNode = activeNode === nodeId;
   const isLocked = !node.isUnlocked;
+
+  const isAnyBudMining = useMemo(() => 
+    assignedBuds.some(budId => isBudMiningActive(budId)),
+    [assignedBuds, isBudMiningActive]
+  );
+
+  if (!node) {
+    return (
+      <div className="p-4 bg-red-500 text-white rounded">
+        <p>Node not found.</p>
+      </div>
+    );
+  }
 
   return (
     <div className={`p-4 rounded shadow-md ${
@@ -72,20 +104,28 @@ const MiningNode: React.FC<MiningNodeProps> = ({ nodeId }) => {
             {assignedBuds.length > 0 ? (
               <div className="space-y-2">
                 <h4 className="font-semibold mb-1">Assigned Buds:</h4>
-                {assignedBuds.map(budId => (
-                  <div key={budId} className="flex items-center justify-between bg-base-200 p-2 rounded">
-                    <span className="font-mono text-sm">
-                      {budId} 
-                    </span>
-                    <button
-                      onClick={() => handleUnassignBud(budId)}
-                      className="btn btn-ghost btn-xs text-error"
-                      title="Unassign Bud"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
+                {assignedBuds.map(budId => {
+                  const bud = partyBuds[budId];
+                  return (
+                    <div key={budId} className="flex items-center justify-between bg-base-200 p-2 rounded">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold">
+                          {bud?.nickname || bud?.name || budId}
+                        </span>
+                        <span className="text-xs opacity-75">
+                          (Lvl {bud?.level})
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleUnassignBud(budId)}
+                        className="btn btn-ghost btn-xs text-error"
+                        title="Unassign Bud"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <select 
@@ -124,14 +164,31 @@ const MiningNode: React.FC<MiningNodeProps> = ({ nodeId }) => {
                 {assignedBuds.length > 0 && (
                   <button
                     className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    onClick={isAnyBudMining ? handleStopBudMining : handleBudMine}
                     disabled={node.nodeHealth <= 0}
                   >
-                    Bud Mine
+                    {isAnyBudMining ? "Stop Bud Mining" : "Start Bud Mining"}
                   </button>
                 )}
               </>
             )}
           </div>
+
+          {assignedBuds.length > 0 && (
+            <div className="mt-4">
+              <h4 className="font-semibold">Mining Progress</h4>
+              {assignedBuds.map(budId => (
+                <div key={budId} className="flex items-center gap-2 mt-2">
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div 
+                      className="bg-blue-600 h-2.5 rounded-full transition-all duration-200" 
+                      style={{ width: `${getBudMiningProgress(budId)}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </>
       )}
 

@@ -1,6 +1,8 @@
 import { TaskManager } from "../../utils/task-manager";
 import { useMiningStore } from "./mining.store";
 import { GameConfig } from "../../core/constants/game-config";
+import { useAssignmentStore } from "../assignment/assignment.store";
+import { usePartyStore } from "../party/party.store";
 /**
  * Start mining on a node.
  */
@@ -66,7 +68,7 @@ export const processMiningTick = (deltaTime: number): void => {
     // Update node health (one point per resource gathered)
     const updatedNode = { 
       ...node, 
-      nodeHealth: Math.max(0, node.nodeHealth - 1),
+      // nodeHealth: Math.max(0, node.nodeHealth - 1),
       currentProgress: newProgress % secondsPerResource // Keep remainder progress
     };
     setNodes({ ...nodes, [activeNode]: updatedNode });
@@ -112,5 +114,124 @@ export const processMiningTick = (deltaTime: number): void => {
  */
 export const stopMining = (): void => {
   TaskManager.stopCurrentTask();
+};
+
+export const processBudMiningTick = (deltaTime: number): void => {
+  const { nodes, setOres, setNodes } = useMiningStore.getState();
+  const assignmentStore = useAssignmentStore.getState();
+
+  // Get all buds assigned to mining
+  const miningBuds = assignmentStore.getBudsByAssignment("mining");
+
+  miningBuds.forEach((budId) => {
+    const assignment = assignmentStore.getBudAssignment(budId);
+    if (!assignment || assignment.task?.taskType !== "resourceNode") return;
+
+    const nodeId = assignment.task.nodeID;
+    if (!nodeId) return;
+
+    const node = nodes[nodeId];
+    const bud = assignmentStore.getBud(budId);
+    if (!node || !bud || node.nodeHealth <= 0) return;
+
+    // Calculate progress based on Bud's efficiency
+    const baseEfficiency = 1.0;
+    const levelBonus = 1 + (bud.level * 0.05); // 5% increase per level
+    const efficiency = baseEfficiency * levelBonus;
+    
+    const secondsPerResource = 1 / (node.gatherRate * efficiency);
+    const currentProgress = node.currentProgress || 0;
+    const newProgress = currentProgress + deltaTime;
+
+    if (newProgress >= secondsPerResource) {
+      // Award resources
+      const newOres: Record<string, number> = {};
+      node.resourceNodeYields.forEach((ore) => {
+        newOres[ore] = 1;
+      });
+      setOres(newOres);
+
+      // Update node health
+      const updatedNode = {
+        ...node,
+        // nodeHealth: Math.max(0, node.nodeHealth - 1),
+        currentProgress: newProgress % secondsPerResource
+      };
+      setNodes({ ...nodes, [nodeId]: updatedNode });
+
+      // Handle node depletion
+      if (updatedNode.nodeHealth <= 0) {
+        assignmentStore.clearTask(budId);
+      }
+    } else {
+      // Just update progress
+      const updatedNode = { ...node, currentProgress: newProgress };
+      setNodes({ ...nodes, [nodeId]: updatedNode });
+    }
+  });
+};
+
+export const startBudMining = (budId: string, nodeId: string): void => {
+  console.group('Bud Mining Operation');
+  const { nodes } = useMiningStore.getState();
+  const node = nodes[nodeId];
+  const assignmentStore = useAssignmentStore.getState();
+  const bud = assignmentStore.getBud(budId);
+
+  // Validation checks
+  if (!node) {
+    console.warn(`Node with ID "${nodeId}" does not exist.`);
+    console.groupEnd();
+    return;
+  }
+
+  if (!bud) {
+    console.warn(`Bud with ID "${budId}" does not exist.`);
+    console.groupEnd();
+    return;
+  }
+
+  if (!node.isUnlocked) {
+    console.warn(`Node "${node.name}" is locked.`);
+    console.groupEnd();
+    return;
+  }
+
+  if (bud.level < node.levelRequired) {
+    console.warn(`Bud level ${node.levelRequired} required to mine "${node.name}".`);
+    console.groupEnd();
+    return;
+  }
+
+  // Assign the bud to mining task
+  const success = assignmentStore.assignBud(budId, "mining", {
+    taskType: "resourceNode",
+    nodeID: nodeId
+  });
+
+  if (success) {
+    console.log(`Started bud mining with "${bud.nickname || bud.name}" on "${node.name}".`);
+  } else {
+    console.warn(`Failed to assign bud "${bud.nickname || bud.name}" to mining task.`);
+  }
+  
+  console.groupEnd();
+};
+
+export const stopBudMining = (budId: string): void => {
+  console.group('Stop Bud Mining');
+  const assignmentStore = useAssignmentStore.getState();
+  
+  const assignment = assignmentStore.getBudAssignment(budId);
+  if (!assignment || assignment.assignment !== "mining") {
+    console.warn(`No active mining operation for bud ${budId}`);
+    console.groupEnd();
+    return;
+  }
+
+  assignmentStore.clearTask(budId);
+  assignmentStore.unassignBud(budId);
+  console.log(`Stopped bud mining for ${budId}`);
+  console.groupEnd();
 };
   
