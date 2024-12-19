@@ -49,11 +49,6 @@ export const useAssignmentStore = create<AssignmentState>((set, get) => ({
       }
     }));
 
-    // Start appropriate task in TaskManager if needed
-    if (task.taskType) {
-      TaskManager.startTask(task.taskType);
-    }
-
     return true;
   },
 
