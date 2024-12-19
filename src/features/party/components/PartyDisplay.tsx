@@ -6,6 +6,7 @@ const PartyDisplay: React.FC = () => {
   const [hoveredBudId, setHoveredBudId] = useState<string | null>(null);
   const budsObject = usePartyStore(state => state.buds);
   const removeBudFromParty = usePartyStore(state => state.removeBud);
+  const createBud = useBudBoxStore(state => state.createBud);
   const addToBudBox = useBudBoxStore(state => state.addBud);
 
   // Memoize the buds array

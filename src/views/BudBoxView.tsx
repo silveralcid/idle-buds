@@ -8,7 +8,7 @@ const BudBoxView: React.FC = () => {
   const budsObject = useBudBoxStore(state => state.buds);
   const selectedBudId = useBudBoxStore(state => state.selectedBudId);
   const selectBud = useBudBoxStore(state => state.selectBud);
-  const addBud = useBudBoxStore(state => state.addBud);
+  const createBud = useBudBoxStore(state => state.createBud);
   const removeBud = useBudBoxStore(state => state.removeBud);
   const deleteAllBuds = useBudBoxStore(state => state.deleteAllBuds);
 
@@ -41,7 +41,7 @@ const BudBoxView: React.FC = () => {
     try {
       const randomIndex = Math.floor(Math.random() * budSpecies.length);
       const randomBudBase = budSpecies[randomIndex];
-      addBud(randomBudBase);
+      createBud(randomBudBase);
     } catch (error) {
       console.error('Error generating bud:', error);
     }

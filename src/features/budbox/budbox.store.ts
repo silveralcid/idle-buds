@@ -6,7 +6,8 @@ import { createBudInstance } from '../../factories/budFactory';
 interface BudBoxState {
   buds: Record<string, budInstance>;
   selectedBudId: string | null;
-  addBud: (base: budBase) => void;
+  addBud: (bud: budInstance) => boolean;
+  createBud: (base: budBase) => void;
   removeBud: (budId: string) => void;
   getBud: (budId: string) => budInstance | undefined;
   getAllBuds: () => budInstance[];
@@ -19,8 +20,20 @@ interface BudBoxState {
 export const useBudBoxStore = create<BudBoxState>((set, get) => ({
   buds: {},
   selectedBudId: null,
-
-  addBud: (base: budBase) => 
+  addBud: (bud: budInstance) => {
+    const state = get();
+    set((state) => ({
+      buds: {
+        ...state.buds,
+        [bud.id]: {
+          ...bud,
+          assignment: "box"
+        }   
+      }
+    }));
+    return true;
+  },
+  createBud: (base: budBase) => 
     set((state) => {
       const newBud = createBudInstance(base);
       return {

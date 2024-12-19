@@ -31,7 +31,10 @@ export const usePartyStore = create<PartyState>((set, get) => ({
     set((state) => ({
       buds: {
         ...state.buds,
-        [bud.id]: bud
+        [bud.id]: {
+          ...bud,
+          assignment: "party"
+        }
       }
     }));
     return true;
