@@ -50,7 +50,8 @@ export const startBudSmithing = (budId: string, workbenchId: string, recipeId: s
   // Assign the bud to smithing task
   const success = assignmentStore.assignBud(budId, "smithing", {
     taskType: "workbench",
-    nodeID: workbenchId
+    nodeID: workbenchId,
+    recipeId: recipeId
   });
 
   if (success) {

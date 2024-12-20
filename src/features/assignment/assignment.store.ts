@@ -63,6 +63,17 @@ export const useAssignmentStore = create<AssignmentState>((set, get) => ({
       }
     }
 
+    // Check level requirements if task is for a workbench
+    if (task?.taskType === "workbench" && task.recipeId) {
+      const smithingStore = useSmithingStore.getState();
+      const recipe = smithingStore.recipes.find(r => r.id === task.recipeId);
+      
+      if (recipe && bud.level < recipe.levelRequired) {
+        console.log(`Bud level ${bud.level} is too low for recipe requiring level ${recipe.levelRequired}`);
+        return false;
+      }
+    }
+
     if (partyBud) {
       partyStore.removeBud(budId);
     } else if (boxBud) {
