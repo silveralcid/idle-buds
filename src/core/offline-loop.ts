@@ -171,6 +171,67 @@ export function processOfflineProgress(lastSaveTime: number): void {
     }
   }
 
+  // Process Bud Smithing more efficiently
+  const smithingBuds = assignmentStore.getBudsByAssignment("smithing");
+  const smithingStore = useSmithingStore.getState();
+  const bankStore = useBankStore.getState();
+
+  smithingBuds.forEach(budId => {
+    const assignment = assignmentStore.getBudAssignment(budId);
+    if (!assignment || assignment.task?.taskType !== "workbench") return;
+
+    const workbenchId = assignment.task.nodeID;
+    const recipeId = assignment.task.recipeId;
+    if (!workbenchId || !recipeId) return;
+
+    const recipe = smithingStore.recipes.find(r => r.id === recipeId);
+    const bud = assignmentStore.getBud(budId);
+    
+    if (!recipe || !bud) return;
+
+    // Calculate efficiency and completed cycles
+    const baseEfficiency = 1.0;
+    const levelBonus = 1 + (bud.level * 0.05); // 5% increase per level
+    const efficiency = baseEfficiency * levelBonus;
+    
+    const adjustedCraftingTime = recipe.craftingTime / efficiency;
+    const completedCycles = Math.floor(totalTimeAway / (adjustedCraftingTime / GameConfig.TICK.RATE.DEFAULT));
+
+    if (completedCycles > 0) {
+      // Calculate total resource requirements
+      const totalInputs = recipe.inputs.map(input => ({
+        ...input,
+        amount: input.amount * completedCycles
+      }));
+
+      // Verify total resources
+      const hasResources = totalInputs.every(input => {
+        return input.itemIds.some(itemId => 
+          (bankStore.items[itemId] || 0) >= input.amount
+        );
+      });
+
+      if (!hasResources) return;
+
+      // Consume all inputs at once
+      totalInputs.forEach(input => {
+        const availableItemId = input.itemIds.find(id => 
+          (bankStore.items[id] || 0) >= input.amount
+        );
+        if (availableItemId) {
+          bankStore.removeItem(availableItemId, input.amount);
+        }
+      });
+
+      // Add all outputs at once
+      recipe.outputs.forEach(output => {
+        bankStore.addItem(output.itemId, output.amount * completedCycles);
+      });
+
+      console.log(`Bud ${bud.nickname || bud.name} completed ${completedCycles} smithing cycles while offline`);
+    }
+  });
+
   console.groupEnd();
 }
 
