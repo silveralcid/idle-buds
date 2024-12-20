@@ -49,6 +49,7 @@ const SmeltingWorkbench: React.FC = () => {
     
     if (isActive) {
       stopBudSmithing(budId);
+      setForceUpdate(prev => prev + 1);
     } else {
       updateBudRecipe(budId, recipeId);
       startBudSmithing(budId, 'smelting_furnace', recipeId);
