@@ -15,6 +15,14 @@ export interface ActiveWorkbench {
   isActive: boolean;
 }
 
+export interface BudCraftingProcess {
+  budId: string;
+  workbenchId: string;
+  recipeId: string;
+  progress: number;
+  efficiency: number;
+}
+
 export interface SmithingState extends BaseSkill {
   workbenches: Record<string, ActiveWorkbench>;
   recipes: Recipe[];
@@ -27,6 +35,18 @@ export interface SmithingState extends BaseSkill {
   isRecipeUnlocked: (recipeId: string) => boolean;
   canCraftRecipe: (recipe: Recipe) => boolean;
   reset: () => void;
+  budCrafting: Record<string, BudCraftingProcess>;
+
+  startBudCrafting: (budId: string, workbenchId: string, recipeId: string) => void;
+  stopBudCrafting: (budId: string) => void;
+  updateBudCraftingProgress: (budId: string, progress: number) => void;
+  getBudCraftingStatus: (budId: string) => {
+    workbenchId: string | null;
+    recipeId: string | null;
+    progress: number;
+    efficiency: number;
+  } | null;
+  isBudCraftingActive: (budId: string) => boolean;
 }
 
 export const useSmithingStore = create<SmithingState>((set, get) => ({
@@ -56,6 +76,7 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
   },
   recipes: recipeRegistry,
   unlockedRecipes: [],
+  budCrafting: {},
 
   setXp: (xp: number) => set(() => ({ xp })),
   setLevel: (level: number) => set((state) => {
@@ -238,6 +259,7 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
         },
       },
       recipes: recipeRegistry,
+      budCrafting: {}
     })),
 
   isRecipeUnlocked: (recipeId: string) => {
@@ -252,5 +274,57 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
         (bankStore.items[itemId] || 0) >= input.amount
       );
     });
+  },
+
+  startBudCrafting: (budId: string, workbenchId: string, recipeId: string) => set((state) => {
+    const recipe = state.recipes.find(r => r.id === recipeId);
+    if (!recipe) return state;
+
+    return {
+      budCrafting: {
+        ...state.budCrafting,
+        [budId]: {
+          budId,
+          workbenchId,
+          recipeId,
+          progress: 0,
+          efficiency: 1.0 // Base efficiency, can be modified based on Bud stats
+        }
+      }
+    };
+  }),
+
+  stopBudCrafting: (budId: string) => set((state) => ({
+    budCrafting: Object.fromEntries(
+      Object.entries(state.budCrafting).filter(([id]) => id !== budId)
+    )
+  })),
+
+  updateBudCraftingProgress: (budId: string, progress: number) => set((state) => ({
+    budCrafting: {
+      ...state.budCrafting,
+      [budId]: {
+        ...state.budCrafting[budId],
+        progress
+      }
+    }
+  })),
+
+  getBudCraftingStatus: (budId: string) => {
+    const state = get();
+    const craftingData = state.budCrafting[budId];
+    if (!craftingData) return null;
+    
+    return {
+      workbenchId: craftingData.workbenchId,
+      recipeId: craftingData.recipeId,
+      progress: craftingData.progress,
+      efficiency: craftingData.efficiency
+    };
+  },
+
+  isBudCraftingActive: (budId: string) => {
+    const state = get();
+    return !!state.budCrafting[budId];
   },
 }));
