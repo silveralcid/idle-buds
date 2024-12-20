@@ -201,7 +201,7 @@ const SmeltingWorkbench: React.FC = () => {
                     className={`px-4 py-2 rounded ${
                       isDisabled 
                         ? 'bg-gray-500 cursor-not-allowed' 
-                        : isPlayerCrafting
+                        : isBudCraftingActive(assignedBuds[0])
                           ? 'bg-red-500 hover:bg-red-600'
                           : 'bg-blue-500 hover:bg-blue-600'
                     }`}
@@ -215,7 +215,7 @@ const SmeltingWorkbench: React.FC = () => {
                       ? `Requires Level ${recipe.levelRequired}`
                       : !hasResources
                         ? 'Missing Resources'
-                        : isPlayerCrafting
+                        : isBudCraftingActive(assignedBuds[0])
                           ? 'Stop Crafting'
                           : 'Start Crafting'}
                   </button>
@@ -225,7 +225,9 @@ const SmeltingWorkbench: React.FC = () => {
                     <button
                       className={`px-4 py-2 rounded ${
                         isUnlocked && (hasResources || workbench.isActive)
-                          ? 'bg-blue-500 hover:bg-blue-600'
+                          ? isPlayerCrafting
+                            ? 'bg-red-500 hover:bg-red-600'
+                            : 'bg-blue-500 hover:bg-blue-600'
                           : 'bg-gray-500 cursor-not-allowed'
                       }`}
                       onClick={() => handlePlayerCraft(recipe.id)}
