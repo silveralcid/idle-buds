@@ -6,7 +6,7 @@ export const budSpecies: budBase[] = [
     name: 'Poodoo',
     description: 'A Bud that thrives in forested areas, adept at lumbering.',
     spriteRef: '/assets/sprites/buds/slice-2.png',
-    allowedTasks: ['lumbering', 'mining'],
+    allowedTasks: ['lumbering', 'mining', 'smithing'],
     primaryAffinity: 'grass',
     // Uncomment and fill in if needed
     // secondaryAffinity: 'ground',
@@ -29,7 +29,7 @@ export const budSpecies: budBase[] = [
     name: 'Wach',
     description: 'A Bud that thrives in forested areas, adept at lumbering.',
     spriteRef: '/assets/sprites/buds/slice-3.png',
-    allowedTasks: ['lumbering', 'mining'],
+    allowedTasks: ['lumbering', 'mining', 'smithing'],
     primaryAffinity: 'water',
     // Uncomment and fill in if needed
     // secondaryAffinity: 'ground',
@@ -52,7 +52,7 @@ export const budSpecies: budBase[] = [
     name: 'Fothy',
     description: 'A Bud that thrives in forested areas, adept at lumbering.',
     spriteRef: '/assets/sprites/buds/slice-1.png',
-    allowedTasks: ['lumbering', 'mining'],
+    allowedTasks: ['lumbering', 'mining', 'smithing'],
     primaryAffinity: 'fire',
     // Uncomment and fill in if needed
     // secondaryAffinity: 'ground',
