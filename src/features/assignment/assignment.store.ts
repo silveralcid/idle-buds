@@ -32,6 +32,7 @@ export interface AssignmentState {
   updateTask: (budId: string, task: BudTask) => void;
   clearTask: (budId: string) => void;
   updateBudRecipe: (budId: string, recipeId: string) => void;
+  removeBudFromRecipe: (budId: string) => void;
 }
 
 export const useAssignmentStore = create<AssignmentState>((set, get) => ({
@@ -213,6 +214,7 @@ export const useAssignmentStore = create<AssignmentState>((set, get) => ({
       }
     })),
 
+  // Add bud to recipe
   updateBudRecipe: (budId: string, recipeId: string) => 
     set((state) => ({
       assignments: {
@@ -225,5 +227,22 @@ export const useAssignmentStore = create<AssignmentState>((set, get) => ({
           }
         } : state.assignments[budId]
       }
-    }))
+    })),
+
+  // Remove bud from recipe
+  removeBudFromRecipe: (budId: string) => 
+    set((state) => ({
+      assignments: {
+        ...state.assignments,
+        [budId]: state.assignments[budId] ? {
+          ...state.assignments[budId],
+          task: {
+            ...state.assignments[budId].task,
+            taskType: "workbench",  // Preserve workbench assignment
+            nodeID: state.assignments[budId].task.nodeID,  // Keep workbench ID
+            recipeId: undefined  // Clear only the recipe
+          }
+        } : state.assignments[budId]
+      }
+    })),
 })); 

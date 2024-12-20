@@ -128,8 +128,8 @@ export const stopBudSmithing = (budId: string): void => {
     return;
   }
 
-  assignmentStore.clearTask(budId);
-  assignmentStore.unassignBud(budId);
+  // Remove recipe but keep workbench assignment
+  assignmentStore.removeBudFromRecipe(budId);
   smithingStore.stopBudCrafting(budId);
   console.log(`Stopped bud smithing for ${budId}`);
   console.groupEnd();
