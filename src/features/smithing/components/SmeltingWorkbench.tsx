@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useSmithingStore } from '../smithing.store';
 import { useBankStore } from '../../bank/bank.store';
 import { usePartyStore } from '../../party/party.store';
@@ -32,6 +32,7 @@ const SmeltingWorkbench: React.FC = () => {
   }, [partyBuds, assignedBuds]);
 
   const [selectedBudId, setSelectedBudId] = useState<string>("");
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   const handleAssignBud = (budId: string, recipeId: string) => {
     if (!budId || !recipeId) return;
@@ -79,6 +80,21 @@ const SmeltingWorkbench: React.FC = () => {
     [recipes]
   );
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Force component update by subscribing to state changes
+      assignedBuds.forEach(budId => {
+        const status = getBudCraftingStatus(budId);
+        if (status) {
+          // This will trigger a re-render when progress changes
+          setForceUpdate(prev => prev + 1);
+        }
+      });
+    }, 50); // Increase update frequency
+
+    return () => clearInterval(interval);
+  }, [assignedBuds, getBudCraftingStatus]);
+
   return (
     <div className="p-4 bg-base-200 rounded-lg">
       <h2 className="text-xl font-bold mb-4">Smelting Furnace</h2>
@@ -90,17 +106,36 @@ const SmeltingWorkbench: React.FC = () => {
           <div className="space-y-2">
             {assignedBuds.map(budId => {
               const bud = getBud(budId);
+              const craftingStatus = getBudCraftingStatus(budId);
+              const recipe = recipes.find(r => r.id === craftingStatus?.recipeId);
               const isActive = isBudCraftingActive(budId);
+
               return (
-                <div key={budId} className="flex items-center justify-between bg-base-300 p-2 rounded">
-                  <span>{bud?.nickname || bud?.name}</span>
-                  <button
-                    onClick={() => handleUnassignBud(budId)}
-                    className="btn btn-ghost btn-xs text-error"
-                    disabled={isActive}
-                  >
-                    Remove
-                  </button>
+                <div key={budId} className="bg-base-300 p-4 rounded">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-sm">{budId.slice(0, 8)}...</span>
+                    <button
+                      onClick={() => handleUnassignBud(budId)}
+                      className="btn btn-ghost btn-xs text-error"
+                      disabled={isActive}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  {isActive && recipe && craftingStatus && (
+                    <div className="mt-2">
+                      <p className="text-sm">Crafting: {recipe.name}</p>
+                      <div className="w-full bg-gray-600 h-2 mt-2 rounded overflow-hidden">
+                        <div 
+                          className="bg-green-500 h-full rounded transition-all duration-100 ease-linear"
+                          style={{ 
+                            width: `${(craftingStatus.progress / recipe.craftingTime) * 100}%`,
+                            transition: 'width 100ms linear'
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -115,7 +150,7 @@ const SmeltingWorkbench: React.FC = () => {
               <option value="">Assign Bud...</option>
               {availableBuds.map(bud => (
                 <option key={bud.id} value={bud.id}>
-                  {bud.nickname || bud.name} (Level {bud.level})
+                  {bud.id.slice(0, 8)}... (Level {bud.level})
                 </option>
               ))}
             </select>
@@ -159,42 +194,6 @@ const SmeltingWorkbench: React.FC = () => {
         </div>
       )}
 
-      {/* Bud Crafting Progress */}
-      {assignedBuds.map(budId => {
-        const bud = getBud(budId);
-        const isActive = isBudCraftingActive(budId);
-        const craftingStatus = getBudCraftingStatus(budId);
-        const recipe = recipes.find(r => r.id === craftingStatus?.recipeId);
-
-        if (!bud) return null;
-
-        return (
-          <div key={budId} className="mb-4 p-4 bg-base-300 rounded">
-            <div className="flex items-center justify-between">
-              <span>{bud.nickname || bud.name}</span>
-              <button
-                onClick={() => handleUnassignBud(budId)}
-                className="btn btn-ghost btn-xs text-error"
-                disabled={isActive}
-              >
-                Remove
-              </button>
-            </div>
-            {isActive && recipe && (
-              <div className="mt-2">
-                <p className="text-sm">Crafting: {recipe.name}</p>
-                <div className="w-full bg-gray-600 h-2 mt-2 rounded">
-                  <div 
-                    className="bg-green-500 h-full rounded transition-all duration-200"
-                    style={{ width: `${((craftingStatus?.progress ?? 0) / recipe.craftingTime) * 100}%` }}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        );
-      })}
-
       {/* Recipe List */}
       <div className="grid grid-cols-1 gap-4">
         {smeltingRecipes.map((recipe) => {
@@ -202,8 +201,13 @@ const SmeltingWorkbench: React.FC = () => {
           const hasResources = canCraftRecipe(recipe);
           const isDisabled = !isUnlocked || (!hasResources && !workbench.isActive);
           const budAssignedToRecipe = assignedBuds.length > 0;
-          const isActive = workbench.isActive && workbench.recipe?.id === recipe.id;
           
+          // Check if any assigned bud is actively crafting this recipe
+          const isActiveCrafting = assignedBuds.some(budId => {
+            const craftingStatus = getBudCraftingStatus(budId);
+            return craftingStatus?.recipeId === recipe.id;
+          });
+
           return (
             <div key={recipe.id} className={`p-4 rounded ${isUnlocked ? 'bg-base-100' : 'bg-base-300 opacity-50'}`}>
               <h3 className="font-semibold">{recipe.name}</h3>
@@ -238,18 +242,25 @@ const SmeltingWorkbench: React.FC = () => {
                     className={`px-4 py-2 rounded ${
                       isDisabled 
                         ? 'bg-gray-500 cursor-not-allowed' 
-                        : isActive 
+                        : isActiveCrafting
                           ? 'bg-red-500 hover:bg-red-600'
-                          : 'bg-orange-500 hover:bg-orange-600'
+                          : 'bg-blue-500 hover:bg-blue-600'
                     }`}
-                    onClick={() => handleAssignBud(assignedBuds[0], recipe.id)}
+                    onClick={() => {
+                      const bud = assignedBuds[0];
+                      if (isActiveCrafting) {
+                        stopBudSmithing(bud);
+                      } else {
+                        handleAssignBud(bud, recipe.id);
+                      }
+                    }}
                     disabled={isDisabled}
                   >
                     {!isUnlocked 
                       ? `Requires Level ${recipe.levelRequired}`
                       : !hasResources
                         ? 'Missing Resources'
-                        : isActive
+                        : isActiveCrafting
                           ? 'Stop Crafting'
                           : 'Start Crafting'}
                   </button>
