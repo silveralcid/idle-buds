@@ -15,7 +15,7 @@ export const processSmithingTick = (deltaTime: number): void => {
   });
 };
 
-export const startBudSmithing = (budId: string, workbenchId: string, recipeId: string): void => {
+export const startBudSmithing = (budId: string, workbenchId: string, recipeId: string): boolean => {
   console.group('Bud Smithing Operation');
   const { recipes, isRecipeUnlocked, canCraftRecipe } = useSmithingStore.getState();
   const assignmentStore = useAssignmentStore.getState();
@@ -26,42 +26,31 @@ export const startBudSmithing = (budId: string, workbenchId: string, recipeId: s
   if (!recipe) {
     console.warn(`Recipe with ID "${recipeId}" does not exist.`);
     console.groupEnd();
-    return;
+    return false;
   }
 
   if (!bud) {
     console.warn(`Bud with ID "${budId}" does not exist.`);
     console.groupEnd();
-    return;
+    return false;
   }
 
   if (!isRecipeUnlocked(recipeId)) {
     console.warn(`Recipe "${recipe.name}" is locked.`);
     console.groupEnd();
-    return;
+    return false;
   }
 
   if (!canCraftRecipe(recipe)) {
     console.warn(`Missing resources for "${recipe.name}".`);
     console.groupEnd();
-    return;
+    return false;
   }
 
-  // Assign the bud to smithing task
-  const success = assignmentStore.assignBud(budId, "smithing", {
-    taskType: "workbench",
-    nodeID: workbenchId,
-    recipeId: recipeId
-  });
-
-  if (success) {
-    useSmithingStore.getState().startBudCrafting(budId, workbenchId, recipeId);
-    console.log(`Started bud smithing with "${bud.nickname || bud.name}" on "${recipe.name}".`);
-  } else {
-    console.warn(`Failed to assign bud "${bud.nickname || bud.name}" to smithing task.`);
-  }
-  
+  useSmithingStore.getState().startBudCrafting(budId, workbenchId, recipeId);
+  console.log(`Started bud smithing with "${bud.nickname || bud.name}" on "${recipe.name}".`);
   console.groupEnd();
+  return true;
 };
 
 export const processBudSmithingTick = (deltaTime: number): void => {
