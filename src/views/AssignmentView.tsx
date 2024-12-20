@@ -17,6 +17,7 @@ const AssignmentView: React.FC = () => {
               <th>Assignment</th>
               <th>Task Type</th>
               <th>Node/Workbench ID</th>
+              <th>Recipe ID</th>
               <th>Start Time</th>
               <th>Duration</th>
               <th>Actions</th>
@@ -46,6 +47,15 @@ const AssignmentView: React.FC = () => {
                   {assignment.task.nodeID ? (
                     <span className="font-mono text-sm">
                       {assignment.task.nodeID}
+                    </span>
+                  ) : (
+                    <span className="text-gray-400">-</span>
+                  )}
+                </td>
+                <td>
+                  {assignment.task.recipeId ? (
+                    <span className="font-mono text-sm">
+                      {assignment.task.recipeId}
                     </span>
                   ) : (
                     <span className="text-gray-400">-</span>

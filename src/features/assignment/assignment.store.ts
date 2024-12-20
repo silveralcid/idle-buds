@@ -14,6 +14,7 @@ interface AssignmentState {
     assignment: BudAssignment;
     task: BudTask;
     startTime: number;
+    recipeId?: string;
   }>;
   
   // Core assignment actions
