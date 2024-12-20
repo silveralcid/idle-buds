@@ -11,14 +11,17 @@ const SmeltingWorkbench: React.FC = () => {
   const recipes = useSmithingStore((state) => state.recipes);
   const bankItems = useBankStore((state) => state.items);
   const isRecipeUnlocked = useSmithingStore((state) => state.isRecipeUnlocked);
-  const activateWorkbench = useSmithingStore((state) => state.activateWorkbench);
   const partyBuds = usePartyStore((state) => state.buds);
   const assignBud = useAssignmentStore((state) => state.assignBud);
   const unassignBud = useAssignmentStore((state) => state.unassignBud);
+  const updateBudRecipe = useAssignmentStore((state) => state.updateBudRecipe);
   const getBudsByWorkbench = useAssignmentStore((state) => state.getBudsByWorkbench);
   const isBudCraftingActive = useSmithingStore((state) => state.isBudCraftingActive);
   const getBudCraftingStatus = useSmithingStore(state => state.getBudCraftingStatus);
   const getBud = useAssignmentStore((state) => state.getBud);
+
+  const [selectedBudId, setSelectedBudId] = useState<string>("");
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   const assignedBuds = getBudsByWorkbench('smelting_furnace');
   const hasBudAssigned = assignedBuds.length > 0;
@@ -31,39 +34,30 @@ const SmeltingWorkbench: React.FC = () => {
     );
   }, [partyBuds, assignedBuds]);
 
-  const [selectedBudId, setSelectedBudId] = useState<string>("");
-  const [forceUpdate, setForceUpdate] = useState(0);
-
-  const handleAssignBud = (budId: string, recipeId: string) => {
-    if (!budId || !recipeId) return;
+  const handleAssignBud = (budId: string) => {
+    if (!budId) return;
     
+    assignBud(budId, "smithing", {
+      taskType: "workbench",
+      nodeID: 'smelting_furnace'
+    });
+    setSelectedBudId("");
+  };
+
+  const handleStartCrafting = (budId: string, recipeId: string) => {
     const isActive = isBudCraftingActive(budId);
     
     if (isActive) {
       stopBudSmithing(budId);
-      return;
+    } else {
+      updateBudRecipe(budId, recipeId);
+      startBudSmithing(budId, 'smelting_furnace', recipeId);
     }
-  
-    // First start the crafting process
-    startBudSmithing(budId, 'smelting_furnace', recipeId);
-    
-    // Then assign the bud
-    assignBud(budId, "smithing", {
-      taskType: "workbench",
-      nodeID: 'smelting_furnace',
-      recipeId: recipeId
-    });
   };
 
   const handleUnassignBud = (budId: string) => {
     stopBudSmithing(budId);
     unassignBud(budId);
-  };
-
-  const handleCraft = (recipeId: string) => {
-    if (!hasBudAssigned) {
-      activateWorkbench('smelting_furnace', recipeId);
-    }
   };
 
   const canCraftRecipe = (recipe: Recipe): boolean => {
@@ -82,15 +76,13 @@ const SmeltingWorkbench: React.FC = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Force component update by subscribing to state changes
       assignedBuds.forEach(budId => {
         const status = getBudCraftingStatus(budId);
         if (status) {
-          // This will trigger a re-render when progress changes
           setForceUpdate(prev => prev + 1);
         }
       });
-    }, 50); // Increase update frequency
+    }, 50);
 
     return () => clearInterval(interval);
   }, [assignedBuds, getBudCraftingStatus]);
@@ -141,58 +133,20 @@ const SmeltingWorkbench: React.FC = () => {
             })}
           </div>
         ) : (
-          <div>
-            <select 
-              className="select select-bordered w-full max-w-xs mb-2"
-              onChange={(e) => setSelectedBudId(e.target.value)}
-              value={selectedBudId}
-            >
-              <option value="">Assign Bud...</option>
-              {availableBuds.map(bud => (
-                <option key={bud.id} value={bud.id}>
-                  {bud.id.slice(0, 8)}... (Level {bud.level})
-                </option>
-              ))}
-            </select>
-            
-            {selectedBudId && (
-              <select
-                className="select select-bordered w-full max-w-xs mb-2"
-                onChange={(e) => {
-                  handleAssignBud(selectedBudId, e.target.value);
-                  setSelectedBudId("");
-                }}
-                value=""
-              >
-                <option value="">Select Recipe...</option>
-                {smeltingRecipes.map(recipe => (
-                  <option 
-                    key={recipe.id} 
-                    value={recipe.id}
-                    disabled={!isRecipeUnlocked(recipe.id) || !canCraftRecipe(recipe)}
-                  >
-                    {recipe.name}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
+          <select 
+            className="select select-bordered w-full max-w-xs mb-2"
+            onChange={(e) => handleAssignBud(e.target.value)}
+            value={selectedBudId}
+          >
+            <option value="">Assign Bud...</option>
+            {availableBuds.map(bud => (
+              <option key={bud.id} value={bud.id}>
+                {bud.id.slice(0, 8)}... (Level {bud.level})
+              </option>
+            ))}
+          </select>
         )}
       </div>
-
-      {/* Active Workbench Progress */}
-      {workbench.isActive && workbench.recipe && (
-        <div className="mb-4 p-4 bg-base-300 rounded">
-          <h3 className="font-semibold">Currently Smelting:</h3>
-          <p>{workbench.recipe.name}</p>
-          <div className="w-full bg-gray-600 h-2 mt-2 rounded">
-            <div 
-              className="bg-blue-500 h-full rounded"
-              style={{ width: `${(workbench.progress / workbench.recipe.craftingTime) * 100}%` }}
-            />
-          </div>
-        </div>
-      )}
 
       {/* Recipe List */}
       <div className="grid grid-cols-1 gap-4">
@@ -248,11 +202,7 @@ const SmeltingWorkbench: React.FC = () => {
                     }`}
                     onClick={() => {
                       const bud = assignedBuds[0];
-                      if (isActiveCrafting) {
-                        stopBudSmithing(bud);
-                      } else {
-                        handleAssignBud(bud, recipe.id);
-                      }
+                      handleStartCrafting(bud, recipe.id);
                     }}
                     disabled={isDisabled}
                   >

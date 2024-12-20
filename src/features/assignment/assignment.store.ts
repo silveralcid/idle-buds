@@ -31,6 +31,7 @@ export interface AssignmentState {
   // Task management
   updateTask: (budId: string, task: BudTask) => void;
   clearTask: (budId: string) => void;
+  updateBudRecipe: (budId: string, recipeId: string) => void;
 }
 
 export const useAssignmentStore = create<AssignmentState>((set, get) => ({
@@ -209,6 +210,20 @@ export const useAssignmentStore = create<AssignmentState>((set, get) => ({
           task: { taskType: null },
           startTime: Date.now()
         }
+      }
+    })),
+
+  updateBudRecipe: (budId: string, recipeId: string) => 
+    set((state) => ({
+      assignments: {
+        ...state.assignments,
+        [budId]: state.assignments[budId] ? {
+          ...state.assignments[budId],
+          task: {
+            ...state.assignments[budId].task,
+            recipeId
+          }
+        } : state.assignments[budId]
       }
     }))
 })); 
