@@ -15,6 +15,9 @@ export function processOfflineProgress(lastSaveTime: number): void {
   const lumberingStore = useLumberingStore.getState();
   const assignmentStore = useAssignmentStore.getState();
   const partyStore = usePartyStore.getState();
+  const smithingStore = useSmithingStore.getState();
+  const bankStore = useBankStore.getState();
+
   
   const { timeAwayMilliseconds } = calculateTimeAway(lastSaveTime);
   const maxOfflineTime = GameConfig.SAVE.MAX_OFFLINE_TIME;
@@ -173,8 +176,6 @@ export function processOfflineProgress(lastSaveTime: number): void {
 
   // Process Bud Smithing more efficiently
   const smithingBuds = assignmentStore.getBudsByAssignment("smithing");
-  const smithingStore = useSmithingStore.getState();
-  const bankStore = useBankStore.getState();
 
   smithingBuds.forEach(budId => {
     const assignment = assignmentStore.getBudAssignment(budId);
@@ -231,6 +232,65 @@ export function processOfflineProgress(lastSaveTime: number): void {
       console.log(`Bud ${bud.nickname || bud.name} completed ${completedCycles} smithing cycles while offline`);
     }
   });
+
+  // player smithing
+ // Process each active workbench
+ Object.entries(smithingStore.workbenches).forEach(([workbenchId, workbench]) => {
+  if (!workbench.isActive || !workbench.recipe) return;
+
+  const recipe = workbench.recipe;
+  const baseEfficiency = 1.0;
+  const efficiency = baseEfficiency;
+  
+  // Calculate how many complete crafting cycles could have occurred
+  const adjustedCraftingTime = recipe.craftingTime / efficiency;
+  const completedCycles = Math.floor(totalTimeAway / (adjustedCraftingTime / GameConfig.TICK.RATE.DEFAULT));
+  if (completedCycles > 0) {
+   // Calculate total resource requirements for all cycles
+   const totalInputs = recipe.inputs.map(input => ({
+     ...input,
+     amount: input.amount * completedCycles
+   }));
+    // Verify total resources are available
+   const hasResources = totalInputs.every(input => {
+     return input.itemIds.some(itemId => 
+       (bankStore.items[itemId] || 0) >= input.amount
+     );
+   });
+    
+
+    if (!hasResources) {
+     // If resources aren't available, deactivate the workbench
+     smithingStore.updateWorkbenchProgress(workbenchId, 0);
+     return;
+   }
+    // Consume all inputs at once
+   totalInputs.forEach(input => {
+     const availableItemId = input.itemIds.find(id => 
+       (bankStore.items[id] || 0) >= input.amount
+     );
+     if (availableItemId) {
+       bankStore.removeItem(availableItemId, input.amount);
+     }
+   });
+    // Add all outputs at once
+   recipe.outputs.forEach(output => {
+     bankStore.addItem(output.itemId, output.amount * completedCycles);
+   });
+    // Calculate and award total XP
+    const smithingXpGained = recipe.experienceGain * completedCycles;
+    updateXpAndLevel(smithingStore, smithingXpGained);
+
+    
+    console.log(`Workbench ${workbenchId} completed ${completedCycles} crafting cycles while offline`);
+ }
+});
+
+
+
+
+
+
 
   console.groupEnd();
 }
