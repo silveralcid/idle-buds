@@ -7,6 +7,7 @@ export type BudAssignment = "party" | "box" | "mining" | "smithing" | "lumbering
 export type BudTask = {
     taskType: "resourceNode" | "workbench" | null;
     nodeID?: string; // ID of the node or workbench
+    recipeId?: string;
 };
 
 export interface budInstance extends budBase {

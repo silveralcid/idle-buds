@@ -7,14 +7,13 @@ import { useBudBoxStore } from '../budbox/budbox.store';
 import { useMiningStore } from '../mining/mining.store';
 import { useSmithingStore } from '../smithing/smithing.store';
 
-interface AssignmentState {
+export interface AssignmentState {
   buds: Record<string, budInstance>;
   assignments: Record<string, {
     budId: string;
     assignment: BudAssignment;
     task: BudTask;
     startTime: number;
-    recipeId?: string;
   }>;
   
   // Core assignment actions
