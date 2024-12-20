@@ -88,6 +88,13 @@ const SmeltingWorkbench: React.FC = () => {
     return () => clearInterval(interval);
   }, [assignedBuds, getBudCraftingStatus]);
 
+  // Add player crafting controls
+  const activateWorkbench = useSmithingStore((state) => state.activateWorkbench);
+  
+  const handlePlayerCraft = (recipeId: string) => {
+    activateWorkbench('smelting_furnace', recipeId);
+  };
+
   return (
     <div className="p-4 bg-base-200 rounded-lg">
       <h2 className="text-xl font-bold mb-4">Smelting Furnace</h2>
@@ -155,13 +162,9 @@ const SmeltingWorkbench: React.FC = () => {
           const isUnlocked = isRecipeUnlocked(recipe.id);
           const hasResources = canCraftRecipe(recipe);
           const isDisabled = !isUnlocked || (!hasResources && !workbench.isActive);
-          const budAssignedToRecipe = assignedBuds.length > 0;
           
-          // Check if any assigned bud is actively crafting this recipe
-          const isActiveCrafting = assignedBuds.some(budId => {
-            const craftingStatus = getBudCraftingStatus(budId);
-            return craftingStatus?.recipeId === recipe.id;
-          });
+          // Check if workbench is active for player crafting
+          const isPlayerCrafting = workbench.isActive && workbench.recipe?.id === recipe.id;
 
           return (
             <div key={recipe.id} className={`p-4 rounded ${isUnlocked ? 'bg-base-100' : 'bg-base-300 opacity-50'}`}>
@@ -192,12 +195,13 @@ const SmeltingWorkbench: React.FC = () => {
               </div>
 
               <div className="flex gap-2 mt-4">
-                {budAssignedToRecipe && (
+                {hasBudAssigned ? (
+                  // Show Bud crafting controls
                   <button
                     className={`px-4 py-2 rounded ${
                       isDisabled 
                         ? 'bg-gray-500 cursor-not-allowed' 
-                        : isActiveCrafting
+                        : isPlayerCrafting
                           ? 'bg-red-500 hover:bg-red-600'
                           : 'bg-blue-500 hover:bg-blue-600'
                     }`}
@@ -211,10 +215,45 @@ const SmeltingWorkbench: React.FC = () => {
                       ? `Requires Level ${recipe.levelRequired}`
                       : !hasResources
                         ? 'Missing Resources'
-                        : isActiveCrafting
+                        : isPlayerCrafting
                           ? 'Stop Crafting'
                           : 'Start Crafting'}
                   </button>
+                ) : (
+                  // Show Player crafting controls
+                  <div>
+                    <button
+                      className={`px-4 py-2 rounded ${
+                        isUnlocked && (hasResources || workbench.isActive)
+                          ? 'bg-blue-500 hover:bg-blue-600'
+                          : 'bg-gray-500 cursor-not-allowed'
+                      }`}
+                      onClick={() => handlePlayerCraft(recipe.id)}
+                      disabled={!isUnlocked || (!hasResources && !workbench.isActive)}
+                    >
+                      {!isUnlocked 
+                        ? `Requires Level ${recipe.levelRequired}`
+                        : !hasResources && !workbench.isActive
+                        ? 'Missing Resources'
+                        : isPlayerCrafting
+                        ? 'Stop'
+                        : 'Start'}
+                    </button>
+                    {isPlayerCrafting && (
+                      <div className="mt-2">
+                        <p className="text-sm">Crafting: {recipe.name}</p>
+                        <div className="w-full bg-gray-600 h-2 mt-2 rounded overflow-hidden">
+                          <div 
+                            className="bg-green-500 h-full rounded transition-all duration-100 ease-linear"
+                            style={{ 
+                              width: `${(workbench.progress / recipe.craftingTime) * 100}%`,
+                              transition: 'width 100ms linear'
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
