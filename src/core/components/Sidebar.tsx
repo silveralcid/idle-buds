@@ -8,6 +8,7 @@ import { useGameStore } from "../game.store";
 import { useLumberingStore } from "../../features/lumbering/lumbering.store";
 import { useTendingStore } from "../../features/tending/tending.store";
 import PartyDisplay from '../../features/party/components/PartyDisplay';
+import EquipmentDisplay from "../../features/equipment/components/EquipmentDisplay";
 
 const Sidebar: React.FC = () => {
   // Access mining state
@@ -87,6 +88,8 @@ const Sidebar: React.FC = () => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPartyOpen, setIsPartyOpen] = useState(true);
+  const [isEquipmentOpen, setIsEquipmentOpen] = useState(false);
+  const [isBankOpen, setIsBankOpen] = useState(true);
 
   // Game control
   const { saveGame, loadGame, resetGame, pauseGame, startGame, deleteSave } = useGameStore();
@@ -191,18 +194,58 @@ const Sidebar: React.FC = () => {
             {isPartyOpen && <PartyDisplay />}
           </div>
 
-          {/* Bank Items - Scrollable Section */}
+                  {/* Bank Items - Scrollable Section */}
+                  <div className="border-b border-gray-700 pb-4">
+            <button
+              onClick={() => setIsBankOpen(!isBankOpen)}
+              className="flex items-center justify-between w-full text-md font-semibold p-2 hover:bg-gray-700 rounded"
+            >
+              <span>Bank</span>
+              <span
+                className="transform transition-transform duration-200"
+                style={{
+                  transform: isBankOpen ? "rotate(180deg)" : "rotate(0deg)",
+                }}
+              >
+                ▼
+              </span>
+            </button>
+
+            {isBankOpen && (
+              <div className="max-h-32 overflow-y-auto custom-scrollbar pr-2 mt-2">
+                <ul className="space-y-1">
+                  {Object.entries(bankItems).map(([itemId, quantity]) => (
+                    <li key={itemId} className="text-sm">
+                      {itemId}: {Math.floor(quantity)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          {/* Equipment - Scrollable Section */}
           <div className="border-b border-gray-700 pb-4">
-            <h3 className="text-md font-semibold mb-2">Bank</h3>
-            <div className="max-h-32 overflow-y-auto custom-scrollbar pr-2">
-              <ul className="space-y-1">
-                {Object.entries(bankItems).map(([itemId, quantity]) => (
-                  <li key={itemId} className="text-sm">
-                    {itemId}: {Math.floor(quantity)}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <button
+              onClick={() => setIsEquipmentOpen(!isEquipmentOpen)}
+              className="flex items-center justify-between w-full text-md font-semibold p-2 hover:bg-gray-700 rounded"
+            >
+              <span>Equipment</span>
+              <span
+                className="transform transition-transform duration-200"
+                style={{
+                  transform: isEquipmentOpen ? "rotate(180deg)" : "rotate(0deg)",
+                }}
+              >
+                ▼
+              </span>
+            </button>
+
+            {isEquipmentOpen && (
+              <div>
+                <EquipmentDisplay />
+              </div>
+            )}
           </div>
 
           {/* Skills Section */}
