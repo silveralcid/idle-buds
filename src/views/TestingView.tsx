@@ -11,6 +11,7 @@ import { lumberingItems } from "../data/items/log.data";
 import { smeltedItems } from "../data/items/smelted.data";
 import { melee } from "../data/items/melee.data";
 import { eggItems } from "../data/buds/eggItems.data";
+import { GameConfig } from "../core/constants/game-config";
 
 const LevelControls: React.FC<{
   budId: string;
@@ -106,13 +107,13 @@ const TestingView: React.FC = () => {
   const handleMaxLevel = () => {
     switch (selectedSkill) {
       case "smithing":
-        smithingStore.setLevel(99);
+        smithingStore.setLevel(GameConfig.EXPERIENCE.MAX_LEVEL);
         break;
       case "mining":
-        miningStore.setLevel(99);
+        miningStore.setLevel(GameConfig.EXPERIENCE.MAX_LEVEL);
         break;
       case "lumbering":
-        lumberingStore.setLevel(99);
+        lumberingStore.setLevel(GameConfig.EXPERIENCE.MAX_LEVEL);
         break;
     }
   };
