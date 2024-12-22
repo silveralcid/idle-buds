@@ -1,6 +1,6 @@
 ## Idle Buds - Collect, Train, & Dominate!
 
-Inspired by the charm of creature-collecting adventures and the convenience of idle progression games, *Idle Buds* combines the best of both worlds. Drawing influence from timeless RPG mechanics, we envisioned a world where strategy, resource management, and exciting battles meet the joy of nurturing and evolving unique creatures—Buds.
+In a unique mashup that combines the best of Palworld and Melvor Idle, *Idle Buds*  is inspired by the charm of creature-collecting adventures and the convenience of idle progression games. Drawing influence from timeless RPG mechanics, we envisioned a world that respected players' time and where strategy, resource management, and exciting battles meet the joy of nurturing and evolving unique creatures—*Buds*.
 
 ---
 
