@@ -3,6 +3,7 @@ import { useMiningStore } from "./mining.store";
 import { GameConfig } from "../../core/constants/game-config";
 import { useAssignmentStore } from "../assignment/assignment.store";
 import { usePartyStore } from "../party/party.store";
+import { isMaxLevel } from "../../utils/experience";
 /**
  * Start mining on a node.
  */
@@ -75,16 +76,25 @@ export const processMiningTick = (deltaTime: number): void => {
 
     // Award XP for the single resource gathered
     const xpGain = node.experienceGain;
-    const newXp = xp + xpGain;
-    setXp(newXp);
+    // Only award XP if not at max level
+    if (!isMaxLevel(level)) {
+      const newXp = xp + xpGain;
+      setXp(newXp);
 
     // Handle level-up
     const requiredXp = xpToNextLevel();
     if (newXp >= requiredXp) {
       const newLevel = level + 1;
-      setLevel(newLevel);
-      setXp(newXp - requiredXp);
+      // Double check we don't exceed max level
+      if (!isMaxLevel(newLevel)) {
+        setLevel(newLevel);
+        setXp(newXp - requiredXp);
+      } else {
+        setLevel(newLevel);
+        setXp(0); // At max level, no excess XP stored
+      }
     }
+  }
 
     // Handle depletion and regeneration
     if (updatedNode.nodeHealth <= 0) {
