@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { calculateXpToNextLevel } from "../../utils/experience";
+import { calculateXpToNextLevel, enforceMaxLevel, isMaxLevel } from "../../utils/experience";
 import { BaseSkill } from "../../types/base-skill.types";
 import { Workbench } from "../../types/workbench.types";
 import { Recipe } from "../../types/recipe.types";
@@ -193,14 +193,26 @@ export const useSmithingStore = create<SmithingState>((set, get) => ({
         });
 
         // Award full XP only on completion
+        if (isMaxLevel(state.level)) {
+          return {
+            workbenches: {
+              ...state.workbenches,
+              [workbenchId]: {
+                ...workbench,
+                progress: 0, // Reset progress but keep crafting active
+              },
+            },
+          };
+        }
+
         const newXp = state.xp + recipe.experienceGain;
         const requiredXp = state.xpToNextLevel();
 
         // Handle potential level up
         if (newXp >= requiredXp) {
-          const newLevel = state.level + 1;
+          const newLevel = enforceMaxLevel(state.level + 1);
           return {
-            xp: newXp - requiredXp,
+            xp: newLevel === state.level ? state.xp : newXp - requiredXp,
             level: newLevel,
             workbenches: {
               ...state.workbenches,
