@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { BaseSkill } from "../../types/base-skill.types";
 import { calculateXpToNextLevel } from "../../utils/experience";
 import { EggHatchData } from "../../types/egg.types";
+import { GameConfig } from "../../core/constants/game-config";
 
 interface HatchingProcess {
   eggId: string;
@@ -60,21 +61,29 @@ export const useTendingStore = create<TendingState>((set, get) => ({
   cancelHatching: () => set({ activeHatching: null }),
   
   setXp: (xp) => set((state) => {
+    // Don't process XP if already at max level
+    if (state.level >= GameConfig.EXPERIENCE.MAX_LEVEL) {
+      return { xp: 0 };
+    }
+
     const requiredXp = get().xpToNextLevel();
     
     // Handle potential level up
     if (xp >= requiredXp) {
-      const newLevel = state.level + 1;
+      const newLevel = Math.min(state.level + 1, GameConfig.EXPERIENCE.MAX_LEVEL);
       return {
         level: newLevel,
-        xp: xp - requiredXp
+        xp: newLevel === GameConfig.EXPERIENCE.MAX_LEVEL ? 0 : xp - requiredXp
       };
     }
     
     return { xp };
   }),
 
-  setLevel: (level) => set({ level }),
+  setLevel: (level) => set({ 
+    level: Math.min(level, GameConfig.EXPERIENCE.MAX_LEVEL),
+    xp: level >= GameConfig.EXPERIENCE.MAX_LEVEL ? 0 : get().xp
+  }),
   
   xpToNextLevel: () => calculateXpToNextLevel(get().level),
 

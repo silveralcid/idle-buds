@@ -3,6 +3,7 @@ import { useBankStore } from "../features/bank/bank.store";
 import { useSmithingStore } from "../features/smithing/smithing.store";
 import { useMiningStore } from "../features/mining/mining.store";
 import { useLumberingStore } from "../features/lumbering/lumbering.store";
+import { useTendingStore } from "../features/tending/tending.store";
 import { usePartyStore } from "../features/party/party.store";
 import { useBudBoxStore } from "../features/budbox/budbox.store";
 import { budInstance } from "../types/budInstance.types";
@@ -58,6 +59,7 @@ const TestingView: React.FC = () => {
   const smithingStore = useSmithingStore();
   const miningStore = useMiningStore();
   const lumberingStore = useLumberingStore();
+  const tendingStore = useTendingStore();
 
   const partyBuds = usePartyStore(state => state.buds);
   const budboxBuds = useBudBoxStore(state => state.buds);
@@ -87,6 +89,8 @@ const TestingView: React.FC = () => {
       case "lumbering":
         lumberingStore.setLevel(skillLevel);
         break;
+      case "tending":
+        tendingStore.setLevel(skillLevel);
     }
   };
 
@@ -101,6 +105,9 @@ const TestingView: React.FC = () => {
       case "lumbering":
         lumberingStore.setXp(lumberingStore.xp + xpAmount);
         break;
+      case "tending":
+        tendingStore.setXp(tendingStore.xp + xpAmount);
+        break;
     }
   };
 
@@ -114,6 +121,9 @@ const TestingView: React.FC = () => {
         break;
       case "lumbering":
         lumberingStore.setLevel(GameConfig.EXPERIENCE.MAX_LEVEL);
+        break;
+      case "tending":
+        tendingStore.setLevel(GameConfig.EXPERIENCE.MAX_LEVEL);
         break;
     }
   };
@@ -169,6 +179,7 @@ const TestingView: React.FC = () => {
             <option value="mining">Mining</option>
             <option value="smithing">Smithing</option>
             <option value="lumbering">Lumbering</option>
+            <option value="tending">Tending</option>
           </select>
           
           {/* Level Control */}
