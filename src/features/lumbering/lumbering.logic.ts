@@ -1,6 +1,7 @@
 import { TaskManager } from "../../utils/task-manager";
 import { useLumberingStore } from "./lumbering.store";
 import { useAssignmentStore } from "../assignment/assignment.store";
+import { isMaxLevel } from "../../utils/experience";
 
 /**
  * Start lumbering on a tree.
@@ -73,19 +74,25 @@ export const processLumberingTick = (deltaTime: number): void => {
 
     // Award XP for the single resource gathered
     const xpGain = tree.experienceGain;
-    const newXp = xp + xpGain;
-    setXp(newXp);
+    // Only award XP if not at max level
+    if (!isMaxLevel(level)) {
+      const newXp = xp + xpGain;
+      setXp(newXp);
 
     // Handle level-up
     const requiredXp = xpToNextLevel();
     if (newXp >= requiredXp) {
       const newLevel = level + 1;
-      setLevel(newLevel);
-      setXp(newXp - requiredXp);
-      console.group('Level Up!');
-      console.log(`Congratulations! Reached level ${newLevel}.`);
-      console.groupEnd();
+      // Double check we don't exceed max level
+      if (!isMaxLevel(newLevel)) {
+        setLevel(newLevel);
+        setXp(newXp - requiredXp);
+      } else {
+        setLevel(newLevel);
+        setXp(0); // At max level, no excess XP stored
+      }
     }
+  }
 
     // Handle depletion and regeneration
     if (updatedTree.nodeHealth <= 0) {
