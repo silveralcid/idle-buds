@@ -49,6 +49,14 @@ const Sidebar: React.FC = () => {
     setView("LumberingView");
   };
 
+  const navigateToFishing = () => {
+    setView("FishingView");
+  };
+
+  const navigateToCooking = () => {
+    setView("CookingView");
+  };
+
   const navigateToBank = () => {
     setView("BankView");
   };
@@ -252,6 +260,16 @@ const Sidebar: React.FC = () => {
             style={{ width: `${(progressTending * 100).toFixed(0)}%` }}
           ></div>
         </div>
+      </div>
+
+       {/* Fishing Section */}
+       <div className="mb-6 cursor-pointer" onClick={navigateToFishing}>
+        <h3 className="text-md font-semibold mb-2 hover:text-gray-300">Fishing</h3>
+      </div>
+
+      {/* Cooking Section */}
+      <div className="mb-6 cursor-pointer" onClick={navigateToCooking}>
+        <h3 className="text-md font-semibold mb-2 hover:text-gray-300">Cooking</h3>
       </div>
 
     </aside>

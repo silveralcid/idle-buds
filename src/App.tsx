@@ -14,6 +14,8 @@ import BudBoxView from "./views/BudBoxView";
 import TendingView from "./views/TendingView";
 import ShopView from "./views/ShopView";
 import AssignmentView from "./views/AssignmentView";
+import CookingView from "./views/CookingView";
+import FishingView from "./views/FishingView";
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
@@ -36,6 +38,10 @@ function App() {
         return <LumberingView />;
       case "TestingView":
         return <TestingView />;
+      case "FishingView":
+        return <FishingView />;
+      case "CookingView":
+        return <CookingView />;
       case "BankView":
         return <BankView />;
       case "BudBoxView":
