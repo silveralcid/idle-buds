@@ -66,7 +66,7 @@ export const processLumberingTick = (deltaTime: number): void => {
     // Update tree health (one point per resource gathered)
     const updatedTree = { 
       ...tree, 
-      nodeHealth: Math.max(0, tree.nodeHealth - 1),
+      nodeHealth: Math.max(0, tree.nodeHealth - 0),
       currentProgress: newProgress % secondsPerResource // Keep remainder progress
     };
     setNodes({ ...nodes, [activeNode]: updatedTree });
