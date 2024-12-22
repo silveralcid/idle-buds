@@ -297,15 +297,34 @@ export function processOfflineProgress(lastSaveTime: number): void {
 
 
 // Helper to update XP and handle level-ups
+
+const MAX_LEVEL = GameConfig.EXPERIENCE.MAX_LEVEL;
+
 function updateXpAndLevel(store: any, totalXpGained: number): void {
   const { xp, level } = store.getState();
+  
+  // If already at max level, don't process XP gains
+  if (level >= MAX_LEVEL) {
+    store.getState().setLevel(MAX_LEVEL);
+    store.getState().setXp(0);
+    return;
+  }
+
   const newXp = xp + totalXpGained;
   const xpToNextLevel = store.getState().xpToNextLevel();
   
   if (newXp >= xpToNextLevel) {
-    const newLevel = level + Math.floor(newXp / xpToNextLevel);
-    store.getState().setLevel(newLevel);
-    store.getState().setXp(newXp % xpToNextLevel);
+    const levelsGained = Math.floor(newXp / xpToNextLevel);
+    const newLevel = Math.min(level + levelsGained, MAX_LEVEL);
+    
+    // If we hit max level, discard remaining XP
+    if (newLevel === MAX_LEVEL) {
+      store.getState().setLevel(MAX_LEVEL);
+      store.getState().setXp(0);
+    } else {
+      store.getState().setLevel(newLevel);
+      store.getState().setXp(newXp % xpToNextLevel);
+    }
   } else {
     store.getState().setXp(newXp);
   }

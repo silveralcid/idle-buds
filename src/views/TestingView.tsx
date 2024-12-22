@@ -94,19 +94,19 @@ const TestingView: React.FC = () => {
     }
   };
 
-  const handleAddXP = () => {
+  const handleSetXP = () => {
     switch (selectedSkill) {
       case "smithing":
-        smithingStore.setXp(smithingStore.xp + xpAmount);
+        smithingStore.setXp(xpAmount);
         break;
       case "mining":
-        miningStore.setXp(miningStore.xp + xpAmount);
+        miningStore.setXp(xpAmount);
         break;
       case "lumbering":
-        lumberingStore.setXp(lumberingStore.xp + xpAmount);
+        lumberingStore.setXp(xpAmount);
         break;
       case "tending":
-        tendingStore.setXp(tendingStore.xp + xpAmount);
+        tendingStore.setXp(xpAmount);
         break;
     }
   };
@@ -220,10 +220,10 @@ const TestingView: React.FC = () => {
               min="0"
             />
             <button 
-              onClick={handleAddXP}
+              onClick={handleSetXP}
               className="w-full bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded"
             >
-              Add XP
+              Set XP
             </button>
           </div>
         </div>
