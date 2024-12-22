@@ -19,7 +19,7 @@ const {
 /**
  * Calculate experience required for a specific level
  */
-export const calculateRequiredExperience = (level: number): number => {
+export const calculateXpToNextLevel = (level: number): number => {
   if (level >= MAX_LEVEL) return 0;
   return Math.floor(BASE_XP * Math.pow(GROWTH_FACTOR, level - 1));
 };
@@ -30,7 +30,7 @@ export const calculateRequiredExperience = (level: number): number => {
 export const calculateTotalExperienceToLevel = (targetLevel: number): number => {
   let total = 0;
   for (let level = 1; level < targetLevel; level++) {
-    total += calculateRequiredExperience(level);
+    total += calculateXpToNextLevel(level);
   }
   return total;
 };
@@ -40,12 +40,12 @@ export const calculateTotalExperienceToLevel = (targetLevel: number): number => 
  */
 export const calculateLevelFromExperience = (totalXp: number): number => {
   let level = 1;
-  let xpRequired = calculateRequiredExperience(level);
+  let xpRequired = calculateXpToNextLevel(level);
   
   while (totalXp >= xpRequired && level < MAX_LEVEL) {
     totalXp -= xpRequired;
     level++;
-    xpRequired = calculateRequiredExperience(level);
+    xpRequired = calculateXpToNextLevel(level);
   }
   
   return level;
@@ -77,6 +77,6 @@ export const calculateLevelPenalty = (actorLevel: number, targetLevel: number): 
 export const isMaxLevel = (level: number): boolean => level >= MAX_LEVEL;
 export const enforceMaxLevel = (level: number): number => Math.min(level, MAX_LEVEL);
 export const getProgressToNextLevel = (currentXp: number, level: number): number => {
-  const requiredXp = calculateRequiredExperience(level);
+  const requiredXp = calculateXpToNextLevel(level);
   return requiredXp > 0 ? currentXp / requiredXp : 1;
 };
