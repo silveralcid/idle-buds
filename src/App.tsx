@@ -16,6 +16,7 @@ import ShopView from "./views/ShopView";
 import AssignmentView from "./views/AssignmentView";
 import CookingView from "./views/CookingView";
 import FishingView from "./views/FishingView";
+import CombatView from "./views/CombatView";
 
 function App() {
   const currentView = useViewStore((state) => state.currentView);
@@ -42,6 +43,8 @@ function App() {
         return <FishingView />;
       case "CookingView":
         return <CookingView />;
+      case "CombatView":
+        return <CombatView />;
       case "BankView":
         return <BankView />;
       case "BudBoxView":

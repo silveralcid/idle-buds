@@ -81,6 +81,10 @@ const Sidebar: React.FC = () => {
     setView("AssignmentView");
   };
 
+  const navigateToCombat = () => {
+    setView("CombatView");
+  };
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPartyOpen, setIsPartyOpen] = useState(true);
 
@@ -203,6 +207,13 @@ const Sidebar: React.FC = () => {
 
           {/* Skills Section */}
           <div className="space-y-4">
+
+
+            {/* Fishing */}
+            <div className="cursor-pointer hover:bg-gray-700 p-2 rounded" onClick={navigateToCombat}>
+              <h3 className="text-md font-semibold mb-1">Combat</h3>
+              
+            </div>
             {/* Mining */}
             <div className="cursor-pointer hover:bg-gray-700 p-2 rounded" onClick={navigateToMining}>
               <h3 className="text-md font-semibold mb-1">Mining</h3>
