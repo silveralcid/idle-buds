@@ -1,33 +1,82 @@
-import { skillsConfig } from "../data/skills.data";
 import { GameConfig } from "../core/constants/game-config";
 
+// Types
+export type ExperienceData = {
+  currentXp: number;
+  level: number;
+};
 
-export const calculateExperienceRequirement = (skillId: string, level: number): number => {
-    const skillConfig = skillsConfig[skillId];
-    if (!skillConfig) {
-      throw new Error(`Skill configuration not found for skillId: ${skillId}`);
-    }
-  
-    const { baseExperience, xpMultiplier } = skillConfig;
-    return Math.floor(baseExperience * Math.pow(xpMultiplier, level - 1));
-  };
-  
+// Constants
+const {
+  BASE_XP,
+  GROWTH_FACTOR,
+  MAX_LEVEL,
+  LEVEL_SCALING,
+  PENALTY_SCALING,
+  EVOLUTION_LEVELS
+} = GameConfig.EXPERIENCE;
 
-const BASE_XP = GameConfig.EXPERIENCE.BASE_XP;
-const XP_MULTIPLIER = GameConfig.EXPERIENCE.GROWTH_FACTOR;
+/**
+ * Calculate experience required for a specific level
+ */
+export const calculateRequiredExperience = (level: number): number => {
+  if (level >= MAX_LEVEL) return 0;
+  return Math.floor(BASE_XP * Math.pow(GROWTH_FACTOR, level - 1));
+};
 
-export const calculateXpToNextLevel = (level: number): number => {
-  // Return 0 if at max level to prevent further XP gains
-  if (level >= GameConfig.EXPERIENCE.MAX_LEVEL) {
-    return 0;
+/**
+ * Calculate total experience required up to a specific level
+ */
+export const calculateTotalExperienceToLevel = (targetLevel: number): number => {
+  let total = 0;
+  for (let level = 1; level < targetLevel; level++) {
+    total += calculateRequiredExperience(level);
   }
-  return Math.floor(BASE_XP * Math.pow(XP_MULTIPLIER, level - 1));
+  return total;
 };
 
-export const isMaxLevel = (level: number): boolean => {
-  return level >= GameConfig.EXPERIENCE.MAX_LEVEL;
+/**
+ * Calculate level based on total experience
+ */
+export const calculateLevelFromExperience = (totalXp: number): number => {
+  let level = 1;
+  let xpRequired = calculateRequiredExperience(level);
+  
+  while (totalXp >= xpRequired && level < MAX_LEVEL) {
+    totalXp -= xpRequired;
+    level++;
+    xpRequired = calculateRequiredExperience(level);
+  }
+  
+  return level;
 };
 
-export const enforceMaxLevel = (level: number): number => {
-  return Math.min(level, GameConfig.EXPERIENCE.MAX_LEVEL);
+/**
+ * Check if a level qualifies for evolution
+ */
+export const getEvolutionPhase = (level: number): keyof typeof EVOLUTION_LEVELS | null => {
+  if (level >= EVOLUTION_LEVELS.ASCENDED) return 'ASCENDED';
+  if (level >= EVOLUTION_LEVELS.THIRD) return 'THIRD';
+  if (level >= EVOLUTION_LEVELS.SECOND) return 'SECOND';
+  if (level >= EVOLUTION_LEVELS.FIRST) return 'FIRST';
+  return null;
+};
+
+/**
+ * Calculate experience penalty based on level difference
+ */
+export const calculateLevelPenalty = (actorLevel: number, targetLevel: number): number => {
+  const levelDiff = targetLevel - actorLevel;
+  if (levelDiff <= 0) return 1;
+  return Math.max(0, 1 - (levelDiff * PENALTY_SCALING));
+};
+
+/**
+ * Utility functions
+ */
+export const isMaxLevel = (level: number): boolean => level >= MAX_LEVEL;
+export const enforceMaxLevel = (level: number): number => Math.min(level, MAX_LEVEL);
+export const getProgressToNextLevel = (currentXp: number, level: number): number => {
+  const requiredXp = calculateRequiredExperience(level);
+  return requiredXp > 0 ? currentXp / requiredXp : 1;
 };
