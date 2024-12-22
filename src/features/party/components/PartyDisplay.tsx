@@ -22,7 +22,6 @@ const PartyDisplay: React.FC = () => {
 
   return (
     <div className="mt-6">
-      <h3 className="text-md font-semibold mb-2">Party Members</h3>
       <div className="grid grid-cols-2 gap-2">
         {partyBuds.map((bud) => (
           <div
