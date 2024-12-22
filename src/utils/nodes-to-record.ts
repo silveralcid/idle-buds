@@ -1,4 +1,4 @@
-import { ResourceNode } from "../types/resourceNode.types";
+import { ResourceNode } from "../types/resource-node.types";
 
 export const convertNodesToRecord = (nodes: ResourceNode[]): Record<string, ResourceNode> => {
   return nodes.reduce<Record<string, ResourceNode>>((acc, node) => {
