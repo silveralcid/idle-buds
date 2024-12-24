@@ -113,14 +113,34 @@ Passions are: - Aquatics (Watering, Fishing) - Kindling (Smelting, Cooking) - Ga
 
 ### Stat Matrix
 
-| Stat      | Combat Role                                                                   | Resource/Crafting Role    | Equipment Effectiveness |
-| --------- | ----------------------------------------------------------------------------- | ------------------------- | ----------------------- |
-| Health    | Survival points                                                               | Work duration\*           | Armor                   |
-| Wisdom    | Special Attack Charge speed                                                   | Craft quality             | Magic Staves            |
-| Attack    | Damage output (melee)                                                         | Resource yield per action | Melee                   |
-| Defense   | Damage reduction                                                              | ?                         | Shields                 |
-| Dexterity | Hunter - Damage output (ranged), attack speed<br><br>Bud - Basic attack speed | Activity speed            | Ranged                  |
+Definitely:
 
+Health
+Attack
+Defense
+Dexterity
+Wisdom
+
+
+1
+
+| Attributes | Combat Role                                                                   | Resource/Crafting Role    | Equipment Effectiveness |
+| ---------- | ----------------------------------------------------------------------------- | ------------------------- | ----------------------- |
+| Health     | Survival points                                                               | Work duration\*           | Armor                   |
+| Wisdom     | Special Attack Charge speed                                                   | Craft quality             | Magic Staves            |
+| Attack     | Damage output (melee)                                                         | Resource yield per action | Melee                   |
+| Defense    | Damage reduction                                                              | ?                         | Shields                 |
+| Dexterity  | Hunter - Damage output (ranged), attack speed<br><br>Bud - Basic attack speed | Activity speed            | Ranged                  |
+
+2
+
+| Attribute     | Combat Role                         | Resource/Crafting Role                         | Equipment Effectiveness        |
+| ------------- | ----------------------------------- | ---------------------------------------------- | ------------------------------ |
+| **Vitality**  | Health and survival                 | -                                              | Armor resistance               |
+| **Cunning**   | Critical hit chance and evasion     | Craft quality                                  | Advanced tools and traps       |
+| **Strength**  | Melee damage                        | Resource yield (strength-based)                | Heavy weapons and shields      |
+| **Dexterity** | Ranged damage, speed                | Activity speed (e.g., woodcutting)             | Precision tools, light weapons |
+| **Wisdom**    | Magic and special attack efficiency | Knowledge-based crafting (alchemy, enchanting) | Spellcasting equipment         |
 ### Intrinsic Values
 
 - 0-100 range for normal buds
