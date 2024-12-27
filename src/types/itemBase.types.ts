@@ -1,4 +1,6 @@
 import { ItemType } from "../enums/itemType.enums";
+import { TierType } from "../enums/tierType.enums";
+import { RarityType } from "../enums/rarityType.enums";
 
 export interface BaseItem {
     // Identification
@@ -6,11 +8,11 @@ export interface BaseItem {
     variantId?: string; // Optional identifier for item variants (e.g., "iron_sword+1")
     name: string; // Display name of the item
     type: ItemType; // Core category of the item (see below)
-    tier?: number; // Tier of the item
+    tier?: TierType; // Tier of the item
   
     // General Properties
     description?: string; // Optional description for lore or context
-    rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // Rarity tier
+    rarity: RarityType; // Rarity tier
     value: number; // Base value for trading or selling
   
     // Stackable Items

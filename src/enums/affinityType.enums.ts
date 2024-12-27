@@ -1,0 +1,1 @@
+export type AffinityType = 'fire' | 'water' | 'ground' | 'electric' | 'grass' | 'ice' | 'dragon' | 'dark' | 'neutral';

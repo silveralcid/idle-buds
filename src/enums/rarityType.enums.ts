@@ -1,0 +1,1 @@
+export type RarityType = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
