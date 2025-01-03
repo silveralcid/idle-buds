@@ -8,6 +8,7 @@ import { smeltedItems } from "../data/items/smelted.data";
 import { armor } from "../data/items/armor.data";
 import { melee } from "../data/items/melee.data";
 import { equipmentItem } from "../types/equipment.types";
+import { foodItems } from "../data/items/food.data";
 
 const BankView: React.FC = () => {
   const items = useBankStore((state) => state.items);
@@ -16,7 +17,7 @@ const BankView: React.FC = () => {
   const equipItem = useEquipmentStore((state) => state.equipItem);
   const [deleteAmounts, setDeleteAmounts] = useState<Record<string, number>>({});
 
-  const allItems = [...currencyItems, ...miningItems, ...lumberingItems, ...smeltedItems, ...armor, ...melee];
+  const allItems = [...currencyItems, ...miningItems, ...lumberingItems, ...smeltedItems, ...armor, ...melee, ...foodItems];
   
   const isEquippable = (itemId: string): equipmentItem | undefined => {
     return [...armor, ...melee].find(item => item.id === itemId);

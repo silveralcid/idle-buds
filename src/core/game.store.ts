@@ -185,9 +185,8 @@ interface GameActions {
       
 
         useShopStore.setState({
-            items: [],
-            purchaseItem: () => false,
-            sellItem: () => {},
+            purchaseItem: (itemId: string, quantity: number) => false,
+            sellItem: (itemId: string, quantity: number) => {},
         });
       
         useTendingStore.setState({

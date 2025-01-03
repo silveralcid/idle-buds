@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useShopStore } from '../features/shop/shop.store';
 import { useBankStore } from '../features/bank/bank.store';
-import { canAffordItem, getItemSellPrice } from '../features/shop/shop.logic';
+import { canAffordItem, getItemBuyPrice } from '../features/shop/shop.logic';
+import { foodItems } from '../data/items/food.data';
+import { lumberingItems } from '../data/items/log.data';
+import { miningItems } from '../data/items/ore.data';
 
 const ShopView: React.FC = () => {
-  const shopItems = useShopStore(state => state.items);
-  const { purchaseItem, sellItem } = useShopStore();
   const bankItems = useBankStore(state => state.items);
+  const { purchaseItem, sellItem } = useShopStore();
   const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
+
+  const shopItems = useMemo(() => [
+    ...foodItems,
+    ...lumberingItems,
+    ...miningItems
+  ], []);
 
   return (
     <div className="p-4">
@@ -25,32 +33,40 @@ const ShopView: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {shopItems.map(item => (
-          <div key={item.id} className="border p-4 rounded-lg bg-base-200">
-            <h3 className="font-bold text-lg">{item.name}</h3>
-            <p className="text-sm opacity-75">{item.description}</p>
-            <p className="mt-2">Price: {item.price} gold</p>
-            <p className="mb-2">Owned: {bankItems[item.id] || 0}</p>
-            
-            <div className="flex gap-2">
-              <button
-                onClick={() => purchaseItem(item.id, selectedQuantity)}
-                disabled={!canAffordItem(item.id, selectedQuantity)}
-                className="btn btn-primary btn-sm"
-              >
-                Buy {selectedQuantity}
-              </button>
+        {shopItems.map(item => {
+          const buyPrice = getItemBuyPrice(item.id);
+          const sellPrice = item.value;
+          
+          return (
+            <div key={item.id} className="border p-4 rounded-lg bg-base-200">
+              <h3 className="font-bold text-lg">{item.name}</h3>
+              <p className="text-sm opacity-75">{item.description}</p>
+              <div className="mt-2">
+                <p>Buy Price: {buyPrice} gold</p>
+                <p>Sell Price: {sellPrice} gold</p>
+              </div>
+              <p className="mb-2">Owned: {bankItems[item.id] || 0}</p>
               
-              <button
-                onClick={() => sellItem(item.id, selectedQuantity)}
-                disabled={!bankItems[item.id] || bankItems[item.id] < selectedQuantity}
-                className="btn btn-secondary btn-sm"
-              >
-                Sell {selectedQuantity}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => purchaseItem(item.id, selectedQuantity)}
+                  disabled={!canAffordItem(item.id, selectedQuantity)}
+                  className="btn btn-primary btn-sm"
+                >
+                  Buy {selectedQuantity}
+                </button>
+                
+                <button
+                  onClick={() => sellItem(item.id, selectedQuantity)}
+                  disabled={!bankItems[item.id] || bankItems[item.id] < selectedQuantity}
+                  className="btn btn-secondary btn-sm"
+                >
+                  Sell {selectedQuantity}
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

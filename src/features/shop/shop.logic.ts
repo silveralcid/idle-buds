@@ -1,23 +1,21 @@
-import { useShopStore } from './shop.store';
 import { useBankStore } from '../bank/bank.store';
+import { getItemById } from '../../data/item-registry';
+
+export const getItemBuyPrice = (itemId: string): number => {
+  const item = getItemById(itemId);
+  return item ? item.value * 2 : 0;
+};
 
 export const canAffordItem = (itemId: string, quantity: number = 1): boolean => {
-  const shopStore = useShopStore.getState();
   const bankStore = useBankStore.getState();
-  
-  const item = shopStore.items.find(i => i.id === itemId);
-  if (!item) return false;
-  
-  const totalCost = item.price * quantity;
+  const buyPrice = getItemBuyPrice(itemId);
+  const totalCost = buyPrice * quantity;
   const currentGold = bankStore.items['gold_coin'] || 0;
   
   return currentGold >= totalCost;
 };
 
 export const getItemSellPrice = (itemId: string): number => {
-  const shopStore = useShopStore.getState();
-  const item = shopStore.items.find(i => i.id === itemId);
-  
-  if (!item) return 0;
-  return Math.floor(item.price * 0.5); // 50% of buy price
-};
+  const item = getItemById(itemId);
+  return item ? item.value : 0;
+};  
