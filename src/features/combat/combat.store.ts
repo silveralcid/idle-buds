@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import { BaseSkill } from "../../types/base-skill.types";
 import { calculateXpToNextLevel } from "../../utils/experience";
+import { useEquipmentStore } from "../equipment/equipment.store";
 
 export interface CombatStats {
-  health: number;
-  currentHealth: number;
+  health: number;      // Base health attribute
   intelligence: number;
   attack: number;
   defense: number;
@@ -14,6 +14,8 @@ export interface CombatStats {
 interface CombatState extends BaseSkill {
   // Combat specific stats
   stats: CombatStats;
+  currentHealth: number;  // Active health tracking
+  maxHealth: number;     // Calculated max health (base + equipment)
   availableAttributePoints: number;
   totalAttributePoints: number;
 
@@ -32,6 +34,12 @@ interface CombatState extends BaseSkill {
 
   // Add this new method
   addAvailablePoints: (amount: number) => void;
+
+  // Add health management methods
+  healPlayer: (amount: number) => void;
+  damagePlayer: (amount: number) => void;
+  restoreFullHealth: () => void;
+  isDead: () => boolean;
 }
 
 export const useCombatStore = create<CombatState>((set, get) => ({
@@ -48,12 +56,13 @@ export const useCombatStore = create<CombatState>((set, get) => ({
   // Combat specific state
   stats: {
     health: 10,      // Base stats
-    currentHealth: 10,
     intelligence: 5,
     attack: 5,
     defense: 5,
     dexterity: 5,
   },
+  currentHealth: 10,
+  maxHealth: 10,
   availableAttributePoints: 0,
   totalAttributePoints: 0,
 
@@ -89,11 +98,27 @@ export const useCombatStore = create<CombatState>((set, get) => ({
   addAttributePoint: (stat: keyof CombatStats) => set((state) => {
     if (state.availableAttributePoints <= 0) return state;
 
+    const newStats = {
+      ...state.stats,
+      [stat]: state.stats[stat] + 1
+    };
+
+    // If increasing health, recalculate maxHealth and heal to full
+    if (stat === 'health') {
+      const equipmentStore = useEquipmentStore.getState();
+      const equipmentHealth = equipmentStore.getTotalStats().health;
+      const newMaxHealth = newStats.health + equipmentHealth;
+
+      return {
+        stats: newStats,
+        maxHealth: newMaxHealth,
+        currentHealth: newMaxHealth,
+        availableAttributePoints: state.availableAttributePoints - 1
+      };
+    }
+
     return {
-      stats: {
-        ...state.stats,
-        [stat]: state.stats[stat] + 1
-      },
+      stats: newStats,
       availableAttributePoints: state.availableAttributePoints - 1
     };
   }),
@@ -116,7 +141,6 @@ export const useCombatStore = create<CombatState>((set, get) => ({
   resetAttributePoints: () => set((state) => ({
     stats: {
       health: 10,
-      currentHealth: 10,
       intelligence: 5,
       attack: 5,
       defense: 5,
@@ -133,7 +157,6 @@ export const useCombatStore = create<CombatState>((set, get) => ({
     progress: 0,
     stats: {
       health: 10,
-      currentHealth: 10,
       intelligence: 5,
       attack: 5,
       defense: 5,
@@ -148,4 +171,24 @@ export const useCombatStore = create<CombatState>((set, get) => ({
     availableAttributePoints: state.availableAttributePoints + amount,
     totalAttributePoints: state.totalAttributePoints + amount
   })),
+
+  healPlayer: (amount: number) => set((state) => ({
+    currentHealth: Math.min(
+      state.maxHealth,
+      state.currentHealth + amount
+    )
+  })),
+
+  damagePlayer: (amount: number) => set((state) => ({
+    currentHealth: Math.max(0, state.currentHealth - amount)
+  })),
+
+  restoreFullHealth: () => set((state) => ({
+    currentHealth: state.maxHealth
+  })),
+
+  isDead: () => {
+    const state = get();
+    return state.currentHealth <= 0;
+  },
 }));

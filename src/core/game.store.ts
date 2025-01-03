@@ -257,7 +257,6 @@ interface GameActions {
           unlockRequirements: undefined,
           stats: {
             health: 10,
-            currentHealth: 10,
             intelligence: 5,
             attack: 5,
             defense: 5,
