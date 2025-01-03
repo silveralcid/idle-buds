@@ -322,6 +322,7 @@ const TestingView: React.FC = () => {
                   <th>XP</th>
                   <th>Affinity</th>
                   <th>Gender</th>
+                  <th>Combat Stats</th>
                 </tr>
               </thead>
               <tbody>
@@ -338,6 +339,15 @@ const TestingView: React.FC = () => {
                     <td>{bud.experience}/{bud.experienceToNextLevel}</td>
                     <td>{bud.primaryAffinity}</td>
                     <td>{bud.gender}</td>
+                    <td>
+                      <div className="text-xs">
+                        HP: {bud.combatStats.health}<br/>
+                        INT: {bud.combatStats.intelligence}<br/>
+                        ATK: {bud.combatStats.attack}<br/>
+                        DEF: {bud.combatStats.defense}<br/>
+                        DEX: {bud.combatStats.dexterity}
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -402,6 +412,18 @@ const TestingView: React.FC = () => {
                   <tr>
                     <td className="font-bold">Allowed Tasks</td>
                     <td>{selectedBud.allowedTasks.join(", ")}</td>
+                  </tr>
+                  <tr>
+                    <td className="font-bold">Combat Stats</td>
+                    <td>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>HP: {selectedBud.combatStats.health}</div>
+                        <div>INT: {selectedBud.combatStats.intelligence}</div>
+                        <div>ATK: {selectedBud.combatStats.attack}</div>
+                        <div>DEF: {selectedBud.combatStats.defense}</div>
+                        <div>DEX: {selectedBud.combatStats.dexterity}</div>
+                      </div>
+                    </td>
                   </tr>
                 </tbody>
               </table>
