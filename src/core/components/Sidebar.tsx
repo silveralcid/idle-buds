@@ -7,6 +7,7 @@ import { useViewStore } from "../view.store";
 import { useGameStore } from "../game.store";
 import { useLumberingStore } from "../../features/lumbering/lumbering.store";
 import { useTendingStore } from "../../features/tending/tending.store";
+import { useCombatStore } from "../../features/combat/combat.store";
 import PartyDisplay from '../../features/party/components/PartyDisplay';
 import EquipmentDisplay from "../../features/equipment/components/EquipmentDisplay";
 
@@ -34,6 +35,28 @@ const Sidebar: React.FC = () => {
 
   // Access bank items
   const bankItems = useBankStore((state) => state.items);
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isPartyOpen, setIsPartyOpen] = useState(true);
+  const [isEquipmentOpen, setIsEquipmentOpen] = useState(false);
+  const [isBankOpen, setIsBankOpen] = useState(true);
+
+  // Game control
+  const { saveGame, loadGame, resetGame, pauseGame, startGame, deleteSave } = useGameStore();
+
+  // Access tending state
+  const xpTending = useTendingStore((state) => state.xp);
+  const levelTending = useTendingStore((state) => state.level);
+  const xpToNextLevelTending = useTendingStore((state) => state.xpToNextLevel());
+
+  const progressTending = xpToNextLevelTending > 0 ? xpTending / xpToNextLevelTending : 0;
+
+  // Access combat state
+  const xpCombat = useCombatStore((state) => state.xp);
+  const levelCombat = useCombatStore((state) => state.level);
+  const xpToNextLevelCombat = useCombatStore((state) => state.xpToNextLevel());
+
+  const progressCombat = xpToNextLevelCombat > 0 ? xpCombat / xpToNextLevelCombat : 0;
 
   // View navigation
   const setView = useViewStore((state) => state.setView);
@@ -86,20 +109,7 @@ const Sidebar: React.FC = () => {
     setView("CombatView");
   };
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isPartyOpen, setIsPartyOpen] = useState(true);
-  const [isEquipmentOpen, setIsEquipmentOpen] = useState(false);
-  const [isBankOpen, setIsBankOpen] = useState(true);
-
-  // Game control
-  const { saveGame, loadGame, resetGame, pauseGame, startGame, deleteSave } = useGameStore();
-
-  // Access tending state
-  const xpTending = useTendingStore((state) => state.xp);
-  const levelTending = useTendingStore((state) => state.level);
-  const xpToNextLevelTending = useTendingStore((state) => state.xpToNextLevel());
-
-  const progressTending = xpToNextLevelTending > 0 ? xpTending / xpToNextLevelTending : 0;
+ 
 
   return (
     <aside className="w-64 bg-gray-800 text-white h-screen flex flex-col">
@@ -252,10 +262,18 @@ const Sidebar: React.FC = () => {
           <div className="space-y-4">
 
 
-            {/* Fishing */}
+            {/* Combat */}
             <div className="cursor-pointer hover:bg-gray-700 p-2 rounded" onClick={navigateToCombat}>
               <h3 className="text-md font-semibold mb-1">Combat</h3>
-              
+              <p className="text-sm">
+                Level: {levelCombat} | XP: {xpCombat.toFixed(0)}/{xpToNextLevelCombat.toFixed(0)}
+              </p>
+              <div className="h-1.5 bg-gray-600 rounded mt-1">
+                <div
+                  className="h-full bg-red-500 rounded"
+                  style={{ width: `${(progressCombat * 100).toFixed(0)}%` }}
+                ></div>
+              </div>
             </div>
             {/* Mining */}
             <div className="cursor-pointer hover:bg-gray-700 p-2 rounded" onClick={navigateToMining}>
