@@ -10,6 +10,7 @@ import { budInstance } from "../types/budInstance.types";
 import { miningItems } from "../data/items/ore.data";
 import { lumberingItems } from "../data/items/log.data";
 import { smeltedItems } from "../data/items/smelted.data";
+import {armor} from  "../data/items/armor.data";
 import { melee } from "../data/items/melee.data";
 import { eggItems } from "../data/buds/eggItems.data";
 import { GameConfig } from "../core/constants/game-config";
@@ -73,7 +74,7 @@ const TestingView: React.FC = () => {
     budboxBuds[selectedBudId], [selectedBudId, budboxBuds]
   );
 
-  const allItems = [...miningItems, ...lumberingItems, ...smeltedItems, ...melee, ...eggItems];
+  const allItems = [...miningItems, ...lumberingItems, ...smeltedItems, ...melee, ...eggItems, ...armor];
 
   const handleAddItem = () => {
     if (selectedItem && itemAmount > 0) {
