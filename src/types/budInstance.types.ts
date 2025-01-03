@@ -40,4 +40,13 @@ export interface budInstance extends budBase {
     //   combat: number;
     //   mysticism: number;
     // };
+
+      // Add current combat stats
+    combatStats: {
+    health: number;
+    intelligence: number;
+    attack: number;
+    defense: number;
+    dexterity: number;
+  };
   }

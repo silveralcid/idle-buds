@@ -19,4 +19,18 @@ export interface budBase {
   // };
   // primaryPassive: string;
   // secondaryPassive: string;
+  baseStats: {
+    health: number;
+    intelligence: number;
+    attack: number;
+    defense: number;
+    dexterity: number;
+  };
+  statsPerLevel: {
+    health: number;
+    intelligence: number;
+    attack: number;
+    defense: number;
+    dexterity: number;
+  };
 }
