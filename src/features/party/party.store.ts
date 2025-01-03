@@ -15,6 +15,9 @@ interface PartyState {
   getPartySize: () => number;
   MAX_PARTY_SIZE: number;
   adjustBudLevel: (budId: string, newLevel: number) => void;
+  healBud: (budId: string, amount: number) => void;
+  damageBud: (budId: string, amount: number) => void;
+  restoreAllBudsHealth: () => void;
 }
 
 export const usePartyStore = create<PartyState>((set, get) => ({
@@ -77,14 +80,61 @@ export const usePartyStore = create<PartyState>((set, get) => ({
       const bud = state.buds[budId];
       if (!bud) return state;
 
+      const clampedLevel = Math.min(Math.max(1, newLevel), 100);
+      const newMaxHealth = bud.baseStats.health + (bud.statsPerLevel.health * (clampedLevel - 1));
+
       return {
         buds: {
           ...state.buds,
           [budId]: {
             ...bud,
-            level: Math.min(Math.max(1, newLevel), 100)
+            level: clampedLevel,
+            maxHealth: newMaxHealth,
+            currentHealth: newMaxHealth // Optionally heal to full when leveling
           }
         }
       };
     }),
+
+  healBud: (budId: string, amount: number) =>
+    set((state) => {
+      const bud = state.buds[budId];
+      if (!bud) return state;
+
+      return {
+        buds: {
+          ...state.buds,
+          [budId]: {
+            ...bud,
+            currentHealth: Math.min(bud.maxHealth, bud.currentHealth + amount)
+          }
+        }
+      };
+    }),
+
+  damageBud: (budId: string, amount: number) =>
+    set((state) => {
+      const bud = state.buds[budId];
+      if (!bud) return state;
+
+      return {
+        buds: {
+          ...state.buds,
+          [budId]: {
+            ...bud,
+            currentHealth: Math.max(0, bud.currentHealth - amount)
+          }
+        }
+      };
+    }),
+
+  restoreAllBudsHealth: () =>
+    set((state) => ({
+      buds: Object.fromEntries(
+        Object.entries(state.buds).map(([id, bud]) => [
+          id,
+          { ...bud, currentHealth: bud.maxHealth }
+        ])
+      )
+    })),
 }));

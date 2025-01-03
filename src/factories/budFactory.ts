@@ -12,6 +12,8 @@ export function createBudInstance(base: budBase): budInstance {
     dexterity: base.baseStats.dexterity,
   };
 
+  const maxHealth = base.baseStats.health;
+
   const bud = {
     ...base,
     id: uuidv4(),
@@ -20,6 +22,8 @@ export function createBudInstance(base: budBase): budInstance {
     experienceToNextLevel: 100,
     gender: Math.random() > 0.5 ? 'male' : 'female' as 'male' | 'female' | 'none',
     combatStats,
+    currentHealth: maxHealth,
+    maxHealth,
   };
 
   console.log('Created Bud:', bud);

@@ -49,4 +49,8 @@ export interface budInstance extends budBase {
     defense: number;
     dexterity: number;
   };
-  }
+
+  // Add currentHealth tracking
+  currentHealth: number;
+  maxHealth: number;
+}
