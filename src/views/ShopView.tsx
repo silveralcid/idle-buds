@@ -17,6 +17,13 @@ const ShopView: React.FC = () => {
     ...miningItems
   ], []);
 
+  const handleSellAll = (itemId: string) => {
+    const quantity = bankItems[itemId] || 0;
+    if (quantity > 0) {
+      sellItem(itemId, quantity);
+    }
+  };
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Shop</h1>
@@ -36,6 +43,7 @@ const ShopView: React.FC = () => {
         {shopItems.map(item => {
           const buyPrice = getItemBuyPrice(item.id);
           const sellPrice = item.value;
+          const ownedQuantity = bankItems[item.id] || 0;
           
           return (
             <div key={item.id} className="border p-4 rounded-lg bg-base-200">
@@ -45,9 +53,9 @@ const ShopView: React.FC = () => {
                 <p>Buy Price: {buyPrice} gold</p>
                 <p>Sell Price: {sellPrice} gold</p>
               </div>
-              <p className="mb-2">Owned: {bankItems[item.id] || 0}</p>
+              <p className="mb-2">Owned: {ownedQuantity}</p>
               
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => purchaseItem(item.id, selectedQuantity)}
                   disabled={!canAffordItem(item.id, selectedQuantity)}
@@ -62,6 +70,14 @@ const ShopView: React.FC = () => {
                   className="btn btn-secondary btn-sm"
                 >
                   Sell {selectedQuantity}
+                </button>
+
+                <button
+                  onClick={() => handleSellAll(item.id)}
+                  disabled={ownedQuantity === 0}
+                  className="btn btn-accent btn-sm"
+                >
+                  Sell All ({ownedQuantity})
                 </button>
               </div>
             </div>
