@@ -19,7 +19,11 @@ export const EquipmentDisplay: React.FC = () => {
         {item ? (
           <div className="text-center">
             <div className="text-xs font-bold">{item.name}</div>
-            <div className="text-xs opacity-75">{label}</div>
+            {item.type === 'consumable' && item.quantity ? (
+              <div className="text-xs opacity-75">x{item.quantity}</div>
+            ) : (
+              <div className="text-xs opacity-75">{label}</div>
+            )}
           </div>
         ) : (
           <div className="text-xs opacity-50">{label}</div>
@@ -39,6 +43,7 @@ export const EquipmentDisplay: React.FC = () => {
         {renderSlot('1h-weapon', 'Weapon')}
         {renderSlot('shield', 'Shield')}
         {renderSlot('feet', 'Feet')}
+        {renderSlot('food', 'Food')}
       </div>
 
       <div className="mt-4 text-sm">

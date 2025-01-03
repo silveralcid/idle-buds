@@ -52,4 +52,11 @@ export interface equipmentItem extends BaseItem {
         magicDefense?: [number];
         damageReduction?: [number];
     }
+
+    // Add food-specific properties
+    consumableStats?: {
+        healAmount?: number;
+        duration?: number;
+        cooldown?: number;
+    };
 }

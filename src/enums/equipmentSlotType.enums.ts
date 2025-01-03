@@ -1,1 +1,1 @@
-export type SlotType = 'head' | 'body' | 'legs' | 'feet' | 'hands' | '1h-weapon' | '2h-weapon' | 'shield';
+export type SlotType = 'head' | 'body' | 'legs' | 'feet' | 'hands' | '1h-weapon' | '2h-weapon' | 'shield' | 'food';

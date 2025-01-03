@@ -9,6 +9,7 @@ import { armor } from "../data/items/armor.data";
 import { melee } from "../data/items/melee.data";
 import { equipmentItem } from "../types/equipment.types";
 import { foodItems } from "../data/items/food.data";
+import { ConsumableItem } from "../types/consumable.types";
 
 const BankView: React.FC = () => {
   const items = useBankStore((state) => state.items);
@@ -20,12 +21,19 @@ const BankView: React.FC = () => {
   const allItems = [...currencyItems, ...miningItems, ...lumberingItems, ...smeltedItems, ...armor, ...melee, ...foodItems];
   
   const isEquippable = (itemId: string): equipmentItem | undefined => {
-    return [...armor, ...melee].find(item => item.id === itemId);
+    return [...armor, ...melee, ...foodItems].find(item => item.id === itemId);
   };
 
   const handleEquip = (itemId: string) => {
-    const equipmentItem = isEquippable(itemId);
-    if (equipmentItem) {
+    const item = allItems.find(item => item.id === itemId);
+    if (!item) return;
+
+    if (item.type === 'consumable') {
+      const consumableItem = item as ConsumableItem;
+      const quantity = items[itemId] || 0;
+      equipItem(consumableItem, quantity);
+    } else if (item.type === 'equipment') {
+      const equipmentItem = item as equipmentItem;
       equipItem(equipmentItem);
     }
   };
