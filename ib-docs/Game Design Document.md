@@ -113,13 +113,13 @@ Passions are: - Aquatics (Watering, Fishing) - Kindling (Smelting, Cooking) - Ga
 
 ### Stat Matrix
 
-| Stat      | Combat Role                                                                   | Resource/Crafting Role    | Equipment Effectiveness |
-| --------- | ----------------------------------------------------------------------------- | ------------------------- | ----------------------- |
-| Health    | Survival points                                                               | Work duration\*           | Armor                   |
-| Wisdom    | Special Attack Charge speed                                                   | Craft quality             | Magic Staves            |
-| Attack    | Damage output (melee)                                                         | Resource yield per action | Melee                   |
-| Defense   | Damage reduction                                                              | ?                         | Shields                 |
-| Dexterity | Hunter - Damage output (ranged), attack speed<br><br>Bud - Basic attack speed | Activity speed            | Ranged                  |
+| Stat         | Combat Role                                                                   | Resource/Crafting Role    | Equipment Effectiveness |
+| ------------ | ----------------------------------------------------------------------------- | ------------------------- | ----------------------- |
+| Health       | Survival points                                                               | Work duration\*           | Armor                   |
+| Intelligence | Special Attack Charge speed                                                   | Craft quality             | Magic Staves            |
+| Attack       | Damage output (melee)                                                         | Resource yield per action | Melee                   |
+| Defense      | Damage reduction                                                              | ?                         | Shields                 |
+| Dexterity    | Hunter - Damage output (ranged), attack speed<br><br>Bud - Basic attack speed | Activity speed            | Ranged                  |
 
 ### Intrinsic Values
 
