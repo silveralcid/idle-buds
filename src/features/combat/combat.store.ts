@@ -4,6 +4,7 @@ import { calculateXpToNextLevel } from "../../utils/experience";
 
 export interface CombatStats {
   health: number;
+  currentHealth: number;
   intelligence: number;
   attack: number;
   defense: number;
@@ -47,6 +48,7 @@ export const useCombatStore = create<CombatState>((set, get) => ({
   // Combat specific state
   stats: {
     health: 10,      // Base stats
+    currentHealth: 10,
     intelligence: 5,
     attack: 5,
     defense: 5,
@@ -114,6 +116,7 @@ export const useCombatStore = create<CombatState>((set, get) => ({
   resetAttributePoints: () => set((state) => ({
     stats: {
       health: 10,
+      currentHealth: 10,
       intelligence: 5,
       attack: 5,
       defense: 5,
@@ -130,6 +133,7 @@ export const useCombatStore = create<CombatState>((set, get) => ({
     progress: 0,
     stats: {
       health: 10,
+      currentHealth: 10,
       intelligence: 5,
       attack: 5,
       defense: 5,
