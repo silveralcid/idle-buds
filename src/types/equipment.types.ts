@@ -41,15 +41,15 @@ export interface equipmentItem extends BaseItem {
     // Combat specific ranges
     statRanges?: {
         // Offensive Stats
-        attackInterval?: [number, number];
+        attackInterval?: [number];
         meleeDamage?: [number, number];
         rangedDamage?: [number, number];
         magicDamage?: [number, number];
 
         // Defensive Stats
-        meleeDefense?: [number, number];
-        rangedDefense?: [number, number];
-        magicDefense?: [number, number];
-        damageReduction?: [number, number];
+        meleeDefense?: [number];
+        rangedDefense?: [number];
+        magicDefense?: [number];
+        damageReduction?: [number];
     }
 }

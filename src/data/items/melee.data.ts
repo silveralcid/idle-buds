@@ -30,7 +30,7 @@ export const melee: equipmentItem[] = [
     },
 
     statRanges: {
-      attackInterval: [1.8, 2.2],
+      attackInterval: [2.0],
       meleeDamage: [2, 4]
     }
   },
@@ -62,7 +62,7 @@ export const melee: equipmentItem[] = [
     },
 
     statRanges: {
-      attackInterval: [1.8, 2.2],
+      attackInterval: [2.0],
       meleeDamage: [2, 4]
     }
   },
@@ -94,7 +94,7 @@ export const melee: equipmentItem[] = [
     },
 
     statRanges: {
-      attackInterval: [1.7, 2.1],
+      attackInterval: [1.9],
       meleeDamage: [4, 7]
     }
   },
@@ -127,7 +127,7 @@ export const melee: equipmentItem[] = [
     },
 
     statRanges: {
-      attackInterval: [1.6, 2],
+      attackInterval: [1.8],
       meleeDamage: [6, 10]
     }
   },
@@ -160,7 +160,7 @@ export const melee: equipmentItem[] = [
     },
 
     statRanges: {
-      attackInterval: [1.5, 1.9],
+      attackInterval: [1.7],
       meleeDamage: [8, 14]
     }
   },
@@ -193,7 +193,7 @@ export const melee: equipmentItem[] = [
     },
 
     statRanges: {
-      attackInterval: [1.4, 1.8],
+      attackInterval: [1.6],
       meleeDamage: [10, 18]
     }
   },
@@ -226,7 +226,7 @@ export const melee: equipmentItem[] = [
     },
 
     statRanges: {
-      attackInterval: [1.3, 1.7],
+      attackInterval: [1.5],
       meleeDamage: [12, 22]
     }
   }
