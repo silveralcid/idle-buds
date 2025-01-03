@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { BaseSkill } from "../../types/base-skill.types";
 import { calculateXpToNextLevel } from "../../utils/experience";
 
-interface CombatStats {
+export interface CombatStats {
   health: number;
   intelligence: number;
   attack: number;
@@ -28,6 +28,9 @@ interface CombatState extends BaseSkill {
   // Utility methods
   xpToNextLevel: () => number;
   reset: () => void;
+
+  // Add this new method
+  addAvailablePoints: (amount: number) => void;
 }
 
 export const useCombatStore = create<CombatState>((set, get) => ({
@@ -134,5 +137,11 @@ export const useCombatStore = create<CombatState>((set, get) => ({
     },
     availableAttributePoints: 0,
     totalAttributePoints: 0
-  }))
+  })),
+
+  // Add this new method
+  addAvailablePoints: (amount: number) => set((state) => ({
+    availableAttributePoints: state.availableAttributePoints + amount,
+    totalAttributePoints: state.totalAttributePoints + amount
+  })),
 }));

@@ -14,6 +14,7 @@ import { melee } from "../data/items/melee.data";
 import { eggItems } from "../data/buds/eggItems.data";
 import { GameConfig } from "../core/constants/game-config";
 import { useCombatStore } from "../features/combat/combat.store";
+import { CombatStats } from "../features/combat/combat.store";
 
 const LevelControls: React.FC<{
   budId: string;
@@ -237,6 +238,72 @@ const TestingView: React.FC = () => {
             >
               Set XP
             </button>
+          </div>
+        </div>
+
+        {/* Combat Stats Management */}
+        <div className="p-4 bg-gray-200 rounded">
+          <h2 className="font-semibold mb-2">Combat Stats Management</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {/* Combat Stats */}
+            <div>
+              {(['health', 'intelligence', 'attack', 'defense', 'dexterity'] as (keyof CombatStats)[]).map((stat) => (
+                <div key={stat} className="flex items-center gap-2 mb-2">
+                  <span className="capitalize w-24">{stat}:</span>
+                  <span className="w-12">{combatStore.stats[stat]}</span>
+                  <button
+                    onClick={() => combatStore.removeAttributePoint(stat)}
+                    className="btn btn-xs btn-circle"
+                    disabled={combatStore.stats[stat] <= (stat === 'health' ? 10 : 5)}
+                  >
+                    -
+                  </button>
+                  <button
+                    onClick={() => combatStore.addAttributePoint(stat)}
+                    className="btn btn-xs btn-circle"
+                    disabled={combatStore.availableAttributePoints <= 0}
+                  >
+                    +
+                  </button>
+                </div>
+              ))}
+            </div>
+            
+            {/* Points Display and Reset */}
+            <div className="flex flex-col gap-2">
+              <div>Available Points: {combatStore.availableAttributePoints}</div>
+              <div>Total Points: {combatStore.totalAttributePoints}</div>
+              <button
+                onClick={() => combatStore.resetAttributePoints()}
+                className="btn btn-warning btn-sm"
+              >
+                Reset Points
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <h3 className="font-semibold mb-2">Add Available Points</h3>
+            <div className="flex gap-2 items-center">
+              <button
+                onClick={() => combatStore.addAvailablePoints(5)}
+                className="btn btn-sm btn-primary"
+              >
+                +5 Points
+              </button>
+              <button
+                onClick={() => combatStore.addAvailablePoints(10)}
+                className="btn btn-sm btn-primary"
+              >
+                +10 Points
+              </button>
+              <button
+                onClick={() => combatStore.addAvailablePoints(50)}
+                className="btn btn-sm btn-primary"
+              >
+                +50 Points
+              </button>
+            </div>
           </div>
         </div>
       </div>
