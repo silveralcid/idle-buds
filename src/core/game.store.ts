@@ -19,6 +19,7 @@ import { processHatchingTick } from '../features/tending/tending.logic';
 import { useTendingStore } from '../features/tending/tending.store';
 import { useShopStore } from '../features/shop/shop.store';
 import { useAssignmentStore } from '../features/assignment/assignment.store';
+import { useCombatStore } from '../features/combat/combat.store';
 
 interface GameState extends HunterTaskState {
   isInitialLoad: boolean;
@@ -69,6 +70,7 @@ interface GameActions {
           lumbering: useLumberingStore.getState(),
           smithing: useSmithingStore.getState(),
           tending: useTendingStore.getState(),
+          combat: useCombatStore.getState(),
         },
       };
     
@@ -127,6 +129,9 @@ interface GameActions {
           console.log('Tending state loaded:', state.tending);
           useSmithingStore.setState(state.smithing);
           console.log('Smithing state loaded:', state.smithing);
+          useCombatStore.setState(state.combat);
+          console.log('Combat state loaded:', state.combat);
+
           console.groupEnd();
   
           // Pause the game loop after successful load
@@ -239,6 +244,26 @@ interface GameActions {
           },
           recipes: recipeRegistry,
           unlockedRecipes: [],
+        });
+      
+        useCombatStore.setState({
+          id: "combat",
+          name: "Combat",
+          description: "Train your combat abilities and grow stronger.",
+          xp: 0,
+          level: 1,
+          progress: 0,
+          isUnlocked: true,
+          unlockRequirements: undefined,
+          stats: {
+            health: 10,
+            intelligence: 5,
+            attack: 5,
+            defense: 5,
+            dexterity: 5,
+          },
+          availableAttributePoints: 0,
+          totalAttributePoints: 0,
         });
 
   
