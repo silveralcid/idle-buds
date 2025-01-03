@@ -26,6 +26,8 @@ interface EquipmentState {
     intelligence: number;
     dexterity: number;
   };
+
+  reset: () => void;
 }
 
 export const useEquipmentStore = create<EquipmentState>((set, get) => ({
@@ -201,5 +203,9 @@ export const useEquipmentStore = create<EquipmentState>((set, get) => ({
     });
 
     return stats;
-  }
+  },
+
+  reset: () => set(() => ({
+    equipped: {}
+  }))
 }));

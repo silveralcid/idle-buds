@@ -15,6 +15,7 @@ import { useSmithingStore } from '../features/smithing/smithing.store';
 import { recipeRegistry } from '../data/recipe-registry';
 import { useBudBoxStore } from '../features/budbox/budbox.store';
 import { usePartyStore } from '../features/party/party.store';
+import { useEquipmentStore } from '../features/equipment/equipment.store';
 import { processHatchingTick } from '../features/tending/tending.logic';
 import { useTendingStore } from '../features/tending/tending.store';
 import { useShopStore } from '../features/shop/shop.store';
@@ -71,6 +72,7 @@ interface GameActions {
           smithing: useSmithingStore.getState(),
           tending: useTendingStore.getState(),
           combat: useCombatStore.getState(),
+          equipment: useEquipmentStore.getState()
         },
       };
     
@@ -131,6 +133,8 @@ interface GameActions {
           console.log('Smithing state loaded:', state.smithing);
           useCombatStore.setState(state.combat);
           console.log('Combat state loaded:', state.combat);
+          useEquipmentStore.setState(state.equipment);
+          console.log('Combat state loaded:', state.equipment);
 
           console.groupEnd();
   
@@ -183,6 +187,7 @@ interface GameActions {
             assignments: {},
         });
       
+        useEquipmentStore.getState().reset();
 
         useShopStore.setState({
             purchaseItem: (itemId: string, quantity: number) => false,
