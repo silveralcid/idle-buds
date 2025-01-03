@@ -1,7 +1,7 @@
-import { BaseItem } from "../../types/itemBase.types";
+import { equipmentItem } from "../../types/equipment.types";
+import { SlotType } from "../../enums/equipmentSlotType.enums";
 
-
-export const melee: BaseItem[] = [
+export const melee: equipmentItem[] = [
   {
     id: "copper_dagger",
     name: "Copper Dagger",
@@ -12,6 +12,27 @@ export const melee: BaseItem[] = [
     value: 10,
     isStackable: false,
     tags: ["weapon", "melee", "dagger"],
+    slot: "1h-weapon",
+    affinity: null,
+    isEquipped: false,
+    damageType: 'melee',
+    
+    requirements: {
+      level: 1,
+      attributes: {
+        attack: 5
+      }
+    },
+
+    stats: {
+      attack: 2,
+      dexterity: 1
+    },
+
+    statRanges: {
+      attackInterval: [1.8, 2.2],
+      meleeDamage: [2, 4]
+    }
   },
   {
     id: "bronze_dagger",
@@ -23,6 +44,27 @@ export const melee: BaseItem[] = [
     value: 10,
     isStackable: false,
     tags: ["weapon", "melee", "dagger"],
+    slot: "1h-weapon",
+    affinity: null,
+    isEquipped: false,
+    damageType: 'melee',
+    
+    requirements: {
+      level: 1,
+      attributes: {
+        attack: 5
+      }
+    },
+
+    stats: {
+      attack: 2,
+      dexterity: 1
+    },
+
+    statRanges: {
+      attackInterval: [1.8, 2.2],
+      meleeDamage: [2, 4]
+    }
   },
   {
     id: "iron_dagger",
@@ -34,6 +76,27 @@ export const melee: BaseItem[] = [
     value: 20,
     isStackable: false,
     tags: ["weapon", "melee", "dagger"],
+    slot: "1h-weapon",
+    affinity: null,
+    isEquipped: false,
+    damageType: 'melee',
+    
+    requirements: {
+      level: 5,
+      attributes: {
+        attack: 10
+      }
+    },
+
+    stats: {
+      attack: 4,
+      dexterity: 2
+    },
+
+    statRanges: {
+      attackInterval: [1.7, 2.1],
+      meleeDamage: [4, 7]
+    }
   },
   {
     id: "steel_dagger",
@@ -46,6 +109,27 @@ export const melee: BaseItem[] = [
     value: 40,
     isStackable: false,
     tags: ["weapon", "melee", "dagger"],
+    slot: "1h-weapon",
+    affinity: null,
+    isEquipped: false,
+    damageType: 'melee',
+    
+    requirements: {
+      level: 10,
+      attributes: {
+        attack: 15
+      }
+    },
+
+    stats: {
+      attack: 6,
+      dexterity: 3
+    },
+
+    statRanges: {
+      attackInterval: [1.6, 2],
+      meleeDamage: [6, 10]
+    }
   },
   {
     id: "mithril_dagger",
@@ -58,6 +142,27 @@ export const melee: BaseItem[] = [
     value: 80,
     isStackable: false,
     tags: ["weapon", "melee", "dagger"],
+    slot: "1h-weapon",
+    affinity: null,
+    isEquipped: false,
+    damageType: 'melee',
+    
+    requirements: {
+      level: 15,
+      attributes: {
+        attack: 20
+      }
+    },
+
+    stats: {
+      attack: 8,
+      dexterity: 4
+    },
+
+    statRanges: {
+      attackInterval: [1.5, 1.9],
+      meleeDamage: [8, 14]
+    }
   },
   {
     id: "adamantite_dagger",
@@ -70,6 +175,27 @@ export const melee: BaseItem[] = [
     value: 150,
     isStackable: false,
     tags: ["weapon", "melee", "dagger"],
+    slot: "1h-weapon",
+    affinity: null,
+    isEquipped: false,
+    damageType: 'melee',
+    
+    requirements: {
+      level: 20,
+      attributes: {
+        attack: 25
+      }
+    },
+
+    stats: {
+      attack: 10,
+      dexterity: 5
+    },
+
+    statRanges: {
+      attackInterval: [1.4, 1.8],
+      meleeDamage: [10, 18]
+    }
   },
   {
     id: "runite_dagger",
@@ -82,5 +208,26 @@ export const melee: BaseItem[] = [
     value: 250,
     isStackable: false,
     tags: ["weapon", "melee", "dagger"],
+    slot: "1h-weapon",
+    affinity: null,
+    isEquipped: false,
+    damageType: 'melee',
+    
+    requirements: {
+      level: 25,
+      attributes: {
+        attack: 30
+      }
+    },
+
+    stats: {
+      attack: 12,
+      dexterity: 6
+    },
+
+    statRanges: {
+      attackInterval: [1.3, 1.7],
+      meleeDamage: [12, 22]
+    }
   }
 ];
