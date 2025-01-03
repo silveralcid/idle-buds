@@ -13,6 +13,7 @@ import { smeltedItems } from "../data/items/smelted.data";
 import { melee } from "../data/items/melee.data";
 import { eggItems } from "../data/buds/eggItems.data";
 import { GameConfig } from "../core/constants/game-config";
+import { useCombatStore } from "../features/combat/combat.store";
 
 const LevelControls: React.FC<{
   budId: string;
@@ -60,6 +61,7 @@ const TestingView: React.FC = () => {
   const miningStore = useMiningStore();
   const lumberingStore = useLumberingStore();
   const tendingStore = useTendingStore();
+  const combatStore = useCombatStore();
 
   const partyBuds = usePartyStore(state => state.buds);
   const budboxBuds = useBudBoxStore(state => state.buds);
@@ -80,6 +82,9 @@ const TestingView: React.FC = () => {
 
   const handleSkillLevelChange = () => {
     switch (selectedSkill) {
+      case "combat":
+        combatStore.setLevel(skillLevel);
+        break;
       case "smithing":
         smithingStore.setLevel(skillLevel);
         break;
@@ -96,6 +101,9 @@ const TestingView: React.FC = () => {
 
   const handleSetXP = () => {
     switch (selectedSkill) {
+      case "combat":
+        combatStore.setXp(xpAmount);
+        break;
       case "smithing":
         smithingStore.setXp(xpAmount);
         break;
@@ -113,6 +121,9 @@ const TestingView: React.FC = () => {
 
   const handleMaxLevel = () => {
     switch (selectedSkill) {
+      case "combat":
+        combatStore.setLevel(GameConfig.EXPERIENCE.MAX_LEVEL)
+        break;
       case "smithing":
         smithingStore.setLevel(GameConfig.EXPERIENCE.MAX_LEVEL);
         break;
@@ -176,6 +187,7 @@ const TestingView: React.FC = () => {
             onChange={(e) => setSelectedSkill(e.target.value)}
             className="w-full mb-2 p-2 border rounded"
           >
+            <option value="combat">Combat</option>
             <option value="mining">Mining</option>
             <option value="smithing">Smithing</option>
             <option value="lumbering">Lumbering</option>
