@@ -4,6 +4,7 @@ type TickConfig = {
     DEFAULT: number;
     MAX: number;
     MIN: number;
+    COMBAT: number;
   };
   DURATION: number;
 };
@@ -29,7 +30,8 @@ export const GameConfig = {
     RATE: {
       DEFAULT: 20,
       MAX: 60,
-      MIN: 1
+      MIN: 1,
+      COMBAT: 50,
     },
     get DURATION() {
       return 1000 / this.RATE.DEFAULT;

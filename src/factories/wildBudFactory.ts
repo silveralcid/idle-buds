@@ -33,7 +33,8 @@ export function createWildBudInstance(base: budBase, options: WildBudOptions = {
   // Calculate scaled stats based on effective level
   const scaledStats = calculateWildBudStats(base, effectiveLevel, difficultyMultiplier, isBoss);
   
-  const maxHealth = scaledStats.health;
+  // Ensure proper health values
+  const maxHealth = Math.max(10, scaledStats.health);
 
   const wildBud = {
     ...base,
