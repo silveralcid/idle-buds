@@ -180,6 +180,8 @@ interface GameActions {
         usePartyStore.setState({
             buds: {},
             selectedBudId: null,
+            MAX_PARTY_SIZE: GameConfig.BUD.STORAGE.PARTY_CAPACITY,
+
         }); 
       
         useAssignmentStore.setState({

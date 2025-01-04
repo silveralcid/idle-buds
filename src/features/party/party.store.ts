@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { budInstance } from '../../types/budInstance.types';
 import { budBase } from '../../types/budBase.types';
 import { createBudInstance } from '../../factories/budFactory';
+import { GameConfig } from '../../core/constants/game-config';
 
 interface PartyState {
   buds: Record<string, budInstance>;
@@ -23,7 +24,7 @@ interface PartyState {
 export const usePartyStore = create<PartyState>((set, get) => ({
   buds: {},
   selectedBudId: null,
-  MAX_PARTY_SIZE: 6,
+  MAX_PARTY_SIZE: GameConfig.BUD.STORAGE.PARTY_CAPACITY,
 
   addBud: (bud: budInstance) => {
     const state = get();

@@ -63,7 +63,7 @@ export const GameConfig = {
   BUD: {
     STORAGE: {
       BOX_CAPACITY: 100,
-      PARTY_CAPACITY: 2,
+      PARTY_CAPACITY: 5,
       MAX_ASSIGNED_PER_NODE: 1
     },
     STAT_MULTIPLIERS: {
